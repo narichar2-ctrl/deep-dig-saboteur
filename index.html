@@ -661,22 +661,20 @@ body::after{width:260px;height:260px;right:-90px;bottom:8%;background:radial-gra
 @media(max-width:1300px){:root{--board-cell:48px}.v11-layout{grid-template-columns:205px minmax(0,1fr) 300px}.v11-hand-panel .gcard{height:108px!important}}
 @media(max-width:980px){:root{--board-cell:clamp(38px,9.3vw,52px)}.v11-center .board-wrap{overflow:auto!important}.v11-hand-panel .hand{grid-template-columns:repeat(6,90px)!important}.v11-right{order:0}.v11-center{order:1}.v11-left{order:2}}
 
-</style>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 
-<style>
-/* V14 functional layout */
-:root{--board-cell:clamp(40px,4.2vw,54px)!important}
-#app{max-width:1220px!important;margin:0 auto!important;padding:10px 12px 28px!important}
-.v11-layout{grid-template-columns:190px minmax(0,1fr) 300px!important;gap:12px!important}
+/* V14 stability + sizing */
+:root{--board-cell:clamp(44px,3.55vw,58px)!important}
+#app{max-width:1320px!important;padding:10px 12px 36px!important}
+.v11-layout{grid-template-columns:210px minmax(0,1fr) 320px!important;gap:12px!important}
+.v11-center .board-wrap{overflow:hidden!important;padding:10px!important}
 .v11-center .board{gap:3px!important}
-.gcard,.cell{cursor:pointer!important}
-.gcard.disabled{opacity:.55!important;cursor:not-allowed!important}
-.gcard.selected{outline:4px solid #42b8ff!important;transform:translateY(-5px)!important}
-.cell.path-valid-now,.cell.placeable{outline:4px solid #54d86b!important;box-shadow:0 0 0 4px #caffcc,0 0 18px #4cff7c!important;cursor:pointer!important}
-@media(max-width:1100px){.v11-layout{grid-template-columns:170px minmax(0,1fr) 270px!important}:root{--board-cell:44px!important}}
-@media(max-width:900px){.v11-layout{grid-template-columns:1fr!important}.v11-left,.v11-right{display:block!important}.v11-center{order:1}.v11-right{order:2}.v11-left{order:3}}
+.v11-hand-panel .gcard{cursor:pointer!important;pointer-events:auto!important;position:relative!important;z-index:2!important}
+.v11-hand-panel .gcard:not(:disabled):active{transform:translateY(-1px) scale(.98)!important}
+.v11-role-art{height:165px!important;overflow:hidden!important}
+.v11-role-art .role-design-img{width:100%!important;height:158px!important;max-width:100%!important;max-height:158px!important;object-fit:contain!important;object-position:center!important}
+.v11-version{background:#2d7a49!important;color:#fff!important}
+@media(max-width:1200px){:root{--board-cell:46px!important}.v11-layout{grid-template-columns:190px minmax(0,1fr) 290px!important}}
+@media(max-width:980px){.v11-layout{grid-template-columns:1fr!important}.v11-center .board-wrap{overflow:auto!important}.v11-right,.v11-left{position:static!important}}
 </style>
 </head>
 <body>
@@ -719,6 +717,11 @@ const APP_VERSION = 'V14';
 /* ============================== STATE ============================== */
 let myId = sessionStorage.getItem('deepDigPlayerId') || crypto.randomUUID();
 sessionStorage.setItem('deepDigPlayerId', myId);
+function newPlayerIdentity(){
+  myId = crypto.randomUUID();
+  sessionStorage.setItem('deepDigPlayerId', myId);
+  return myId;
+}
 let myName = '';
 let roomCode = null;
 let room = null; // latest fetched room object
@@ -756,114 +759,106 @@ function showToast(msg, ms=2600){
 }
 
 /* ============================== FIREBASE REALTIME DATABASE ============================== */
+// ใช้ Firebase Realtime Database ผ่าน REST API เพื่อให้ GitHub Pages เล่นข้ามเครื่องได้
+// Project: deep-dig-saboteur / Region: asia-southeast1 (Singapore)
 const FIREBASE_DB_URL = 'https://deep-dig-saboteur-default-rtdb.asia-southeast1.firebasedatabase.app';
-const firebaseConfig = {
-  projectId: 'deep-dig-saboteur',
-  databaseURL: FIREBASE_DB_URL
-};
-let firebaseReady = false;
-let db = null;
-let roomListenerRef = null;
-let roomListenerFn = null;
-try{
-  if(typeof firebase !== 'undefined'){
-    if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    db = firebase.database();
-    firebaseReady = true;
-  }
-}catch(e){ console.error('Firebase init failed', e); }
 
-function firebaseRoomKey(code){ return ROOM_PREFIX + String(code||'').toUpperCase(); }
-function firebaseRoomRef(code){
-  if(!firebaseReady || !db) throw new Error('Firebase ยังไม่พร้อม');
-  return db.ref(firebaseRoomKey(code));
+function firebaseRoomUrl(code){
+  const key = ROOM_PREFIX + String(code || '').toUpperCase();
+  return `${FIREBASE_DB_URL}/${encodeURIComponent(key)}.json`;
 }
-function roomSnapshot(r){ try{return JSON.stringify(r);}catch(e){return '';} }
+
+async function fetchWithTimeout(url, options={}, timeoutMs=10000){
+  const controller = new AbortController();
+  const timer = setTimeout(()=>controller.abort(), timeoutMs);
+  try{
+    return await fetch(url, { ...options, signal: controller.signal, cache:'no-store' });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function roomSnapshot(r){
+  try { return JSON.stringify(r); } catch(e) { return ''; }
+}
 
 async function saveRoom(newRoom){
   try{
-    newRoom.rev = Number(newRoom.rev||0)+1;
+    newRoom.rev = Number(newRoom.rev || 0) + 1;
     newRoom.updatedAt = Date.now();
-    await firebaseRoomRef(newRoom.code).set(newRoom);
-    room = structuredClone(newRoom);
-    lastRoomSnapshot = roomSnapshot(room);
-    lastRemoteUpdateAt = Date.now();
+    const res = await fetchWithTimeout(firebaseRoomUrl(newRoom.code), {
+      method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(newRoom)
+    });
+    if(!res.ok){ throw new Error(`Firebase ${res.status}`); }
+    room = newRoom; lastRoomSnapshot = roomSnapshot(newRoom); lastRemoteUpdateAt = Date.now();
     return true;
-  }catch(e){
-    console.error('Firebase save error',e);
-    showToast('เชื่อมต่อห้องออนไลน์ไม่ได้');
-    return false;
-  }
+  }catch(e){ console.error(e); showToast('เชื่อมต่อห้องออนไลน์ไม่ได้'); return false; }
 }
 
 async function loadRoom(code){
   try{
-    const snap = await firebaseRoomRef(code).once('value');
-    return snap.exists() ? snap.val() : null;
-  }catch(e){ console.error('Firebase load error',e); return null; }
+    const res = await fetchWithTimeout(firebaseRoomUrl(code), {method:'GET',cache:'no-store'});
+    if(!res.ok) return null;
+    return (await res.json()) || null;
+  }catch(e){ console.error(e); return null; }
 }
 
 async function atomicRoomUpdate(code, updater){
+  // V14: intentionally avoid ETag/custom headers here. Those headers can fail
+  // CORS preflight on a static GitHub Pages site and were the reason Join/Start
+  // became unreliable in V13. The game is turn-based, so a fresh GET followed
+  // by one PUT is predictable and works well for small private rooms.
   try{
-    let finalRoom = null;
-    const result = await firebaseRoomRef(code).transaction(current=>{
-      if(current==null) return;
-      const next = structuredClone(current);
-      const outcome = updater(next);
-      if(outcome===false) return;
-      next.rev = Number(current.rev||0)+1;
-      next.updatedAt = Date.now();
-      finalRoom = next;
-      return next;
-    }, undefined, false);
-    if(!result.committed) return {ok:false,reason:'cancelled',room:result.snapshot?.val?.()||null};
-    const saved = result.snapshot.val();
-    room = saved;
-    lastRoomSnapshot = roomSnapshot(saved);
-    lastRemoteUpdateAt = Date.now();
-    return {ok:true,room:saved};
+    const current = await loadRoom(code);
+    if(!current) return {ok:false,reason:'missing'};
+    const next = structuredClone(current);
+    const result = updater(next);
+    if(result===false) return {ok:false,reason:'cancelled',room:current};
+    next.rev = Number(current.rev||0)+1;
+    next.updatedAt = Date.now();
+    const ok = await saveRoom(next);
+    return ok ? {ok:true,room:next} : {ok:false,reason:'save'};
   }catch(e){
-    console.error('Firebase transaction error',e);
-    return {ok:false,reason:e.message};
+    console.error('room update failed',e);
+    return {ok:false,reason:e?.message||'update'};
   }
 }
 
 function stopRoomSync(){
   clearInterval(pollTimer); pollTimer=null; pollBusy=false;
-  if(roomListenerRef && roomListenerFn){ try{roomListenerRef.off('value',roomListenerFn);}catch(e){} }
-  roomListenerRef=null; roomListenerFn=null;
+}
+function applyRemoteRoom(fresh){
+  if(!fresh) return;
+  const snap=roomSnapshot(fresh);
+  if(snap===lastRoomSnapshot) return;
+  const keep=shouldKeepSelection(fresh);
+  const oldPhase=room?.phase;
+  room=fresh; lastRoomSnapshot=snap; lastRemoteUpdateAt=Date.now();
+  if(!keep){ui.selectedCardUid=null;ui.rotation=0;ui.targetMode=null;}
+  if(oldPhase==='lobby' && fresh.phase==='playing') ui.screen='game';
+  render();
 }
 function shouldKeepSelection(fresh){
   if(!ui.selectedCardUid || fresh?.phase!=='playing' || !fresh?.game) return false;
   const hand=fresh.game.hands?.[myId]||[];
   return hand.some(c=>c.uid===ui.selectedCardUid) && currentPlayerId(fresh)===myId;
 }
-function applyRemoteRoom(fresh){
-  if(!fresh) return;
-  const snap=roomSnapshot(fresh);
-  if(snap===lastRoomSnapshot) return;
-  const oldPhase=room?.phase;
-  const keep=shouldKeepSelection(fresh);
-  room=fresh; lastRoomSnapshot=snap; lastRemoteUpdateAt=Date.now();
-  if(!keep){ui.selectedCardUid=null;ui.rotation=0;ui.targetMode=null;}
-  if(oldPhase==='lobby' && fresh.phase==='playing') ui.screen='game';
-  render();
+async function pollLoop(){
+  if(!roomCode||pollBusy)return;
+  pollBusy=true;
+  try{
+    const fresh=await loadRoom(roomCode);
+    if(fresh) applyRemoteRoom(fresh);
+  }finally{pollBusy=false;}
 }
 function startPolling(){
   stopRoomSync();
-  if(!roomCode || !firebaseReady) return;
   lastRoomSnapshot=roomSnapshot(room);
-  roomListenerRef=firebaseRoomRef(roomCode);
-  roomListenerFn=snap=>{
-    if(snap.exists()) applyRemoteRoom(snap.val());
-  };
-  roomListenerRef.on('value',roomListenerFn,err=>console.error('Firebase listener error',err));
-  // fallback heartbeat in case a browser suspends the realtime socket
-  pollTimer=setInterval(async()=>{
-    if(pollBusy||!roomCode)return; pollBusy=true;
-    try{const fresh=await loadRoom(roomCode); if(fresh) applyRemoteRoom(fresh);}finally{pollBusy=false;}
-  },4000);
+  pollLoop();
+  pollTimer=setInterval(pollLoop,700);
 }
+window.addEventListener('focus',()=>{ if(roomCode) pollLoop(); });
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden && roomCode) pollLoop(); });
 
 /* ============================== GAME SETUP ============================== */
 function buildDeck(){
@@ -1237,6 +1232,7 @@ function renderHome(){
 function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 
 async function createRoom(){
+  newPlayerIdentity();
   const nameInput=document.getElementById('nameInput'); myName=(nameInput?.value||'').trim()||'Player';
   const code=genRoomCode();
   const newRoom={code,players:[{id:myId,name:myName,gold:0,isHost:true}],phase:'lobby',round:1,log:[`${myName} สร้างห้อง ${code}`],game:null,rev:0,updatedAt:Date.now()};
@@ -1244,6 +1240,7 @@ async function createRoom(){
   if(ok){sessionStorage.setItem('deepDigRoomCode',code);sessionStorage.setItem('deepDigPlayerName',myName);ui.screen='lobby';startPolling();render();}
 }
 async function joinRoom(){
+  newPlayerIdentity();
   const nameInput=document.getElementById('nameInput'),codeInput=document.getElementById('codeInput');
   myName=(nameInput?.value||'').trim()||'Player'; const code=(codeInput?.value||'').trim().toUpperCase();
   if(code.length!==4){document.getElementById('homeError').textContent='กรอกโค้ดห้อง 4 ตัวอักษร';return;}
@@ -1256,7 +1253,7 @@ async function joinRoom(){
     }
     return true;
   });
-  if(!result.ok){document.getElementById('homeError').textContent='เข้าห้องไม่สำเร็จ กรุณาลองอีกครั้ง';return;}
+  if(!result.ok){const msg=result.reason==='missing'?'ไม่พบห้องนี้ กรุณาตรวจรหัสอีกครั้ง':result.reason==='started'?'เกมเริ่มไปแล้ว เข้าร่วมไม่ได้':result.reason==='full'?'ห้องเต็มแล้ว':'เข้าห้องไม่สำเร็จ กรุณาลองอีกครั้ง';document.getElementById('homeError').textContent=msg;return;}
   roomCode=code; room=result.room; sessionStorage.setItem('deepDigRoomCode',code);sessionStorage.setItem('deepDigPlayerName',myName);
   ui.screen=room.phase==='lobby'?'lobby':'game'; startPolling(); render();
 }
@@ -1343,7 +1340,7 @@ function renderCell(r, x, y){
   }
   if(ui.targetMode==='rockfall' && r.game.board[key] && key!==START_POS){ cls += ' target-select'; }
   if(ui.targetMode==='map' && GOAL_POS.includes(key)){ cls += ' target-select'; }
-  return `<div class="${cls}" data-x="${x}" data-y="${y}" data-key="${key}" onclick="playBoardCell(${x},${y})">${stubs}${content}</div>`;
+  return `<div class="${cls}" data-x="${x}" data-y="${y}" data-key="${key}" onclick="cellClickDirect(${x},${y},'${key}')">${stubs}${content}</div>`;
 }
 function renderBoard(r){
   let cells = '';
@@ -1404,7 +1401,7 @@ function renderHand(r){
     let extraCls = c.kind==='action' ? (c.type==='break'?'action sab':(c.type==='repair'?'action fix':'action')) : '';
     const visual = isPath ? renderPathTile(c, selected ? ui.rotation : 0) : `<div class="icon">${cardIcon(c)}</div>`;
     const reason = blockedByTool ? 'เครื่องมือคุณเสีย จึงเล่นไพ่ทางเดินไม่ได้' : (!isMyTurn ? 'ยังไม่ถึงตาของคุณ' : 'คลิกเพื่อเลือกไพ่');
-    return `<button type="button" class="gcard ${extraCls} ${selected?'selected':''} ${disabled?'disabled':''}" data-uid="${c.uid}" data-card-select="1" title="${reason}" aria-pressed="${selected?'true':'false'}" onclick="selectCardByUid('${c.uid}')">
+    return `<button type="button" class="gcard ${extraCls} ${selected?'selected':''} ${disabled?'disabled':''}" data-uid="${c.uid}" data-card-select="1" onclick="selectCardDirect('${c.uid}')" title="${reason}" aria-pressed="${selected?'true':'false'}" ${disabled?'disabled':''}>
       ${visual}
       <div class="card-name">${cardLabel(c)}</div>
       <div class="card-kind">${isPath ? (selected ? `หมุน ${ui.rotation*90}°` : 'ไพ่ทางเดิน') : 'ไพ่คำสั่ง'}</div>
@@ -1553,7 +1550,7 @@ function renderGame(){
   }
 
   const heroAvatars=r.players.slice(0,3).map(p=>avatarFor(p.id)).join('');
-  return `<div class="v11-version">${APP_VERSION} • SYNC</div>
+  return `<div class="v11-version">${APP_VERSION} • STABLE</div>
     <header class="v11-hero">
       <div class="v11-logo"><strong>DEEP DIG</strong><span>SABOTEUR</span><em>ขุด สนุก ลุ้น โพรงลับ! 💎</em></div>
       <div class="v11-hero-miners">${heroAvatars}<div class="v11-spark">✨</div></div>
@@ -1611,65 +1608,46 @@ function renderPeekModal(){
 }
 
 
-function handlePathCellClick(elm){
+function selectCardDirect(uidv){
   if(!room || room.phase!=='playing') return;
-  if(currentPlayerId(room)!==myId){ showToast('⏳ ยังไม่ถึงตาของคุณ'); return; }
-  const selected = getSelectedCard();
-  if(!selected){ showToast('🃏 เลือกไพ่ทางเดินก่อน'); return; }
-  if(selected.kind!=='path') return;
-  const x = Number(elm.getAttribute('data-x'));
-  const y = Number(elm.getAttribute('data-y'));
-  const key = elm.getAttribute('data-key');
-  if(!Number.isFinite(x)||!Number.isFinite(y)) return;
-  const conn = rotateConn(PATH_SHAPES[selected.type], ui.rotation);
-  if(!canPlaceAt(room,x,y,conn)){
-    if(key!==START_POS && !room.game.board[key] && !room.game.goals[key]){
-      showToast('❌ ช่องนี้ต่อไม่ได้ — กดหมุนไพ่ หรือเลือกช่องสีเขียว');
-    }
-    return;
-  }
-  const uidToPlay = selected.uid;
-  const rotationToPlay = ui.rotation;
-  submitAction(r=>doPlacePath(r, uidToPlay, x, y, rotationToPlay), null);
-}
-
-
-function selectCardByUid(uidv){
-  if(!room || room.phase!=='playing') return;
-  if(currentPlayerId(room)!==myId){ showToast(`⏳ ตอนนี้เป็นตาของ ${playerName(room,currentPlayerId(room))}`); return; }
+  if(currentPlayerId(room)!==myId){showToast(`⏳ ตอนนี้เป็นตาของ ${playerName(room,currentPlayerId(room))}`);return;}
   const hand=room.game?.hands?.[myId]||[];
   const card=hand.find(c=>c.uid===uidv);
-  if(!card){ showToast('หาไพ่ใบนี้ไม่เจอ ลองรีเฟรชหน้า'); return; }
+  if(!card){showToast('ไม่พบไพ่ใบนี้ในมือ');return;}
   const broken=room.game?.brokenTools?.[myId]||[];
-  if(card.kind==='path' && broken.length){ showToast('🔧 เครื่องมือเสียอยู่ จึงวางไพ่ทางไม่ได้'); return; }
-  ui.selectedCardUid=(ui.selectedCardUid===uidv)?null:uidv;
+  if(card.kind==='path' && broken.length){showToast('🛠️ เครื่องมือเสียอยู่ จึงยังวางทางไม่ได้');return;}
+  ui.selectedCardUid = ui.selectedCardUid===uidv ? null : uidv;
   ui.targetMode=null;
-  ui.rotation=card.kind==='path'?bestRotationForCard(room,card):0;
-  if(card.kind==='action'){
-    if(card.type==='rockfall') ui.targetMode='rockfall';
-    else if(card.type==='map') ui.targetMode='map';
-    else if(card.type==='break') ui.targetMode='break';
-    else if(card.type==='repair') ui.targetMode='repair';
-  }
+  ui.rotation = (ui.selectedCardUid && card.kind==='path') ? bestRotationForCard(room,card) : 0;
   render();
 }
 
-function playBoardCell(x,y){
+function cellClickDirect(x,y,key){
   if(!room || room.phase!=='playing') return;
-  if(currentPlayerId(room)!==myId){ showToast('⏳ ยังไม่ถึงตาของคุณ'); return; }
-  const key=cellKey(Number(x),Number(y));
+  if(currentPlayerId(room)!==myId){showToast(`⏳ ตอนนี้เป็นตาของ ${playerName(room,currentPlayerId(room))}`);return;}
   const selected=getSelectedCard();
-  if(!selected){ showToast('🃏 เลือกไพ่ก่อน'); return; }
+  if(!selected){
+    if(key===START_POS) showToast('🏡 จุดเริ่มต้นของเหมือง');
+    else if(GOAL_POS.includes(key)) showToast('🎁 โพรงลับ ใช้ไพ่แผนที่เพื่อแอบดูได้');
+    else showToast('🃏 เลือกไพ่จากด้านขวาก่อน');
+    return;
+  }
   if(selected.kind==='path'){
     const conn=rotateConn(PATH_SHAPES[selected.type],ui.rotation);
-    if(!canPlaceAt(room,Number(x),Number(y),conn)){
-      showToast('❌ ช่องนี้ต่อไม่ได้ — ลองหมุนไพ่หรือเลือกช่องสีเขียว'); return;
+    if(!canPlaceAt(room,x,y,conn)){
+      showToast('❌ ช่องนี้ต่อไม่ได้ — ลองหมุนไพ่ หรือเลือกช่องสีเขียว');
+      return;
     }
     const uidv=selected.uid,rot=ui.rotation;
-    submitAction(r=>doPlacePath(r,uidv,Number(x),Number(y),rot),null); return;
+    submitAction(r=>doPlacePath(r,uidv,x,y,rot),null);
+    return;
   }
-  if(selected.type==='rockfall' && room.game.board[key] && key!==START_POS){submitAction(r=>doRockfall(r,selected.uid,Number(x),Number(y)),null);return;}
-  if(selected.type==='map' && GOAL_POS.includes(key)){submitAction(r=>doMap(r,selected.uid,key),null);return;}
+  if(selected.type==='rockfall' && room.game.board[key] && key!==START_POS && !GOAL_POS.includes(key)){
+    submitAction(r=>doRockfall(r,selected.uid,x,y),null); return;
+  }
+  if(selected.type==='map' && GOAL_POS.includes(key)){
+    submitAction(r=>doMap(r,selected.uid,key),null); return;
+  }
 }
 
 function attachHandlers(){

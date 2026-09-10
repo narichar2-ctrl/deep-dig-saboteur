@@ -662,7 +662,7 @@ body::after{width:260px;height:260px;right:-90px;bottom:8%;background:radial-gra
 @media(max-width:980px){:root{--board-cell:clamp(38px,9.3vw,52px)}.v11-center .board-wrap{overflow:auto!important}.v11-hand-panel .hand{grid-template-columns:repeat(6,90px)!important}.v11-right{order:0}.v11-center{order:1}.v11-left{order:2}}
 
 
-/* V14 stability + sizing */
+/* V15 join + normalization stability */
 :root{--board-cell:clamp(44px,3.55vw,58px)!important}
 #app{max-width:1320px!important;padding:10px 12px 36px!important}
 .v11-layout{grid-template-columns:210px minmax(0,1fr) 320px!important;gap:12px!important}
@@ -712,7 +712,7 @@ const DECK_RECIPE = [
 ];
 const HAND_SIZE = 6;
 const MAX_ROUNDS = 3;
-const APP_VERSION = 'V14';
+const APP_VERSION = 'V15';
 
 /* ============================== STATE ============================== */
 let myId = sessionStorage.getItem('deepDigPlayerId') || crypto.randomUUID();
@@ -795,16 +795,35 @@ async function saveRoom(newRoom){
   }catch(e){ console.error(e); showToast('เชื่อมต่อห้องออนไลน์ไม่ได้'); return false; }
 }
 
+function normalizeRoomData(data){
+  if(!data || typeof data!=='object') return null;
+  // Firebase may return numeric-key collections as objects after partial writes.
+  // Normalize the structures that the UI/game expects to be arrays.
+  if(!Array.isArray(data.players)) data.players = data.players ? Object.values(data.players) : [];
+  if(!Array.isArray(data.log)) data.log = data.log ? Object.values(data.log) : [];
+  if(data.game){
+    const g=data.game;
+    if(!Array.isArray(g.turnOrder)) g.turnOrder = g.turnOrder ? Object.values(g.turnOrder) : [];
+    if(g.hands && typeof g.hands==='object'){
+      Object.keys(g.hands).forEach(k=>{ if(!Array.isArray(g.hands[k])) g.hands[k]=g.hands[k]?Object.values(g.hands[k]):[]; });
+    }
+    if(g.brokenTools && typeof g.brokenTools==='object'){
+      Object.keys(g.brokenTools).forEach(k=>{ if(!Array.isArray(g.brokenTools[k])) g.brokenTools[k]=g.brokenTools[k]?Object.values(g.brokenTools[k]):[]; });
+    }
+  }
+  return data;
+}
+
 async function loadRoom(code){
   try{
     const res = await fetchWithTimeout(firebaseRoomUrl(code), {method:'GET',cache:'no-store'});
-    if(!res.ok) return null;
-    return (await res.json()) || null;
-  }catch(e){ console.error(e); return null; }
+    if(!res.ok){ console.error('Firebase GET',res.status); return null; }
+    return normalizeRoomData((await res.json()) || null);
+  }catch(e){ console.error('Firebase load error',e); return null; }
 }
 
 async function atomicRoomUpdate(code, updater){
-  // V14: intentionally avoid ETag/custom headers here. Those headers can fail
+  // V15: intentionally avoid ETag/custom headers here. Those headers can fail
   // CORS preflight on a static GitHub Pages site and were the reason Join/Start
   // became unreliable in V13. The game is turn-based, so a fresh GET followed
   // by one PUT is predictable and works well for small private rooms.
@@ -1240,22 +1259,56 @@ async function createRoom(){
   if(ok){sessionStorage.setItem('deepDigRoomCode',code);sessionStorage.setItem('deepDigPlayerName',myName);ui.screen='lobby';startPolling();render();}
 }
 async function joinRoom(){
-  newPlayerIdentity();
+  if(ui.loading) return;
   const nameInput=document.getElementById('nameInput'),codeInput=document.getElementById('codeInput');
-  myName=(nameInput?.value||'').trim()||'Player'; const code=(codeInput?.value||'').trim().toUpperCase();
-  if(code.length!==4){document.getElementById('homeError').textContent='กรอกโค้ดห้อง 4 ตัวอักษร';return;}
-  const result=await atomicRoomUpdate(code,fresh=>{
-    if(fresh.phase!=='lobby'&&!fresh.players.some(p=>p.id===myId)) throw new Error('started');
-    const existing=fresh.players.find(p=>p.id===myId);
-    if(existing){existing.name=myName;} else {
-      if(fresh.players.length>=10) throw new Error('full');
-      fresh.players.push({id:myId,name:myName,gold:0,isHost:false}); pushLog(fresh,`${myName} เข้าร่วมห้อง`);
+  myName=(nameInput?.value||'').trim()||'Player';
+  const code=(codeInput?.value||'').trim().toUpperCase().replace(/\s+/g,'');
+  const errEl=document.getElementById('homeError');
+  if(code.length!==4){ if(errEl) errEl.textContent='กรอกโค้ดห้อง 4 ตัวอักษร'; return; }
+
+  ui.loading=true;
+  if(errEl) errEl.textContent='กำลังเข้าห้อง...';
+  try{
+    let fresh=await loadRoom(code);
+    if(!fresh){ if(errEl) errEl.textContent='ไม่พบห้องนี้ หรือเชื่อมต่อ Firebase ไม่ได้'; return; }
+    fresh=normalizeRoomData(fresh);
+    if(fresh.phase!=='lobby'){ if(errEl) errEl.textContent='เกมเริ่มไปแล้ว เข้าร่วมไม่ได้'; return; }
+    if(fresh.players.length>=10){ if(errEl) errEl.textContent='ห้องเต็มแล้ว'; return; }
+
+    // Create the identity only after the room has been verified. This makes retries stable.
+    newPlayerIdentity();
+    fresh.players.push({id:myId,name:myName,gold:0,isHost:false});
+    pushLog(fresh,`${myName} เข้าร่วมห้อง`);
+
+    let ok=await saveRoom(fresh);
+    // One retry with a fresh snapshot protects against a near-simultaneous join.
+    if(!ok){
+      const retry=await loadRoom(code);
+      if(retry && retry.phase==='lobby'){
+        const r=normalizeRoomData(retry);
+        if(!r.players.some(p=>p.id===myId)){
+          if(r.players.length>=10){ if(errEl) errEl.textContent='ห้องเต็มแล้ว'; return; }
+          r.players.push({id:myId,name:myName,gold:0,isHost:false});
+          pushLog(r,`${myName} เข้าร่วมห้อง`);
+        }
+        ok=await saveRoom(r);
+        if(ok) fresh=r;
+      }
     }
-    return true;
-  });
-  if(!result.ok){const msg=result.reason==='missing'?'ไม่พบห้องนี้ กรุณาตรวจรหัสอีกครั้ง':result.reason==='started'?'เกมเริ่มไปแล้ว เข้าร่วมไม่ได้':result.reason==='full'?'ห้องเต็มแล้ว':'เข้าห้องไม่สำเร็จ กรุณาลองอีกครั้ง';document.getElementById('homeError').textContent=msg;return;}
-  roomCode=code; room=result.room; sessionStorage.setItem('deepDigRoomCode',code);sessionStorage.setItem('deepDigPlayerName',myName);
-  ui.screen=room.phase==='lobby'?'lobby':'game'; startPolling(); render();
+    if(!ok){ if(errEl) errEl.textContent='เข้าห้องไม่สำเร็จ: Firebase ปฏิเสธการเขียนข้อมูล'; return; }
+
+    roomCode=code; room=fresh;
+    sessionStorage.setItem('deepDigRoomCode',code);
+    sessionStorage.setItem('deepDigPlayerName',myName);
+    ui.screen='lobby';
+    startPolling();
+    render();
+  }catch(e){
+    console.error('joinRoom',e);
+    if(errEl) errEl.textContent='เข้าห้องไม่สำเร็จ: '+(e?.message||'unknown error');
+  }finally{
+    ui.loading=false;
+  }
 }
 
 /* ============================== SCREENS: LOBBY ============================== */

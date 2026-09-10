@@ -714,7 +714,7 @@ const DECK_RECIPE = [
 ];
 const HAND_SIZE = 6;
 const MAX_ROUNDS = 3;
-const APP_VERSION = 'V18';
+const APP_VERSION = 'V19';
 
 /* ============================== STATE ============================== */
 let myId = sessionStorage.getItem('deepDigPlayerId') || crypto.randomUUID();
@@ -1493,15 +1493,17 @@ function renderHand(r){
     const isPath = c.kind==='path';
     const blockedByTool = isPath && myBroken.length>0;
     const selected = ui.selectedCardUid===c.uid;
-    const disabled = !isMyTurn || blockedByTool;
+    // V19: a broken tool must NOT make the whole path card unclickable.
+    // The player can still select the card and discard it to end the turn.
+    const disabled = !isMyTurn;
     let extraCls = c.kind==='action' ? (c.type==='break'?'action sab':(c.type==='repair'?'action fix':'action')) : '';
     const visual = isPath ? renderPathTile(c, selected ? ui.rotation : 0) : `<div class="icon">${cardIcon(c)}</div>`;
-    const reason = blockedByTool ? 'เครื่องมือคุณเสีย จึงเล่นไพ่ทางเดินไม่ได้' : (!isMyTurn ? 'ยังไม่ถึงตาของคุณ' : 'คลิกเพื่อเลือกไพ่');
+    const reason = !isMyTurn ? 'ยังไม่ถึงตาของคุณ' : (blockedByTool ? 'เครื่องมือเสีย: เลือกไพ่ได้ แต่ต้องทิ้งหรือซ่อมก่อนวางทาง' : 'คลิกเพื่อเลือกไพ่');
     return `<button type="button" class="gcard ${extraCls} ${selected?'selected':''} ${disabled?'disabled':''}" data-uid="${c.uid}" data-card-select="1" onclick="selectCardDirect('${c.uid}')" title="${reason}" aria-pressed="${selected?'true':'false'}" ${disabled?'disabled':''}>
       ${visual}
       <div class="card-name">${cardLabel(c)}</div>
       <div class="card-kind">${isPath ? (selected ? `หมุน ${ui.rotation*90}°` : 'ไพ่ทางเดิน') : 'ไพ่คำสั่ง'}</div>
-      ${!disabled ? `<div class="card-select-hint">${selected?'✓ เลือกแล้ว':'แตะเพื่อเลือก'}</div>` : ''}
+      ${!disabled ? `<div class="card-select-hint">${selected?'✓ เลือกแล้ว':(blockedByTool?'เลือกเพื่อทิ้ง':'แตะเพื่อเลือก')}</div>` : ''}
     </button>`;
   }).join('');
   return `<div class="hand-head"><div class="hand-title">🃏 ไพ่ในมือของคุณ</div><div class="hand-count">${myHand.length} ใบ</div></div><div class="hand">${cards}</div>`;
@@ -1614,13 +1616,22 @@ function renderGame(){
   if(r.phase==='playing'){
     if(isMyTurn && selectedCard){
       if(selectedCard.kind==='path'){
+        const brokenNow=g?.brokenTools?.[myId]||[];
         const previewConn=rotateConn(PATH_SHAPES[selectedCard.type], ui.rotation);
-        const valid=countValidPathTargets(r, previewConn);
-        controls=`<div class="v11-action-title">เลือกตำแหน่งวางทาง</div>
-          <div class="rotation-preview">${renderPathTile(selectedCard,ui.rotation,'path-preview-tile')}<div class="rotation-preview-info"><strong>${cardLabel(selectedCard)}</strong><span class="rotation-deg">${['↑','→','↓','←'][ui.rotation]} ${ui.rotation*90}°</span><span class="connection-text">${connectionLabel(previewConn)}</span></div></div>
-          <div class="rotate-row"><button class="small" id="btnRotateL">⟲ หมุนซ้าย</button><button class="small" id="btnRotateR">หมุนขวา ⟳</button><button class="ghost small" id="btnDiscardSelected">ทิ้งใบนี้</button><button class="ghost small" id="btnCancelSel">ยกเลิก</button></div>
-          <div class="place-status ${valid?'ok':'warn'}">${valid?`🟢 มี ${valid} ช่องที่วางได้ — คลิกช่องสีเขียวบนกระดาน`:'🟠 มุมนี้วางไม่ได้ กดหมุนไพ่ 90°'}</div>`;
-        ui.targetMode='place';
+        const valid=brokenNow.length ? 0 : countValidPathTargets(r, previewConn);
+        if(brokenNow.length){
+          controls=`<div class="v11-action-title">🛠️ เครื่องมือของคุณเสีย</div>
+            <div class="rotation-preview">${renderPathTile(selectedCard,ui.rotation,'path-preview-tile')}<div class="rotation-preview-info"><strong>${cardLabel(selectedCard)}</strong><span>ยังวางทางไม่ได้</span></div></div>
+            <div class="place-status warn">เครื่องมือเสีย: ${brokenNow.map(t=>TOOL_ICON[t]||t).join(' ')} — ไพ่ใบนี้ยังเลือกได้ แต่ต้อง <b>ทิ้งใบนี้</b> หรือใช้ไพ่ซ่อมก่อน</div>
+            <div class="rotate-row"><button class="ghost small" id="btnDiscardSelected">ทิ้งใบนี้เพื่อจบตา</button><button class="ghost small" id="btnCancelSel">ยกเลิก</button></div>`;
+          ui.targetMode=null;
+        } else {
+          controls=`<div class="v11-action-title">เลือกตำแหน่งวางทาง</div>
+            <div class="rotation-preview">${renderPathTile(selectedCard,ui.rotation,'path-preview-tile')}<div class="rotation-preview-info"><strong>${cardLabel(selectedCard)}</strong><span class="rotation-deg">${['↑','→','↓','←'][ui.rotation]} ${ui.rotation*90}°</span><span class="connection-text">${connectionLabel(previewConn)}</span></div></div>
+            <div class="rotate-row"><button class="small" id="btnRotateL">⟲ หมุนซ้าย</button><button class="small" id="btnRotateR">หมุนขวา ⟳</button><button class="ghost small" id="btnDiscardSelected">ทิ้งใบนี้</button><button class="ghost small" id="btnCancelSel">ยกเลิก</button></div>
+            <div class="place-status ${valid?'ok':'warn'}">${valid?`🟢 มี ${valid} ช่องที่วางได้ — คลิกช่องสีเขียวบนกระดาน`:'🟠 มุมนี้วางไม่ได้ กดหมุนไพ่ 90°'}</div>`;
+          ui.targetMode='place';
+        }
       } else if(selectedCard.type==='rockfall'){
         controls=`<div class="v11-action-title">💥 หินถล่ม</div><p class="hint">คลิกไพ่ทางเดินบนกระดานเพื่อทำลาย</p><div class="rotate-row"><button class="ghost small" id="btnDiscardSelected">ทิ้งใบนี้</button><button class="ghost small" id="btnCancelSel">ยกเลิก</button></div>`; ui.targetMode='rockfall';
       } else if(selectedCard.type==='map'){
@@ -1648,7 +1659,7 @@ function renderGame(){
   }
 
   const heroAvatars=r.players.slice(0,3).map(p=>avatarFor(p.id)).join('');
-  return `<div class="v11-version">${APP_VERSION} • REALTIME SAFE</div>
+  return `<div class="v11-version">${APP_VERSION} • REALTIME PLAY</div>
     <header class="v11-hero">
       <div class="v11-logo"><strong>DEEP DIG</strong><span>SABOTEUR</span><em>ขุด สนุก ลุ้น โพรงลับ! 💎</em></div>
       <div class="v11-hero-miners">${heroAvatars}<div class="v11-spark">✨</div></div>
@@ -1713,7 +1724,7 @@ function selectCardDirect(uidv){
   const card=hand.find(c=>c.uid===uidv);
   if(!card){showToast('ไม่พบไพ่ใบนี้ในมือ');return;}
   const broken=room.game?.brokenTools?.[myId]||[];
-  if(card.kind==='path' && broken.length){showToast('🛠️ เครื่องมือเสียอยู่ จึงยังวางทางไม่ได้');return;}
+  // V19: allow selecting path cards even while a tool is broken so the player can discard.
   ui.selectedCardUid = ui.selectedCardUid===uidv ? null : uidv;
   ui.targetMode=null;
   ui.rotation = (ui.selectedCardUid && card.kind==='path') ? bestRotationForCard(room,card) : 0;

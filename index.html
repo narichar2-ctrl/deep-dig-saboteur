@@ -56,7 +56,9 @@
   @keyframes pop{ 0%{ transform: scale(.9); } 60%{ transform: scale(1.05); } 100%{ transform: scale(1); } }
   h1,h2,h3{ font-family:'Baloo 2', 'Fredoka', sans-serif; font-weight:700; margin:0; }
   .mono{ font-family:'Fredoka', monospace; }
-  #app{ max-width: 1180px; margin: 0 auto; padding: 22px 16px 60px; position:relative; z-index:1; }
+  #app{ max-width: 1480px; margin: 0 auto; padding: 14px 14px 40px; position:relative; z-index:1; }
+  :root{ --board-cell: clamp(42px, 3.7vw, 54px); }
+
   .brand{ display:flex; align-items:center; gap:14px; margin-bottom:22px; }
   .mascot{ font-size:3rem; display:inline-block; animation: bob 3.5s ease-in-out infinite; filter: drop-shadow(0 4px 0 rgba(0,0,0,.15)); }
   .brand h1{ font-size:2.3rem; color:var(--dirt-dark); text-shadow: 2px 3px 0 #fff, 0 0 0 var(--outline); -webkit-text-stroke: 1.5px var(--outline); }
@@ -633,12 +635,31 @@ body::after{width:260px;height:260px;right:-90px;bottom:8%;background:radial-gra
 .v11-hero-miners{display:flex;justify-content:center;align-items:end;height:105px;gap:2px}.v11-hero-miners .cute-avatar{width:72px;height:72px;flex-basis:72px;border-width:4px;transform:translateY(8px)}.v11-hero-miners .cute-avatar:nth-child(2){transform:translateY(-7px) scale(1.1)}.v11-spark{font-size:30px;animation:twinkle 1.3s infinite}
 .v11-sign{justify-self:end;background:#d9a76c;border:4px solid #6d4329;border-radius:12px;padding:13px 16px;text-align:center;font-weight:900;font-size:18px;box-shadow:0 5px 0 #8d5a38;transform:rotate(1deg)}.v11-sign small{font-size:12px;color:#542d21}
 .v11-topline{display:flex;justify-content:space-between;gap:12px;align-items:center;background:#fff7e2;border:4px solid #70462e;border-radius:18px;padding:10px 15px;box-shadow:0 5px 0 #d19a5e;margin-bottom:10px}.v11-topline b{font-size:20px;color:#6b3f25}.v11-topline span{background:#ffe39b;border:2px solid #a56a27;border-radius:999px;padding:7px 12px;font-weight:900}
-.v11-layout{display:grid;grid-template-columns:250px minmax(520px,1fr) 355px;gap:14px;align-items:start}.v11-left,.v11-right{display:flex;flex-direction:column;gap:12px}.v11-panel{background:#fffaf2;border:4px solid #6e472f;border-radius:20px;box-shadow:0 6px 0 #b77a45;overflow:hidden}.v11-panel-title{display:flex;justify-content:space-between;align-items:center;padding:10px 13px;background:linear-gradient(90deg,#ffe8b6,#f6ddf5);border-bottom:2px solid #d5a56f;font-weight:1000;color:#543622}.v11-player{margin:10px;border:2px solid #d6aa78;border-radius:14px;padding:8px;background:#fff}.v11-player:nth-child(3n+2){background:#eefbe7}.v11-player:nth-child(3n){background:#fff0f7}.v11-player.current{outline:3px solid #64cf72;background:#e8ffe8}.v11-player-main{display:flex;gap:8px;align-items:center}.v11-player-main .cute-avatar{width:42px;height:42px;flex-basis:42px}.v11-player-sub{font-size:11px;color:#7a654f;margin-top:2px}.v11-player-score{position:absolute}.v11-player{position:relative}.v11-player-score{right:8px;top:10px;text-align:right;color:#bd7b00}.v11-player-score small{display:block;color:#765e4a}.v11-broken{font-size:11px;color:#c94d40;margin-top:6px}.v11-room{padding-bottom:10px}.v11-room>div:not(.v11-panel-title){padding:3px 13px;font-size:13px}.v11-cute-sign{background:#d9a76c;border:4px solid #6e472f;border-radius:16px;padding:15px;text-align:center;font-weight:1000;color:#4b2c1c;box-shadow:0 5px 0 #a3683d}
+.v11-layout{display:grid;grid-template-columns:230px minmax(0,1fr) 340px;gap:12px;align-items:start}
+.v11-center{min-width:0}.v11-right{min-width:0}.v11-left{min-width:0}.v11-left,.v11-right{display:flex;flex-direction:column;gap:12px}.v11-panel{background:#fffaf2;border:4px solid #6e472f;border-radius:20px;box-shadow:0 6px 0 #b77a45;overflow:hidden}.v11-panel-title{display:flex;justify-content:space-between;align-items:center;padding:10px 13px;background:linear-gradient(90deg,#ffe8b6,#f6ddf5);border-bottom:2px solid #d5a56f;font-weight:1000;color:#543622}.v11-player{margin:10px;border:2px solid #d6aa78;border-radius:14px;padding:8px;background:#fff}.v11-player:nth-child(3n+2){background:#eefbe7}.v11-player:nth-child(3n){background:#fff0f7}.v11-player.current{outline:3px solid #64cf72;background:#e8ffe8}.v11-player-main{display:flex;gap:8px;align-items:center}.v11-player-main .cute-avatar{width:42px;height:42px;flex-basis:42px}.v11-player-sub{font-size:11px;color:#7a654f;margin-top:2px}.v11-player-score{position:absolute}.v11-player{position:relative}.v11-player-score{right:8px;top:10px;text-align:right;color:#bd7b00}.v11-player-score small{display:block;color:#765e4a}.v11-broken{font-size:11px;color:#c94d40;margin-top:6px}.v11-room{padding-bottom:10px}.v11-room>div:not(.v11-panel-title){padding:3px 13px;font-size:13px}.v11-cute-sign{background:#d9a76c;border:4px solid #6e472f;border-radius:16px;padding:15px;text-align:center;font-weight:1000;color:#4b2c1c;box-shadow:0 5px 0 #a3683d}
 .v11-center .board-wrap{margin:0}.v11-center .legend{margin-top:8px;justify-content:center}.v11-log{margin-top:12px}.v11-log .log{max-height:180px}.v11-hand-panel{position:sticky;top:8px;padding-bottom:10px}.v11-hand-panel .hand-head{display:none}.v11-hand-panel .hand{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px;margin:0}.v11-hand-panel .gcard{width:100%;height:122px;margin:0;transform:none}.v11-hand-panel .gcard:hover:not(.disabled){transform:translateY(-4px) scale(1.02)}.v11-hand-panel .gcard.selected{transform:translateY(-6px) scale(1.04);outline:4px solid #2497ff;box-shadow:0 7px 0 #1884d6,0 0 0 7px #bce5ff}.v11-hand-panel .card-select-hint{font-size:10px}.v11-controls{margin:0 10px 10px;padding:10px;background:#fff3d8;border:2px solid #ecc58f;border-radius:14px}.v11-turn-help{text-align:center;font-size:15px;line-height:1.5;color:#65492e}.v11-turn-help.wait{color:#8a7c6b}.v11-action-title{font-weight:1000;color:#613b25;margin-bottom:7px}.place-status.ok{background:#e4ffe8;border-color:#5ac56a;color:#25733a}.place-status.warn{background:#fff1d5;border-color:#e5a642;color:#8a5615}.v11-role{text-align:center;padding-bottom:12px}.v11-role-art{height:190px;display:flex;align-items:center;justify-content:center}.v11-role-art .role-design-img{max-height:185px;max-width:88%}.v11-role-name{font-size:18px;font-weight:1000;color:#49a652}.v11-role-name.sab{color:#d95146}.v11-role-text{font-size:12px;padding:6px 18px 0;color:#735b47}.turn-banner{font-size:16px}
 .cell.placeable,.cell.path-valid-now{cursor:pointer!important;outline:4px solid #47d764!important;box-shadow:0 0 0 5px #e2ffe7,0 0 22px #4ff57f!important;animation:v11Pulse .8s ease-in-out infinite alternate!important;z-index:6!important}.cell.placeable::before,.cell.path-valid-now::before{content:"＋"!important;position:absolute!important;inset:6px!important;border-radius:10px!important;display:flex!important;align-items:center!important;justify-content:center!important;background:#ecfff0dd!important;color:#23a948!important;font-size:28px!important;font-weight:1000!important}.cell.placeable::after,.cell.path-valid-now::after{content:"วาง"!important;position:absolute!important;bottom:2px!important;left:50%!important;transform:translateX(-50%)!important;background:#2fbf59!important;color:white!important;border-radius:999px!important;padding:1px 5px!important;font-size:8px!important;font-weight:1000!important;z-index:9!important}@keyframes v11Pulse{from{filter:brightness(1)}to{filter:brightness(1.18)}}
-@media(max-width:1180px){.v11-layout{grid-template-columns:220px minmax(460px,1fr) 315px}.v11-hand-panel .gcard{height:112px}.v11-hero{grid-template-columns:1fr .8fr}.v11-sign{display:none}}
-@media(max-width:900px){.v11-layout{grid-template-columns:1fr}.v11-left{order:2}.v11-center{order:1}.v11-right{order:0}.v11-hand-panel{position:static}.v11-hand-panel .hand{grid-template-columns:repeat(6,minmax(82px,1fr));overflow-x:auto}.v11-hero{grid-template-columns:1fr}.v11-hero-miners{display:none}.v11-logo{text-align:center}.v11-left{display:grid;grid-template-columns:1fr 1fr}.v11-cute-sign{display:none}}
+@media(max-width:1180px){.v11-layout{grid-template-columns:210px minmax(0,1fr) 300px}.v11-hand-panel .gcard{height:112px}.v11-hero{grid-template-columns:1fr .8fr}.v11-sign{display:none}}
+@media(max-width:980px){.v11-layout{grid-template-columns:1fr}.v11-left{order:2}.v11-center{order:1}.v11-right{order:0}.v11-hand-panel{position:static}.v11-hand-panel .hand{grid-template-columns:repeat(6,minmax(82px,1fr));overflow-x:auto}.v11-hero{grid-template-columns:1fr}.v11-hero-miners{display:none}.v11-logo{text-align:center}.v11-left{display:grid;grid-template-columns:1fr 1fr}.v11-cute-sign{display:none}}
 @media(max-width:620px){.v11-left{display:flex}.v11-hand-panel .hand{grid-template-columns:repeat(3,1fr)}.v11-topline{font-size:12px}.v11-topline b{font-size:15px}.v11-hero{min-height:110px;padding:12px}.v11-logo strong{font-size:34px}}
+
+
+/* V13 responsive board + interaction */
+.v11-center .board-wrap{padding:12px!important;overflow:hidden!important}
+.v11-center .board{grid-template-columns:repeat(9,var(--board-cell))!important;grid-template-rows:repeat(9,var(--board-cell))!important;gap:4px!important;width:100%!important;justify-content:center!important}
+.v11-center .cell{width:var(--board-cell)!important;height:var(--board-cell)!important;box-sizing:border-box!important}
+.v11-center .cell .stub.N,.v11-center .cell .stub.S{left:calc(50% - 6px)!important;width:12px!important;height:52%!important}
+.v11-center .cell .stub.E,.v11-center .cell .stub.W{top:calc(50% - 6px)!important;height:12px!important;width:52%!important}
+.v11-hand-panel .hand{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+.v11-hand-panel .gcard{min-width:0!important;touch-action:manipulation!important;user-select:none!important}
+.cell{touch-action:manipulation!important;user-select:none!important}
+.v13-status{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:6px 0 10px;font-size:11px;font-weight:900}
+.v13-status span{background:#fff8df;border:2px solid #d0a16d;border-radius:999px;padding:4px 8px}
+.v13-status .online{background:#e9ffe9;border-color:#67c66f;color:#277331}
+.v13-status .turn{background:#eaf4ff;border-color:#70aee7;color:#245f93}
+.v13-status .warn{background:#fff0e5;border-color:#e89f61;color:#9b4e19}
+@media(max-width:1300px){:root{--board-cell:48px}.v11-layout{grid-template-columns:205px minmax(0,1fr) 300px}.v11-hand-panel .gcard{height:108px!important}}
+@media(max-width:980px){:root{--board-cell:clamp(38px,9.3vw,52px)}.v11-center .board-wrap{overflow:auto!important}.v11-hand-panel .hand{grid-template-columns:repeat(6,90px)!important}.v11-right{order:0}.v11-center{order:1}.v11-left{order:2}}
 
 </style>
 </head>
@@ -677,7 +698,7 @@ const DECK_RECIPE = [
 ];
 const HAND_SIZE = 6;
 const MAX_ROUNDS = 3;
-const APP_VERSION = 'V12';
+const APP_VERSION = 'V13';
 
 /* ============================== STATE ============================== */
 let myId = sessionStorage.getItem('deepDigPlayerId') || crypto.randomUUID();
@@ -747,73 +768,89 @@ async function saveRoom(newRoom){
     newRoom.rev = Number(newRoom.rev || 0) + 1;
     newRoom.updatedAt = Date.now();
     const res = await fetchWithTimeout(firebaseRoomUrl(newRoom.code), {
-      method:'PUT',
-      headers:{ 'Content-Type':'application/json' },
-      body:JSON.stringify(newRoom)
+      method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(newRoom)
     });
-    if(!res.ok){
-      const detail = await res.text().catch(()=> '');
-      console.error('Firebase save failed:', res.status, detail);
-      showToast(`บันทึกห้องไม่สำเร็จ (${res.status})`);
-      return false;
-    }
-    room = newRoom;
-    lastRoomSnapshot = roomSnapshot(newRoom);
-    lastRemoteUpdateAt = Date.now();
+    if(!res.ok){ throw new Error(`Firebase ${res.status}`); }
+    room = newRoom; lastRoomSnapshot = roomSnapshot(newRoom); lastRemoteUpdateAt = Date.now();
     return true;
-  }catch(e){
-    console.error('Firebase connection error:', e);
-    showToast('เชื่อมต่อห้องออนไลน์ไม่ได้ ลองใหม่อีกครั้ง');
-    return false;
-  }
+  }catch(e){ console.error(e); showToast('เชื่อมต่อห้องออนไลน์ไม่ได้'); return false; }
 }
 
 async function loadRoom(code){
   try{
-    const res = await fetchWithTimeout(firebaseRoomUrl(code), { method:'GET', cache:'no-store' });
-    if(!res.ok){
-      console.error('Firebase load failed:', res.status);
-      return null;
-    }
-    const data = await res.json();
-    return data || null;
-  }catch(e){
-    console.error('Firebase load error:', e);
-    return null;
-  }
+    const res = await fetchWithTimeout(firebaseRoomUrl(code), {method:'GET',cache:'no-store'});
+    if(!res.ok) return null;
+    return (await res.json()) || null;
+  }catch(e){ console.error(e); return null; }
 }
 
+async function atomicRoomUpdate(code, updater, retries=6){
+  for(let attempt=0; attempt<retries; attempt++){
+    const url=firebaseRoomUrl(code);
+    try{
+      const getRes=await fetchWithTimeout(url,{method:'GET',headers:{'X-Firebase-ETag':'true'},cache:'no-store'});
+      if(!getRes.ok) throw new Error(`GET ${getRes.status}`);
+      const etag=getRes.headers.get('ETag');
+      const current=await getRes.json();
+      if(!current) return {ok:false,reason:'missing'};
+      const next=structuredClone(current);
+      const result=updater(next);
+      if(result===false) return {ok:false,reason:'cancelled',room:current};
+      next.rev=Number(current.rev||0)+1; next.updatedAt=Date.now();
+      const headers={'Content-Type':'application/json'}; if(etag) headers['If-Match']=etag;
+      const putRes=await fetchWithTimeout(url,{method:'PUT',headers,body:JSON.stringify(next)});
+      if(putRes.status===412) continue;
+      if(!putRes.ok) throw new Error(`PUT ${putRes.status}`);
+      room=next; lastRoomSnapshot=roomSnapshot(next); lastRemoteUpdateAt=Date.now();
+      return {ok:true,room:next};
+    }catch(e){
+      console.error('atomic update',attempt,e);
+      if(attempt===retries-1) return {ok:false,reason:e.message};
+      await new Promise(r=>setTimeout(r,120*(attempt+1)));
+    }
+  }
+  return {ok:false,reason:'retry'};
+}
+
+let roomStream=null;
+function stopRoomSync(){
+  clearInterval(pollTimer); pollTimer=null; pollBusy=false;
+  if(roomStream){ try{roomStream.close();}catch(e){} roomStream=null; }
+}
+function applyRemoteRoom(fresh){
+  if(!fresh) return;
+  const snap=roomSnapshot(fresh);
+  if(snap===lastRoomSnapshot) return;
+  const keep=shouldKeepSelection(fresh);
+  room=fresh; lastRoomSnapshot=snap; lastRemoteUpdateAt=Date.now();
+  if(!keep){ui.selectedCardUid=null;ui.rotation=0;ui.targetMode=null;}
+  render();
+}
+function startRoomStream(){
+  if(!roomCode || typeof EventSource==='undefined') return false;
+  try{
+    if(roomStream) roomStream.close();
+    roomStream=new EventSource(firebaseRoomUrl(roomCode));
+    roomStream.addEventListener('put',ev=>{
+      try{const payload=JSON.parse(ev.data); if(payload.path==='/' && payload.data) applyRemoteRoom(payload.data);}catch(e){console.error(e)}
+    });
+    roomStream.addEventListener('patch',()=>pollLoop());
+    roomStream.onerror=()=>{};
+    return true;
+  }catch(e){console.error(e);return false;}
+}
 function shouldKeepSelection(fresh){
   if(!ui.selectedCardUid || fresh?.phase!=='playing' || !fresh?.game) return false;
-  const hand = fresh.game.hands?.[myId] || [];
+  const hand=fresh.game.hands?.[myId]||[];
   return hand.some(c=>c.uid===ui.selectedCardUid) && currentPlayerId(fresh)===myId;
 }
-
 async function pollLoop(){
-  if(!roomCode || pollBusy) return;
-  pollBusy = true;
-  try{
-    const fresh = await loadRoom(roomCode);
-    if(!fresh) return;
-    const snap = roomSnapshot(fresh);
-    // Critical fix: do NOT rebuild the DOM when Firebase data did not change.
-    // The old 900ms forced render could destroy a button/cell between pointer-down and click.
-    if(snap === lastRoomSnapshot) return;
-    const keepSelection = shouldKeepSelection(fresh);
-    room = fresh;
-    lastRoomSnapshot = snap;
-    lastRemoteUpdateAt = Date.now();
-    if(!keepSelection){ ui.selectedCardUid=null; ui.rotation=0; ui.targetMode=null; }
-    render();
-  } finally {
-    pollBusy = false;
-  }
+  if(!roomCode||pollBusy)return; pollBusy=true;
+  try{const fresh=await loadRoom(roomCode); if(fresh) applyRemoteRoom(fresh);}finally{pollBusy=false;}
 }
 function startPolling(){
-  clearInterval(pollTimer);
-  lastRoomSnapshot = roomSnapshot(room);
-  pollLoop();
-  pollTimer = setInterval(pollLoop, 650);
+  stopRoomSync(); lastRoomSnapshot=roomSnapshot(room); startRoomStream();
+  pollLoop(); pollTimer=setInterval(pollLoop,1200);
 }
 
 /* ============================== GAME SETUP ============================== */
@@ -919,40 +956,22 @@ function isConnectedToStart(r, x, y){
   return false;
 }
 function canPlaceAt(r, x, y, conn){
-  const key = cellKey(x,y);
-  if(x<BOARD_MIN_X||x>BOARD_MAX_X||y<BOARD_MIN_Y||y>BOARD_MAX_Y) return false;
+  const key=cellKey(x,y);
+  if(!r?.game || x<BOARD_MIN_X||x>BOARD_MAX_X||y<BOARD_MIN_Y||y>BOARD_MAX_Y) return false;
   if(key===START_POS || r.game.board[key] || r.game.goals[key]) return false;
-
-  let touchesBoard = false;
-  let joinsConnectedTunnel = false;
-
+  let touches=false, connects=false;
   for(const d of DIRS){
-    const [dx,dy] = DELTA[d];
-    const nx=x+dx, ny=y+dy;
-    const nkey = cellKey(nx,ny);
-
-    // Goal cards are face-down/hidden, so they do not constrain placement until reached.
-    // They also do not count as a tunnel connection by themselves.
-    if(r.game.goals[nkey]) continue;
-
-    const neighbor = r.game.board[nkey];
-    if(!neighbor) continue;
-    touchesBoard = true;
-
-    const myOpen = !!conn[d];
-    const neighborOpen = !!neighbor[OPP[d]];
-
-    // Every touching tunnel edge must agree: open-open or closed-closed.
-    if(myOpen !== neighborOpen) return false;
-
-    // A new path must actually join the network that comes from the start tile.
-    if(myOpen && neighborOpen && isConnectedToStart(r,nx,ny)) joinsConnectedTunnel = true;
+    const [dx,dy]=DELTA[d]; const nkey=cellKey(x+dx,y+dy);
+    if(r.game.goals[nkey]) continue; // hidden goal never blocks placement
+    const nb=r.game.board[nkey]; if(!nb) continue;
+    touches=true;
+    const mine=!!conn[d], theirs=!!nb[OPP[d]];
+    if(mine!==theirs) return false; // touching edges must match
+    if(mine&&theirs) connects=true;
   }
-
-  if(!touchesBoard) return false;
-  // Special blocked tile remains usable as an obstruction; normal path tiles must connect to the live tunnel network.
-  const isFullyBlocked = !DIRS.some(d=>conn[d]);
-  return isFullyBlocked ? true : joinsConnectedTunnel;
+  if(!touches) return false;
+  const fullyBlocked=!DIRS.some(d=>conn[d]);
+  return fullyBlocked ? touches : connects;
 }
 function allPlaceableCells(r){
   const out = [];
@@ -1005,24 +1024,19 @@ function endTurn(r){
 }
 
 async function submitAction(mutator, logMsg){
-  ui.loading = true; render();
-  let fresh = await loadRoom(roomCode);
-  if(!fresh){ ui.loading=false; showToast('ไม่พบห้อง'); render(); return; }
-  if(fresh.phase==='playing' && currentPlayerId(fresh)!==myId){
-    ui.loading=false; showToast('ไม่ใช่ตาของคุณแล้ว — สถานะเปลี่ยนไป'); render(); return;
-  }
+  if(ui.loading) return;
+  ui.loading=true; render();
   try{
-    mutator(fresh);
-    if(logMsg) pushLog(fresh, logMsg);
-    checkAttrition(fresh);
-    const ok = await saveRoom(fresh);
-    ui.loading = false;
-    ui.selectedCardUid = null; ui.rotation = 0; ui.targetMode = null;
-    if(ok) render();
-  }catch(e){
-    console.error(e);
+    const result=await atomicRoomUpdate(roomCode,fresh=>{
+      if(fresh.phase==='playing' && currentPlayerId(fresh)!==myId) throw new Error('not your turn');
+      mutator(fresh); if(logMsg) pushLog(fresh,logMsg); checkAttrition(fresh); return true;
+    });
     ui.loading=false;
-    showToast(e?.message==='invalid placement' ? '❌ ช่องนี้ต่อทางไม่ได้ ลองหมุนไพ่หรือเลือกช่องสีเขียว' : 'เกิดข้อผิดพลาด: '+(e?.message||'ลองใหม่'));
+    if(!result.ok){showToast('บันทึกตาไม่สำเร็จ ลองอีกครั้ง'); render(); return;}
+    ui.selectedCardUid=null;ui.rotation=0;ui.targetMode=null; render();
+  }catch(e){
+    console.error(e); ui.loading=false;
+    showToast(e?.message==='invalid placement'?'❌ วางตรงนี้ไม่ได้ ลองหมุนไพ่หรือเลือกช่องสีเขียว':(e?.message==='not your turn'?'⏳ ตานี้ถูกเล่นไปแล้ว':'เกิดข้อผิดพลาด: '+(e?.message||'')));
     render();
   }
 }
@@ -1211,33 +1225,28 @@ function renderHome(){
 function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 
 async function createRoom(){
-  const nameInput = document.getElementById('nameInput');
-  myName = (nameInput.value||'').trim() || 'Player';
-  const code = genRoomCode();
-  const newRoom = {
-    code, players:[{id:myId, name:myName, gold:0, isHost:true}],
-    phase:'lobby', round:1, log:[`${myName} สร้างห้อง ${code}`], game:null
-  };
-  roomCode = code;
-  const ok = await saveRoom(newRoom);
-  if(ok){ ui.screen='lobby'; startPolling(); render(); }
+  const nameInput=document.getElementById('nameInput'); myName=(nameInput?.value||'').trim()||'Player';
+  const code=genRoomCode();
+  const newRoom={code,players:[{id:myId,name:myName,gold:0,isHost:true}],phase:'lobby',round:1,log:[`${myName} สร้างห้อง ${code}`],game:null,rev:0,updatedAt:Date.now()};
+  roomCode=code; const ok=await saveRoom(newRoom);
+  if(ok){sessionStorage.setItem('deepDigRoomCode',code);sessionStorage.setItem('deepDigPlayerName',myName);ui.screen='lobby';startPolling();render();}
 }
 async function joinRoom(){
-  const nameInput = document.getElementById('nameInput');
-  const codeInput = document.getElementById('codeInput');
-  myName = (nameInput.value||'').trim() || 'Player';
-  const code = (codeInput.value||'').trim().toUpperCase();
-  if(code.length!==4){ document.getElementById('homeError').textContent='กรอกโค้ดห้อง 4 ตัวอักษร'; return; }
-  const found = await loadRoom(code);
-  if(!found){ document.getElementById('homeError').textContent='ไม่พบห้องนี้ ตรวจสอบโค้ดอีกครั้ง'; return; }
-  if(!found.players.find(p=>p.id===myId)){
-    if(found.phase!=='lobby'){ document.getElementById('homeError').textContent='เกมเริ่มไปแล้ว เข้าร่วมไม่ได้'; return; }
-    found.players.push({id:myId, name:myName, gold:0, isHost:false});
-    pushLog(found, `${myName} เข้าร่วมห้อง`);
-  }
-  roomCode = code;
-  const ok = await saveRoom(found);
-  if(ok){ ui.screen='lobby'; startPolling(); render(); }
+  const nameInput=document.getElementById('nameInput'),codeInput=document.getElementById('codeInput');
+  myName=(nameInput?.value||'').trim()||'Player'; const code=(codeInput?.value||'').trim().toUpperCase();
+  if(code.length!==4){document.getElementById('homeError').textContent='กรอกโค้ดห้อง 4 ตัวอักษร';return;}
+  const result=await atomicRoomUpdate(code,fresh=>{
+    if(fresh.phase!=='lobby'&&!fresh.players.some(p=>p.id===myId)) throw new Error('started');
+    const existing=fresh.players.find(p=>p.id===myId);
+    if(existing){existing.name=myName;} else {
+      if(fresh.players.length>=10) throw new Error('full');
+      fresh.players.push({id:myId,name:myName,gold:0,isHost:false}); pushLog(fresh,`${myName} เข้าร่วมห้อง`);
+    }
+    return true;
+  });
+  if(!result.ok){document.getElementById('homeError').textContent='เข้าห้องไม่สำเร็จ กรุณาลองอีกครั้ง';return;}
+  roomCode=code; room=result.room; sessionStorage.setItem('deepDigRoomCode',code);sessionStorage.setItem('deepDigPlayerName',myName);
+  ui.screen=room.phase==='lobby'?'lobby':'game'; startPolling(); render();
 }
 
 /* ============================== SCREENS: LOBBY ============================== */
@@ -1267,20 +1276,22 @@ function renderLobby(){
   </div>`;
 }
 async function startGame(){
-  ui.loading=true; render();
-  const fresh = await loadRoom(roomCode);
-  if(!fresh){ ui.loading=false; showToast('โหลดห้องไม่สำเร็จ'); render(); return; }
-  const me = fresh.players.find(p=>p.id===myId);
-  if(!me?.isHost){ ui.loading=false; showToast('เฉพาะโฮสต์เท่านั้นที่เริ่มเกมได้'); render(); return; }
-  if(fresh.players.length < 3){ ui.loading=false; showToast('ต้องมีอย่างน้อย 3 คน'); render(); return; }
-  startNewRound(fresh);
-  const ok = await saveRoom(fresh);
-  ui.loading=false;
-  if(ok){ showToast('🎮 เริ่มเกมแล้ว กำลังซิงก์ผู้เล่นทุกคน'); render(); }
+  if(ui.loading)return; ui.loading=true;render();
+  try{
+    const result=await atomicRoomUpdate(roomCode,fresh=>{
+      const me=fresh.players.find(p=>p.id===myId); if(!me?.isHost) throw new Error('host');
+      if(fresh.players.length<3) throw new Error('players');
+      if(fresh.phase!=='lobby') return false;
+      startNewRound(fresh); pushLog(fresh,'🎮 โฮสต์เริ่มเกม — ทุกคนเข้าสู่เหมือง'); return true;
+    });
+    ui.loading=false;
+    if(result.ok){room=result.room;showToast('🎮 เริ่มเกมแล้ว');render();}else{showToast('เริ่มเกมไม่สำเร็จ ลองอีกครั้ง');render();}
+  }catch(e){ui.loading=false;showToast(e.message==='players'?'ต้องมีอย่างน้อย 3 คน':'เริ่มเกมไม่สำเร็จ');render();}
 }
 async function leaveRoom(){
-  clearInterval(pollTimer);
+  stopRoomSync();
   pollBusy=false; lastRoomSnapshot='';
+  sessionStorage.removeItem('deepDigRoomCode'); sessionStorage.removeItem('deepDigPlayerName');
   roomCode = null; room = null; ui.screen='home';
   render();
 }
@@ -1612,69 +1623,61 @@ function handlePathCellClick(elm){
 
 function attachHandlers(){
   const el=id=>document.getElementById(id);
-  if(el('btnCreate')) el('btnCreate').onclick=createRoom;
-  if(el('btnJoin')) el('btnJoin').onclick=joinRoom;
-  if(el('btnCopyCode')) el('btnCopyCode').onclick=()=>{navigator.clipboard?.writeText(room.code);showToast('คัดลอกโค้ดแล้ว');};
-  if(el('btnLeave')) el('btnLeave').onclick=leaveRoom;
-  if(el('btnStartGame')) el('btnStartGame').onclick=startGame;
-  if(el('btnNextRound')) el('btnNextRound').onclick=async()=>{ui.loading=true;render();let fresh=await loadRoom(roomCode);if(!fresh)return;fresh.round+=1;startNewRound(fresh);await saveRoom(fresh);ui.loading=false;render();};
-  if(el('btnFinishGame')) el('btnFinishGame').onclick=async()=>{let fresh=await loadRoom(roomCode);if(!fresh)return;fresh.phase='gameOver';await saveRoom(fresh);render();};
-  if(el('btnBackHome')) el('btnBackHome').onclick=leaveRoom;
-  if(el('btnClosePeek')) el('btnClosePeek').onclick=()=>{ui.peek=null;render();};
-  if(el('btnCancelSel')) el('btnCancelSel').onclick=()=>{ui.selectedCardUid=null;ui.targetMode=null;ui.rotation=0;render();};
-  if(el('btnRotateL')) el('btnRotateL').onclick=()=>{ui.rotation=(ui.rotation+3)%4;render();};
-  if(el('btnRotateR')) el('btnRotateR').onclick=()=>{ui.rotation=(ui.rotation+1)%4;render();};
-  if(el('btnDiscardSelected')) el('btnDiscardSelected').onclick=()=>{const c=getSelectedCard();if(c)submitAction(r=>doDiscard(r,c.uid),null);};
+  if(el('btnCreate'))el('btnCreate').onclick=createRoom;
+  if(el('btnJoin'))el('btnJoin').onclick=joinRoom;
+  if(el('btnCopyCode'))el('btnCopyCode').onclick=()=>{navigator.clipboard?.writeText(room.code);showToast('คัดลอกโค้ดแล้ว');};
+  if(el('btnLeave'))el('btnLeave').onclick=leaveRoom;
+  if(el('btnStartGame'))el('btnStartGame').onclick=startGame;
+  if(el('btnBackHome'))el('btnBackHome').onclick=leaveRoom;
+  if(el('btnClosePeek'))el('btnClosePeek').onclick=()=>{ui.peek=null;render();};
+  if(el('btnCancelSel'))el('btnCancelSel').onclick=()=>{ui.selectedCardUid=null;ui.targetMode=null;ui.rotation=0;render();};
+  if(el('btnRotateL'))el('btnRotateL').onclick=()=>{ui.rotation=(ui.rotation+3)%4;render();};
+  if(el('btnRotateR'))el('btnRotateR').onclick=()=>{ui.rotation=(ui.rotation+1)%4;render();};
+  if(el('btnDiscardSelected'))el('btnDiscardSelected').onclick=()=>{const c=getSelectedCard();if(c)submitAction(r=>doDiscard(r,c.uid),null);};
+  if(el('btnNextRound'))el('btnNextRound').onclick=async()=>{const result=await atomicRoomUpdate(roomCode,fresh=>{fresh.round+=1;startNewRound(fresh);return true;});if(result.ok){room=result.room;render();}};
+  if(el('btnFinishGame'))el('btnFinishGame').onclick=async()=>{const result=await atomicRoomUpdate(roomCode,fresh=>{fresh.phase='gameOver';return true;});if(result.ok){room=result.room;render();}};
 
-  document.querySelectorAll('[data-card-select="1"]').forEach(cardEl=>{
-    const selectCard = ev=>{
-      ev.preventDefault(); ev.stopPropagation();
-      if(cardEl.disabled||cardEl.classList.contains('disabled')) return;
-      const uidv=cardEl.getAttribute('data-uid');
-      const handNow=room?.game?.hands?.[myId]||[];
-      const card=handNow.find(c=>c.uid===uidv);
-      if(!card){showToast('ไพ่ใบนี้ไม่อยู่ในมือแล้ว');return;}
+  const app=document.getElementById('app');
+  app.onpointerdown=ev=>{
+    const cardEl=ev.target.closest?.('[data-card-select="1"]');
+    if(cardEl){
+      ev.preventDefault();
+      if(cardEl.disabled||cardEl.classList.contains('disabled')){showToast('ไพ่ใบนี้ยังเล่นไม่ได้');return;}
+      const uidv=cardEl.dataset.uid, hand=room?.game?.hands?.[myId]||[], card=hand.find(c=>c.uid===uidv);
+      if(!card)return;
       if(currentPlayerId(room)!==myId){showToast(`⏳ ตอนนี้เป็นตาของ ${playerName(room,currentPlayerId(room))}`);return;}
-      ui.selectedCardUid=(ui.selectedCardUid===uidv)?null:uidv;
-      ui.targetMode=null;
-      ui.rotation=card.kind==='path'?bestRotationForCard(room,card):0;
-      render();
-    };
-    // pointerdown happens before a background sync can replace the DOM node.
-    cardEl.onpointerdown=selectCard;
-    cardEl.onclick=ev=>{ ev.preventDefault(); };
-  });
-
-  document.querySelectorAll('[data-break-target]').forEach(x=>x.onclick=()=>{const c=getSelectedCard();if(c)submitAction(r=>doBreak(r,c.uid,c.tool,x.getAttribute('data-break-target')),null);});
-  document.querySelectorAll('[data-repair-target]').forEach(x=>x.onclick=()=>{const c=getSelectedCard();if(c)submitAction(r=>doRepair(r,c.uid,c.tool,x.getAttribute('data-repair-target')),null);});
-
-  document.querySelectorAll('.cell').forEach(cell=>{
-    const handleCell = ev=>{
-      if(ev){ ev.preventDefault(); ev.stopPropagation(); }
-      if(!room||room.phase!=='playing') return;
-      const x=Number(cell.dataset.x), y=Number(cell.dataset.y), key=cell.dataset.key;
-      const selected=getSelectedCard();
-      if(selected?.kind==='path' && currentPlayerId(room)===myId){
+      ui.selectedCardUid=ui.selectedCardUid===uidv?null:uidv; ui.targetMode=null; ui.rotation=card.kind==='path'?bestRotationForCard(room,card):0; render(); return;
+    }
+    const cell=ev.target.closest?.('.cell');
+    if(cell&&room?.phase==='playing'){
+      ev.preventDefault();
+      const x=Number(cell.dataset.x),y=Number(cell.dataset.y),key=cell.dataset.key,selected=getSelectedCard();
+      if(selected?.kind==='path'&&currentPlayerId(room)===myId){
         const conn=rotateConn(PATH_SHAPES[selected.type],ui.rotation);
-        if(canPlaceAt(room,x,y,conn)){
-          const uidv=selected.uid, rot=ui.rotation;
-          submitAction(r=>doPlacePath(r,uidv,x,y,rot),null);
-          return;
-        }
-        if(key!==START_POS && !room.game.board[key] && !room.game.goals[key]) showToast('❌ ช่องนี้ต่อไม่ได้ — เลือกช่องสีเขียวหรือหมุนไพ่');
+        if(canPlaceAt(room,x,y,conn)){const uidv=selected.uid,rot=ui.rotation;submitAction(r=>doPlacePath(r,uidv,x,y,rot),null);return;}
+        if(key!==START_POS&&!room.game.board[key]&&!room.game.goals[key])showToast('❌ ช่องนี้ต่อทางไม่ได้ เลือกช่องสีเขียว');
         return;
       }
-      if(ui.targetMode==='rockfall' && room.game.board[key] && key!==START_POS){const c=getSelectedCard();if(c)submitAction(r=>doRockfall(r,c.uid,x,y),null);return;}
-      if(ui.targetMode==='map' && GOAL_POS.includes(key)){const c=getSelectedCard();if(c)submitAction(r=>doMap(r,c.uid,key),null);return;}
-      if(key===START_POS){showToast('🏠 จุดเริ่มขุด — ต่อทางจากรอบ ๆ จุดนี้');return;}
-      if(GOAL_POS.includes(key)){const goal=room.game.goals[key];showToast(goal?.revealed?(goal.isGold?'💎 เจอทองแล้ว!':'🪨 ทางตัน'):'🎁 โพรงลับ — ใช้ไพ่แผนที่เพื่อดู');}
-    };
-    cell.onpointerdown=handleCell;
-    cell.onclick=ev=>{ ev.preventDefault(); };
-  });
+      if(ui.targetMode==='rockfall'&&room.game.board[key]&&key!==START_POS){const c=getSelectedCard();if(c)submitAction(r=>doRockfall(r,c.uid,x,y),null);return;}
+      if(ui.targetMode==='map'&&GOAL_POS.includes(key)){const c=getSelectedCard();if(c)submitAction(r=>doMap(r,c.uid,key),null);return;}
+    }
+  };
+  app.onclick=ev=>{
+    const bt=ev.target.closest?.('[data-break-target]'); if(bt){const c=getSelectedCard();if(c)submitAction(r=>doBreak(r,c.uid,c.tool,bt.dataset.breakTarget),null);return;}
+    const rt=ev.target.closest?.('[data-repair-target]'); if(rt){const c=getSelectedCard();if(c)submitAction(r=>doRepair(r,c.uid,c.tool,rt.dataset.repairTarget),null);return;}
+  };
 }
 
-render();
+// Auto reconnect on refresh within the same tab/session
+(async()=>{
+  const savedCode=sessionStorage.getItem('deepDigRoomCode');
+  const savedName=sessionStorage.getItem('deepDigPlayerName');
+  if(savedCode){
+    const fresh=await loadRoom(savedCode);
+    if(fresh&&fresh.players?.some(p=>p.id===myId)){roomCode=savedCode;myName=savedName||fresh.players.find(p=>p.id===myId)?.name||'';room=fresh;startPolling();}
+  }
+  render();
+})();
 </script>
 </body>
 </html>

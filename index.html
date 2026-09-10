@@ -1603,8 +1603,8 @@ body::after{width:260px;height:260px;right:-90px;bottom:8%;background:radial-gra
 .mine-map-shell .board{width:100%!important;min-width:0!important;height:auto!important;min-height:0!important;grid-template-columns:repeat(var(--board-cols),minmax(0,1fr))!important;grid-template-rows:repeat(var(--board-rows),auto)!important;gap:2px!important;justify-content:stretch!important;}
 .mine-map-shell .cell{width:auto!important;height:auto!important;min-width:0!important;min-height:0!important;aspect-ratio:1/1!important;border-radius:7px!important;}
 .mine-map-footer::after{content:"📱 กระดานปรับขนาดอัตโนมัติตามจำนวนผู้เล่น — เห็นครบโดยไม่ต้องเลื่อน"!important;}
-.mine-map-shell .board[data-cols="13"] .goal-marker .goal-label,.mine-map-shell .board[data-cols="13"] .start-marker .marker-label{display:none!important;}
-.mine-map-shell .board[data-cols="13"] .goal-marker .goal-icon,.mine-map-shell .board[data-cols="13"] .start-marker .marker-icon{font-size:clamp(.7rem,3vw,1.1rem)!important;}
+.mine-map-shell .board[data-cols="13"] .goal-marker .goal-label,.mine-map-shell .board[data-cols="13"] .start-marker .marker-label,.mine-map-shell .board[data-cols="15"] .goal-marker .goal-label,.mine-map-shell .board[data-cols="15"] .start-marker .marker-label{display:none!important;}
+.mine-map-shell .board[data-cols="13"] .goal-marker .goal-icon,.mine-map-shell .board[data-cols="13"] .start-marker .marker-icon,.mine-map-shell .board[data-cols="15"] .goal-marker .goal-icon,.mine-map-shell .board[data-cols="15"] .start-marker .marker-icon{font-size:clamp(.7rem,3vw,1.1rem)!important;}
 }
 
 /* ==================== V21 MOBILE SIX-CARD FIX ==================== */
@@ -2036,11 +2036,13 @@ const DIRS = ['N','E','S','W'];
 const OPP = { N:'S', E:'W', S:'N', W:'E' };
 const DELTA = { N:[0,-1], E:[1,0], S:[0,1], W:[-1,0] };
 const START_POS = '0,0';
+const MAX_PLAYERS = 15;
 const LEGACY_BOARD_CONFIG = { minX:-2, maxX:6, minY:-4, maxY:4, goalX:6, goalYs:[-1,0,1] };
 function boardConfigForPlayers(n){
   if(n<=4) return { minX:-2, maxX:6, minY:-4, maxY:4, goalX:6, goalYs:[-1,0,1] };
   if(n<=7) return { minX:-2, maxX:8, minY:-4, maxY:4, goalX:8, goalYs:[-2,-1,0,1] };
-  return { minX:-2, maxX:10, minY:-4, maxY:4, goalX:10, goalYs:[-2,-1,0,1,2] };
+  if(n<=10) return { minX:-2, maxX:10, minY:-4, maxY:4, goalX:10, goalYs:[-2,-1,0,1,2] };
+  return { minX:-2, maxX:12, minY:-4, maxY:4, goalX:12, goalYs:[-3,-2,-1,0,1,2] };
 }
 function boardConfigFromExistingGoals(r){
   const keys=Object.keys(r?.game?.goals||{});
@@ -2323,14 +2325,17 @@ function startPolling(){
 window.addEventListener('focus',()=>{ if(roomCode && firebaseReady) pollLoop(); });
 
 /* ============================== GAME SETUP ============================== */
-function buildDeck(){
-  return shuffle(DECK_RECIPE).map(c => ({ ...c, uid: uid() }));
+function buildDeck(playerCount=10){
+  const copies = playerCount > 10 ? 2 : 1;
+  const recipe = Array.from({length:copies},()=>DECK_RECIPE).flat();
+  return shuffle(recipe).map(c => ({ ...c, uid: uid() }));
 }
 function saboteurCount(n){
   if(n<=4) return 1;
   if(n<=6) return 2;
   if(n<=9) return 3;
-  return 4;
+  if(n<=12) return 4;
+  return 5;
 }
 function startNewRound(r){
   const players = r.players;
@@ -2363,7 +2368,7 @@ function startNewRound(r){
   const roles = {};
   ids.forEach(id=>{ roles[id] = sabSet.has(id) ? 'saboteur' : 'digger'; });
 
-  const deck = buildDeck();
+  const deck = buildDeck(n);
   const hands = {};
   players.forEach(p=>{ hands[p.id] = deck.splice(0, HAND_SIZE); });
 
@@ -2679,7 +2684,7 @@ function renderHome(){
   <section class="cute-hero">
     <img src="${heroImg}" alt="Deep Dig cute mine characters">
     <div class="cute-hero-content">
-      <div class="cute-kicker">⛏️ เกมปาร์ตี้ในเหมือง · 3–10 คน</div>
+      <div class="cute-kicker">⛏️ เกมปาร์ตี้ในเหมือง · 3–15 คน</div>
       <h1 class="cute-title">Deep Dig</h1>
       <div style="font-family:'Baloo 2',sans-serif;font-size:1.55rem;font-weight:800;color:#5b3d28;">Saboteur 💎</div>
       <p class="cute-subtitle">ขุดทางให้ถึงทองก่อนหมดเวลา… แต่ระวังเพื่อนตัวแสบที่แอบทำลายทางอยู่! 😈</p>
@@ -2707,7 +2712,7 @@ function renderHome(){
         </div>
       </div>
       <p class="hint" id="homeError" style="color:var(--danger); margin-top:12px;"></p>
-      <div class="home-note">💡 เกมนี้เหมาะสำหรับเล่นกันเอง ข้อมูลบทบาทและโพรงทองไม่ได้เข้ารหัสสำหรับการโกงผ่าน dev-tools</div>
+      <div class="home-note"></div>
     </div>
     <div class="card-panel" style="display:flex;flex-direction:column;justify-content:center;">
       <h3 style="font-size:1.35rem;">🌟 วิธีเล่นแบบเร็ว</h3>
@@ -2747,7 +2752,7 @@ async function joinRoom(){
     if(!fresh){ if(errEl) errEl.textContent='ไม่พบห้องนี้ หรือเชื่อมต่อ Firebase ไม่ได้'; return; }
     fresh=normalizeRoomData(fresh);
     if(fresh.phase!=='lobby'){ if(errEl) errEl.textContent='เกมเริ่มไปแล้ว เข้าร่วมไม่ได้'; return; }
-    if(fresh.players.length>=10){ if(errEl) errEl.textContent='ห้องเต็มแล้ว'; return; }
+    if(fresh.players.length>=MAX_PLAYERS){ if(errEl) errEl.textContent='ห้องเต็มแล้ว'; return; }
 
     // Create the identity only after the room has been verified. This makes retries stable.
     newPlayerIdentity();
@@ -2761,7 +2766,7 @@ async function joinRoom(){
       if(retry && retry.phase==='lobby'){
         const r=normalizeRoomData(retry);
         if(!r.players.some(p=>p.id===myId)){
-          if(r.players.length>=10){ if(errEl) errEl.textContent='ห้องเต็มแล้ว'; return; }
+          if(r.players.length>=MAX_PLAYERS){ if(errEl) errEl.textContent='ห้องเต็มแล้ว'; return; }
           r.players.push({id:myId,name:myName,gold:0,isHost:false,authUid:firebaseUid});
           pushLog(r,`${myName} เข้าร่วมห้อง`);
         }
@@ -2803,7 +2808,7 @@ function renderLobby(){
       <button class="ghost small" id="btnLeave">ออกจากห้อง</button>
     </div>
     <div class="divider"></div>
-    <h3 style="margin-bottom:10px;">ผู้เล่น (${r.players.length}/10)</h3>
+    <h3 style="margin-bottom:10px;">ผู้เล่น (${r.players.length}/${MAX_PLAYERS})</h3>
     <div class="row">${chips}</div>
     <p class="hint" style="margin-top:10px;">ต้องมีอย่างน้อย 3 คนถึงจะเริ่มได้ ${!canStart?`(ขาดอีก ${3-r.players.length} คน)`:''}</p>
     <div class="divider"></div>
@@ -3123,7 +3128,7 @@ function renderPlayersPanel(r){
       ${broken.length?`<div class="v11-broken">เครื่องมือเสีย ${broken.map(t=>TOOL_ICON[t]).join(' ')}</div>`:''}
     </div>`;
   }).join('');
-  return `<section class="v11-panel v11-players"><div class="v11-panel-title">🐣 ผู้เล่นในห้อง <span>${r.players.length}/10</span></div>${rows}</section>`;
+  return `<section class="v11-panel v11-players"><div class="v11-panel-title">🐣 ผู้เล่นในห้อง <span>${r.players.length}/${MAX_PLAYERS}</span></div>${rows}</section>`;
 }
 
 function renderRolePanelV11(r){

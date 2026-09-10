@@ -527,20 +527,47 @@ function showToast(msg, ms=2600){
 }
 
 /* ============================== STORAGE ============================== */
+// Storage adapter: use ChatGPT shared storage when available, otherwise browser localStorage.
+// Note: localStorage works on GitHub Pages but only within the same browser/device.
+const roomStorage = {
+  async set(key, value){
+    if(window.storage && typeof window.storage.set === 'function'){
+      const res = await window.storage.set(key, value, true);
+      return !!res;
+    }
+    localStorage.setItem(key, value);
+    return true;
+  },
+  async get(key){
+    if(window.storage && typeof window.storage.get === 'function'){
+      const res = await window.storage.get(key, true);
+      return res ? res.value : null;
+    }
+    return localStorage.getItem(key);
+  }
+};
+
 async function saveRoom(newRoom){
   try{
-    const res = await window.storage.set(ROOM_PREFIX+newRoom.code, JSON.stringify(newRoom), true);
-    if(!res){ showToast('บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง'); return false; }
+    const ok = await roomStorage.set(ROOM_PREFIX+newRoom.code, JSON.stringify(newRoom));
+    if(!ok){ showToast('บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง'); return false; }
     room = newRoom;
     return true;
-  }catch(e){ console.error(e); showToast('เกิดปัญหาการเชื่อมต่อ'); return false; }
+  }catch(e){
+    console.error('saveRoom failed:', e);
+    showToast('บันทึกห้องไม่สำเร็จ');
+    return false;
+  }
 }
 async function loadRoom(code){
   try{
-    const res = await window.storage.get(ROOM_PREFIX+code, true);
-    if(!res) return null;
-    return JSON.parse(res.value);
-  }catch(e){ return null; }
+    const value = await roomStorage.get(ROOM_PREFIX+code);
+    if(!value) return null;
+    return JSON.parse(value);
+  }catch(e){
+    console.error('loadRoom failed:', e);
+    return null;
+  }
 }
 
 async function pollLoop(){

@@ -186,6 +186,34 @@
 
   .rotate-row{ display:flex; gap:8px; margin:10px 0; align-items:center; }
 
+  /* Clear card / rotation preview */
+  .hand-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:4px 0 10px;}
+  .hand-title{font-weight:900;color:var(--dirt-dark);font-size:1.05rem;}
+  .hand-count{background:#fff3d0;border:2px solid var(--outline-soft);border-radius:999px;padding:4px 10px;font-weight:900;font-size:.8rem;white-space:nowrap;}
+  .gcard{width:96px;height:132px;justify-content:flex-start;padding:8px 6px;gap:6px;}
+  .gcard .card-name{font-size:.76rem;line-height:1.15;min-height:28px;display:flex;align-items:center;justify-content:center;}
+  .gcard .card-kind{font-size:.62rem;opacity:.72;font-weight:800;}
+  .path-tile-mini,.path-preview-tile{
+    position:relative;background:var(--dirt);border:3px solid var(--dirt-dark);border-radius:12px;flex:0 0 auto;
+    box-shadow:inset 0 0 0 2px rgba(255,255,255,.12);
+  }
+  .path-tile-mini{width:58px;height:58px;margin-top:2px;transition:transform .18s ease;}
+  .path-preview-tile{width:88px;height:88px;}
+  .path-tile-mini .stub,.path-preview-tile .stub{position:absolute;background:#7a4b2a;border-radius:5px;}
+  .path-tile-mini .stub.N{top:-3px;left:20px;width:18px;height:32px}.path-tile-mini .stub.S{bottom:-3px;left:20px;width:18px;height:32px}.path-tile-mini .stub.E{right:-3px;top:20px;width:32px;height:18px}.path-tile-mini .stub.W{left:-3px;top:20px;width:32px;height:18px}
+  .path-preview-tile .stub.N{top:-3px;left:31px;width:22px;height:48px}.path-preview-tile .stub.S{bottom:-3px;left:31px;width:22px;height:48px}.path-preview-tile .stub.E{right:-3px;top:31px;width:48px;height:22px}.path-preview-tile .stub.W{left:-3px;top:31px;width:48px;height:22px}
+  .path-center{position:absolute;inset:36%;background:#7a4b2a;border-radius:50%;z-index:2;}
+  .path-blocked-mark{position:absolute;inset:8px;display:flex;align-items:center;justify-content:center;font-size:2rem;background:#bda77b;border-radius:9px;border:2px solid #9b845b;z-index:3;}
+  .rotation-preview{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#fffaf1;border:3px dashed var(--lantern-dark);border-radius:16px;padding:12px 14px;margin:10px 0;}
+  .rotation-preview-info{display:flex;flex-direction:column;gap:3px;min-width:155px;}
+  .rotation-deg{font-weight:900;color:var(--lantern-dark);font-size:1.05rem;}
+  .connection-text{font-size:.75rem;color:var(--text-dim);font-weight:800;}
+  .cell.placeable::before{content:"✓";position:absolute;right:3px;top:2px;font-size:.68rem;background:var(--safe);border:2px solid #fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;color:#174c20;font-weight:900;z-index:4;}
+  .player-hand-summary{display:flex;align-items:center;gap:5px;flex-wrap:wrap;padding:4px 0 8px 31px;border-bottom:2px dashed #e8dcc0;}
+  .player-hand-summary:last-child{border-bottom:none;}
+  .mini-card-chip{background:#fff;border:2px solid var(--outline-soft);border-radius:7px;min-width:25px;height:31px;padding:0 4px;display:inline-flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:900;box-shadow:0 2px 0 var(--outline-soft);}
+  .cards-left-badge{background:#f4ead4;border:2px solid var(--outline-soft);border-radius:999px;padding:2px 8px;font-size:.72rem;font-weight:900;color:var(--text-dim);}
+
   /* side panel */
   .panel-box{ background:#fff; border:3px solid var(--outline-soft); border-radius:18px; padding:14px; margin-bottom:14px; }
   .panel-box h3{ font-size:1.15rem; color:var(--dirt-dark); margin-bottom:8px; }
@@ -251,6 +279,179 @@
     .home-actions{grid-template-columns:1fr;}
   }
   @media(prefers-reduced-motion:reduce){.mascot,.cute-hero *{animation:none!important;transition:none!important;}}
+
+
+
+/* ====================== CUTE IN-GAME POLISH V3 ====================== */
+:root{
+  --cream:#fff8e7;
+  --peach:#ffd7b8;
+  --mint:#bff0c7;
+  --berry:#ff8eaa;
+  --lavender:#d9c2ff;
+  --cocoa:#6f4a31;
+}
+body::before,body::after{
+  content:"";position:fixed;pointer-events:none;z-index:-1;filter:blur(.2px);opacity:.55;
+}
+body::before{width:190px;height:190px;left:-55px;top:18%;background:radial-gradient(circle,#fff7b2 0 7%,transparent 8%),radial-gradient(circle at 65% 30%,#c7f0ff 0 6%,transparent 7%);}
+body::after{width:220px;height:220px;right:-60px;bottom:8%;background:radial-gradient(circle,#ffd0df 0 8%,transparent 9%),radial-gradient(circle at 35% 70%,#d9c2ff 0 7%,transparent 8%);}
+
+.topbar{
+  background:linear-gradient(180deg,#fffdf7,#fff3d8);
+  border:4px solid var(--outline);
+  border-radius:24px;
+  padding:12px 16px;
+  box-shadow:0 8px 0 #c9945a,0 16px 28px #6b4a2f25;
+  position:relative;overflow:hidden;
+}
+.topbar::after{content:"✨ 💎 ✨";position:absolute;right:18px;bottom:-3px;font-size:.75rem;opacity:.65;letter-spacing:7px;}
+.round-badge{
+  background:linear-gradient(180deg,#fff0a8,#ffd267);
+  border:3px solid var(--outline);
+  border-radius:999px;
+  box-shadow:0 4px 0 #c88d37;
+  padding:8px 14px;
+}
+.turn-banner{
+  border:4px solid var(--outline);
+  border-radius:22px;
+  background:linear-gradient(135deg,#eadbff,#d7c0ff 55%,#c8e8ff);
+  box-shadow:0 6px 0 #9c7fc8,0 12px 24px #6b4a2f1f;
+  font-size:1.05rem;
+  position:relative;overflow:hidden;
+}
+.turn-banner::before{content:"⛏️";position:absolute;left:12px;top:50%;transform:translateY(-50%) rotate(-12deg);font-size:1.35rem;}
+.turn-banner.mine{
+  background:linear-gradient(135deg,#d7ffd8,#baf0c0 55%,#fff1a9);
+  box-shadow:0 6px 0 #67b86f,0 12px 24px #6b4a2f1f;
+  animation:cutePulse 1.8s ease-in-out infinite;
+}
+@keyframes cutePulse{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+
+.board-wrap{
+  padding:16px;
+  background:linear-gradient(180deg,#9a603a,#744225);
+  border:5px solid #56311f;
+  border-radius:28px;
+  box-shadow:inset 0 0 0 5px #c88953,0 10px 0 #4e2f20,0 22px 35px #3d24152e;
+  position:relative;
+}
+.board-wrap::before,.board-wrap::after{position:absolute;top:-18px;font-size:2rem;filter:drop-shadow(0 3px 0 #6f4a31);z-index:2;}
+.board-wrap::before{content:"🏮";left:18px;transform:rotate(-7deg)}
+.board-wrap::after{content:"🏮";right:18px;transform:rotate(7deg)}
+.board{
+  border-radius:18px;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 14px 14px,#e7b16d 0 2px,transparent 3px),
+    linear-gradient(#bb7a42,#a96736);
+  background-size:30px 30px,auto;
+  border:4px solid #4b2e1e;
+}
+.cell{transition:transform .14s ease,filter .14s ease,box-shadow .14s ease;}
+.cell:hover{filter:brightness(1.06);z-index:3}
+.cell.placeable{
+  animation:placeGlow 1.35s ease-in-out infinite;
+  box-shadow:inset 0 0 0 4px #fff6a8,0 0 16px #ffe45c;
+}
+@keyframes placeGlow{0%,100%{transform:scale(.98)}50%{transform:scale(1.035)}}
+.cell.start{background:linear-gradient(145deg,#d9ffd5,#95df88)!important;}
+.cell.goal{background:linear-gradient(145deg,#eee1ff,#c6a6ff)!important;}
+.cell.path{background:linear-gradient(145deg,#e5aa67,#ca7f42)!important;}
+.cell.blocked{background:linear-gradient(145deg,#d4c4aa,#a98e6b)!important;}
+.board-hint{font-weight:800;color:#8a633e;background:#fff6df;border:2px dashed #c9a174;border-radius:12px;padding:7px 10px;margin-top:12px;text-align:center;}
+.legend{background:#fffaf0;border:3px solid #d8b388;border-radius:18px;padding:9px 12px;box-shadow:0 4px 0 #d0ad80;}
+
+.card-panel{
+  background:linear-gradient(180deg,#fffdf8,#fff5e7);
+  border:4px solid var(--outline);
+  border-radius:24px;
+  box-shadow:0 8px 0 #c69a68,0 16px 30px #6b4a2f1c;
+}
+.card-panel .hint{color:#7d664e}
+.hand-head{background:#fff3cf;border:2px dashed #d8aa69;border-radius:14px;padding:8px 10px;}
+.hand-title{display:flex;align-items:center;gap:6px}
+.hand-title::after{content:"✨";font-size:.9rem;}
+.hand-count{background:#fff;border-color:#e0b76f;box-shadow:0 3px 0 #e0b76f;}
+.hand{gap:14px;align-items:flex-end;}
+.gcard{
+  background:linear-gradient(180deg,#fffefa,#fff3dc);
+  border:4px solid #805b3b;
+  border-radius:18px;
+  box-shadow:0 7px 0 #b48358,0 12px 18px #6b4a2f22;
+  position:relative;overflow:hidden;
+}
+.gcard::before{content:"";position:absolute;inset:5px;border:2px solid #ffffffb8;border-radius:12px;pointer-events:none;}
+.gcard:hover{transform:translateY(-9px) rotate(-1deg);box-shadow:0 10px 0 #b48358,0 18px 24px #6b4a2f29;}
+.gcard:nth-child(even):hover{transform:translateY(-9px) rotate(1deg)}
+.gcard.selected{transform:translateY(-12px) scale(1.04);box-shadow:0 0 0 4px #fff,0 0 0 8px #ffc84a,0 13px 0 #cc8d23;animation:selectedWiggle 1.2s ease-in-out infinite;}
+@keyframes selectedWiggle{0%,100%{rotate:0deg}50%{rotate:1.2deg}}
+.gcard.action{background:linear-gradient(180deg,#d8f1ff,#9ed8f3)}
+.gcard.action.sab{background:linear-gradient(180deg,#ffd4d0,#ff9d92)}
+.gcard.action.fix{background:linear-gradient(180deg,#d6f8d9,#9fe2a8)}
+.gcard .card-name{font-weight:1000;color:#5b3d29;text-shadow:0 1px #fff;}
+.gcard .card-kind{background:#ffffffaa;border-radius:999px;padding:3px 6px;color:#765f48;}
+.path-tile-mini,.path-preview-tile{background:linear-gradient(145deg,#d99a5b,#b96f37)!important;border-color:#704329!important;box-shadow:inset 0 0 0 3px #efbd79;}
+.rotation-preview{
+  background:linear-gradient(135deg,#fff6bf,#ffe4a8 45%,#ffe1d4);
+  border:4px solid #8b5a37;
+  border-radius:20px;
+  padding:12px;
+  box-shadow:0 6px 0 #d29a51;
+}
+.rotation-preview::after{content:"👀 เห็นทิศทางก่อนวาง";display:inline-block;margin-left:auto;background:#fff8e8;border:2px solid #d8b483;border-radius:999px;padding:4px 8px;font-size:.72rem;font-weight:900;color:#7a5b3d;}
+.rotation-deg{background:#6f4a31;color:#fff;border-radius:999px;padding:4px 9px;}
+.connection-text{font-weight:900;color:#5d8b3f;}
+.rotate-row button{border-width:3px;box-shadow:0 4px 0 #b88a5b;}
+
+.panel-box{
+  background:linear-gradient(180deg,#fffdf7,#fff4e6);
+  border:4px solid var(--outline);
+  border-radius:22px;
+  box-shadow:0 7px 0 #c29667,0 14px 24px #6b4a2f18;
+  overflow:hidden;
+}
+.panel-box h3{
+  background:linear-gradient(90deg,#ffe6ad,#ffd5c9,#e6d9ff);
+  margin:-12px -12px 10px;
+  padding:10px 12px;
+  border-bottom:3px solid #d6ad7b;
+  color:#634127;
+}
+.player-row{
+  border:3px solid #e5c497;
+  background:#fff;
+  border-radius:14px;
+  padding:8px 9px;
+  margin-top:8px;
+  box-shadow:0 3px 0 #e5c497;
+}
+.player-row.current{background:linear-gradient(90deg,#e6ffd9,#fff2b4);border-color:#7cc96f;box-shadow:0 3px 0 #66ad59,0 0 14px #a7ef8f88;}
+.player-row.current::after{content:" ⭐"}
+.player-hand-summary{margin:0 6px 3px;padding:7px 6px 9px 10px;background:#fff8ea;border-radius:0 0 12px 12px;border-bottom:2px dashed #e6c99c;}
+.mini-card-chip{background:linear-gradient(180deg,#fff,#fff1d8);box-shadow:0 2px 0 #cfa574;transform:rotate(-2deg)}
+.mini-card-chip:nth-child(even){transform:rotate(2deg)}
+.role-cartoon{background:radial-gradient(circle,#fff8cf 0 46%,transparent 47%);padding-top:4px;}
+.log{background:#fffaf2;border:2px dashed #dfbd8e;border-radius:12px;padding:8px;}
+.log div{padding:6px 8px;border-radius:8px;margin-bottom:4px;background:#fff;}
+.log div:nth-child(odd){background:#fff4d8;}
+
+.primary,.ghost,button.small{
+  border-radius:14px!important;
+  font-weight:950!important;
+  transition:transform .12s ease,box-shadow .12s ease,filter .12s ease;
+}
+.primary:hover,.ghost:hover,button.small:hover{transform:translateY(-2px);filter:brightness(1.04)}
+.primary{background:linear-gradient(180deg,#ffc85b,#f5a92d)!important;box-shadow:0 5px 0 #b9771f!important;}
+.ghost{background:linear-gradient(180deg,#fff,#f6ead6)!important;}
+.toast{border:4px solid var(--outline)!important;border-radius:18px!important;background:#fff8cf!important;color:#5a3d28!important;box-shadow:0 7px 0 #b78655,0 16px 32px #0002!important;}
+.modal{border-radius:26px!important;border:5px solid var(--outline)!important;background:linear-gradient(180deg,#fffdf9,#fff1dc)!important;box-shadow:0 12px 0 #9b6b46,0 24px 60px #0004!important;}
+
+@media(max-width:860px){
+  .topbar{border-radius:18px}.board-wrap{padding:10px;border-radius:20px}.panel-box{border-radius:18px}.gcard{width:84px;height:118px}.hand{gap:10px;justify-content:center}.rotation-preview{align-items:center}.rotation-preview::after{display:none}
+}
+@media(prefers-reduced-motion:reduce){.turn-banner.mine,.cell.placeable,.gcard.selected{animation:none!important}}
 
 </style>
 </head>
@@ -429,36 +630,66 @@ function hasAnyNeighborStructure(r, x, y){
   }
   return false;
 }
+function isPathStruct(c){
+  return !!c && (c.type==='start' || c.type==='straight' || c.type==='bend' || c.type==='tjunction' || c.type==='cross' || c.type==='blocked');
+}
+function isConnectedToStart(r, x, y){
+  const target = cellKey(x,y);
+  if(target===START_POS) return true;
+  if(!r.game.board[target]) return false;
+  const q=[START_POS], seen=new Set([START_POS]);
+  while(q.length){
+    const key=q.shift();
+    if(key===target) return true;
+    const [cx,cy]=key.split(',').map(Number);
+    const cur=r.game.board[key];
+    if(!cur) continue;
+    for(const d of DIRS){
+      if(!cur[d]) continue;
+      const [dx,dy]=DELTA[d];
+      const nk=cellKey(cx+dx,cy+dy);
+      const nb=r.game.board[nk];
+      if(!nb || !nb[OPP[d]] || seen.has(nk)) continue;
+      seen.add(nk); q.push(nk);
+    }
+  }
+  return false;
+}
 function canPlaceAt(r, x, y, conn){
   const key = cellKey(x,y);
   if(x<BOARD_MIN_X||x>BOARD_MAX_X||y<BOARD_MIN_Y||y>BOARD_MAX_Y) return false;
-  if(key===START_POS) return false;
-  if(r.game.board[key]) return false;
-  if(r.game.goals[key]) return false; // can't place ON a goal slot
-  if(!hasAnyNeighborStructure(r,x,y)) return false;
+  if(key===START_POS || r.game.board[key] || r.game.goals[key]) return false;
+
+  let touchesBoard = false;
+  let joinsConnectedTunnel = false;
+
   for(const d of DIRS){
     const [dx,dy] = DELTA[d];
     const nx=x+dx, ny=y+dy;
     const nkey = cellKey(nx,ny);
-    let neighborConn = null;
-    if(nkey===START_POS) neighborConn = r.game.board[nkey];
-    else if(r.game.board[nkey]) neighborConn = r.game.board[nkey];
-    else if(r.game.goals[nkey]){
-      if(r.game.goals[nkey].revealed && !r.game.goals[nkey].isGold){
-        neighborConn = { N:false,E:false,S:false,W:false }; // revealed rock = solid wall
-      } else {
-        continue; // unrevealed goal or gold goal slot -> no constraint
-      }
-    } else {
-      continue; // empty, no constraint
-    }
-    const sideTowardNeighbor = d;
-    const sideOfNeighborTowardMe = OPP[d];
-    const myOpen = conn[sideTowardNeighbor];
-    const neighborOpen = neighborConn[sideOfNeighborTowardMe];
+
+    // Goal cards are face-down/hidden, so they do not constrain placement until reached.
+    // They also do not count as a tunnel connection by themselves.
+    if(r.game.goals[nkey]) continue;
+
+    const neighbor = r.game.board[nkey];
+    if(!neighbor) continue;
+    touchesBoard = true;
+
+    const myOpen = !!conn[d];
+    const neighborOpen = !!neighbor[OPP[d]];
+
+    // Every touching tunnel edge must agree: open-open or closed-closed.
     if(myOpen !== neighborOpen) return false;
+
+    // A new path must actually join the network that comes from the start tile.
+    if(myOpen && neighborOpen && isConnectedToStart(r,nx,ny)) joinsConnectedTunnel = true;
   }
-  return true;
+
+  if(!touchesBoard) return false;
+  // Special blocked tile remains usable as an obstruction; normal path tiles must connect to the live tunnel network.
+  const isFullyBlocked = !DIRS.some(d=>conn[d]);
+  return isFullyBlocked ? true : joinsConnectedTunnel;
 }
 function allPlaceableCells(r){
   const out = [];
@@ -861,12 +1092,28 @@ function renderBoard(r){
       cells += renderCell(r,x,y);
     }
   }
-  return `<div class="board-wrap"><div class="board">${cells}</div></div><div class="board-hint">👉 เลื่อนนิ้วซ้าย-ขวาบนกระดานเพื่อดูทั้งหมด</div>`;
+  return `<div class="board-wrap"><div class="board">${cells}</div></div><div class="board-hint">🗺️ เลื่อนซ้าย–ขวาเพื่อสำรวจเหมืองทั้งหมด ✨</div>`;
 }
 function getSelectedCard(){
   if(!room || !ui.selectedCardUid) return null;
   const hand = room.game.hands[myId] || [];
   return hand.find(c=>c.uid===ui.selectedCardUid) || null;
+}
+function connectionLabel(conn){
+  const th={N:'บน',E:'ขวา',S:'ล่าง',W:'ซ้าย'};
+  const open=DIRS.filter(d=>conn[d]).map(d=>th[d]);
+  return open.length ? `ทางออก: ${open.join(' • ')}` : 'ปิดทุกด้าน';
+}
+function renderPathTile(card, rot=0, cls='path-tile-mini'){
+  const base = PATH_SHAPES[card?.type] || {N:false,E:false,S:false,W:false};
+  const conn = rotateConn(base, rot);
+  if(card?.type==='blocked') return `<div class="${cls}"><div class="path-blocked-mark">🪨</div></div>`;
+  const stubs = DIRS.filter(d=>conn[d]).map(d=>`<span class="stub ${d}"></span>`).join('');
+  return `<div class="${cls}">${stubs}<span class="path-center"></span></div>`;
+}
+function cardMiniSummary(card){
+  if(card.kind==='path') return PATH_SHAPES[card.type]?.icon || '🛤️';
+  return cardIcon(card);
 }
 function cardIcon(card){
   if(card.kind==='path') return PATH_SHAPES[card.type].icon;
@@ -895,11 +1142,15 @@ function renderHand(r){
     const selected = ui.selectedCardUid===c.uid;
     const disabled = !isMyTurn || blockedByTool;
     let extraCls = c.kind==='action' ? (c.type==='break'?'action sab':(c.type==='repair'?'action fix':'action')) : '';
-    return `<div class="gcard ${extraCls} ${selected?'selected':''} ${disabled?'disabled':''}" data-uid="${c.uid}" title="${blockedByTool?'เครื่องมือคุณเสีย เล่นไพ่ทางเดินไม่ได้':''}">
-      <div class="icon">${cardIcon(c)}</div><div>${cardLabel(c)}</div>
+    const visual = isPath ? renderPathTile(c, selected ? ui.rotation : 0) : `<div class="icon">${cardIcon(c)}</div>`;
+    const reason = blockedByTool ? 'เครื่องมือคุณเสีย จึงเล่นไพ่ทางเดินไม่ได้' : (!isMyTurn ? 'ยังไม่ถึงตาของคุณ' : 'คลิกเพื่อเลือกไพ่');
+    return `<div class="gcard ${extraCls} ${selected?'selected':''} ${disabled?'disabled':''}" data-uid="${c.uid}" title="${reason}">
+      ${visual}
+      <div class="card-name">${cardLabel(c)}</div>
+      <div class="card-kind">${isPath ? (selected ? `หมุน ${ui.rotation*90}°` : 'ไพ่ทางเดิน') : 'ไพ่คำสั่ง'}</div>
     </div>`;
   }).join('');
-  return `<div class="hand">${cards}</div>`;
+  return `<div class="hand-head"><div class="hand-title">🃏 ไพ่ในมือของคุณ</div><div class="hand-count">${myHand.length} ใบ</div></div><div class="hand">${cards}</div>`;
 }
 
 function renderSidePanel(r){
@@ -910,27 +1161,32 @@ function renderSidePanel(r){
     const broken = (g.brokenTools[p.id]||[]);
     const roleKnown = p.id===myId; // only reveal own role in UI (others hidden even though technically in shared data)
     const roleTag = roleKnown ? `<span class="role-tag ${myRole==='saboteur'?'sab':'dig'}">${myRole==='saboteur'?'ซาโบเทอร์':'นักขุด'}</span>` : '';
+    const hand = g.hands[p.id] || [];
+    const ownHand = p.id===myId;
+    const handSummary = ownHand
+      ? hand.map(c=>`<span class="mini-card-chip" title="${escapeHtml(cardLabel(c))}">${cardMiniSummary(c)}</span>`).join('')
+      : `<span class="cards-left-badge">🃏 ${hand.length} ใบ</span>`;
     return `<div class="player-row ${isCur?'current':''}">
       <span>${isCur?'▶ ':''}${avatarFor(p.id)} ${escapeHtml(p.name)} ${roleTag}</span>
       <span class="gold-count">${p.gold}💰</span>
     </div>
-    ${broken.length? `<div class="tool-broken">เครื่องมือเสีย: ${broken.map(t=>TOOL_ICON[t]).join(' ')}</div>`:''}`;
+    <div class="player-hand-summary">${handSummary}${broken.length? `<span class="tool-broken">เสีย: ${broken.map(t=>TOOL_ICON[t]).join(' ')}</span>`:''}</div>`;
   }).join('');
   const logHtml = (r.log||[]).slice().reverse().map(l=>`<div>${escapeHtml(l)}</div>`).join('');
   const isSab = myRole==='saboteur';
   return `
   <div class="panel-box">
-    <h3>🐾 ผู้เล่นและทอง</h3>
+    <h3>🐾 แก๊งนักขุดในเหมือง</h3>
     ${players}
   </div>
   <div class="panel-box" style="text-align:center;">
-    <h3>บทบาทของคุณ</h3>
+    <h3>🎭 บทบาทลับของคุณ</h3>
     <div class="role-cartoon">${isSab ? SVG_SABOTEUR : SVG_MINER}</div>
     <div style="font-size:1.2rem; font-weight:800; color:${isSab?'var(--danger-dark)':'var(--grass-dark)'};">${isSab ? 'คุณคือซาโบเทอร์! 🎭' : 'คุณคือนักขุดทอง! ⛏️'}</div>
     <p class="hint" style="margin-top:6px;">${isSab ? 'แผนลับ: แอบขัดขวางจนการ์ดหมดสำรับก่อนใครเจอทอง 😈' : 'ภารกิจ: ขุดทางไปให้ถึงโพรงทองให้เจอ! 💎'}</p>
   </div>
   <div class="panel-box">
-    <h3>📜 บันทึกเกม</h3>
+    <h3>📜 เรื่องเล่าในเหมือง</h3>
     <div class="log">${logHtml}</div>
   </div>`;
 }
@@ -945,15 +1201,23 @@ function renderGame(){
   if(r.phase==='playing'){
     if(isMyTurn && selectedCard){
       if(selectedCard.kind==='path'){
+        const previewConn = rotateConn(PATH_SHAPES[selectedCard.type], ui.rotation);
         controls = `
+        <div class="rotation-preview">
+          ${renderPathTile(selectedCard, ui.rotation, 'path-preview-tile')}
+          <div class="rotation-preview-info">
+            <strong>กำลังวาง: ${cardLabel(selectedCard)}</strong>
+            <span class="rotation-deg">${['↑','→','↓','←'][ui.rotation]} หมุน ${ui.rotation*90}°</span>
+            <span class="connection-text">${connectionLabel(previewConn)}</span>
+          </div>
+        </div>
         <div class="rotate-row">
           <span class="hint">หมุนไพ่:</span>
-          <button class="small" id="btnRotateL">⟲ หมุน</button>
-          <span class="mono" style="font-size:1.4rem;">${['↑','→','↓','←'][ui.rotation]}</span>
-          <button class="small" id="btnRotateR">⟳ หมุน</button>
+          <button class="small" id="btnRotateL">⟲ ซ้าย 90°</button>
+          <button class="small" id="btnRotateR">ขวา 90° ⟳</button>
           <button class="ghost small" id="btnCancelSel">ยกเลิก</button>
         </div>
-        <p class="hint">คลิกช่องบนกระดานที่มีขอบเส้นประสีส้มเพื่อวางไพ่</p>`;
+        <p class="hint">✅ วางได้เฉพาะช่องเส้นประที่ทางเดินของไพ่เชื่อมตรงกับไพ่ข้างเคียงทุกด้าน และเชื่อมถึงทางจากจุดเริ่ม</p>`;
         ui.targetMode = 'place';
       } else if(selectedCard.type==='rockfall'){
         controls = `<p class="hint">คลิกไพ่ทางเดินบนกระดาน (ที่ไม่ใช่จุดเริ่ม/โพรงทอง) เพื่อทำลาย</p>
@@ -1013,7 +1277,7 @@ function renderGame(){
     <div class="brand" style="margin:0;"><span class="mascot" style="font-size:2rem;">🐹</span><h1 style="font-size:1.6rem;">${r.code}</h1></div>
     <div class="round-badge">🎲 ยกที่ ${r.round}/${MAX_ROUNDS} · 🃏 เหลือ ${g.deck.length} ใบ</div>
   </div>
-  ${r.phase==='playing' ? `<div class="turn-banner ${isMyTurn?'mine':''}">${isMyTurn ? '🔔 ตาของคุณแล้ว!' : `⏳ รอ ${avatarFor(currentPlayerId(r))} ${escapeHtml(playerName(r,currentPlayerId(r)))}`}</div>` : ''}
+  ${r.phase==='playing' ? `<div class="turn-banner ${isMyTurn?'mine':''}">${isMyTurn ? '🌟 ตาของคุณแล้ว! เลือกไพ่แล้วลุยเลย ⛏️' : `⏳ รอ ${avatarFor(currentPlayerId(r))} ${escapeHtml(playerName(r,currentPlayerId(r)))}`}</div>` : ''}
   ${roundEndPanel}
   <div class="game-grid">
     <div>

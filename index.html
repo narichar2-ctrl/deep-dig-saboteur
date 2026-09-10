@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Deep Dig — Saboteur Online</title>
+<title>Deep Dig — Saboteur Online (Firebase)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -526,46 +526,59 @@ function showToast(msg, ms=2600){
   window._toastT = setTimeout(()=>{ ui.toast=null; render(); }, ms);
 }
 
-/* ============================== STORAGE ============================== */
-// Storage adapter: use ChatGPT shared storage when available, otherwise browser localStorage.
-// Note: localStorage works on GitHub Pages but only within the same browser/device.
-const roomStorage = {
-  async set(key, value){
-    if(window.storage && typeof window.storage.set === 'function'){
-      const res = await window.storage.set(key, value, true);
-      return !!res;
-    }
-    localStorage.setItem(key, value);
-    return true;
-  },
-  async get(key){
-    if(window.storage && typeof window.storage.get === 'function'){
-      const res = await window.storage.get(key, true);
-      return res ? res.value : null;
-    }
-    return localStorage.getItem(key);
+/* ============================== FIREBASE REALTIME DATABASE ============================== */
+// ใช้ Firebase Realtime Database ผ่าน REST API เพื่อให้ GitHub Pages เล่นข้ามเครื่องได้
+// Project: deep-dig-saboteur / Region: asia-southeast1 (Singapore)
+const FIREBASE_DB_URL = 'https://deep-dig-saboteur-default-rtdb.asia-southeast1.firebasedatabase.app';
+
+function firebaseRoomUrl(code){
+  const key = ROOM_PREFIX + String(code || '').toUpperCase();
+  return `${FIREBASE_DB_URL}/${encodeURIComponent(key)}.json`;
+}
+
+async function fetchWithTimeout(url, options={}, timeoutMs=10000){
+  const controller = new AbortController();
+  const timer = setTimeout(()=>controller.abort(), timeoutMs);
+  try{
+    return await fetch(url, { ...options, signal: controller.signal, cache:'no-store' });
+  } finally {
+    clearTimeout(timer);
   }
-};
+}
 
 async function saveRoom(newRoom){
   try{
-    const ok = await roomStorage.set(ROOM_PREFIX+newRoom.code, JSON.stringify(newRoom));
-    if(!ok){ showToast('บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง'); return false; }
+    const res = await fetchWithTimeout(firebaseRoomUrl(newRoom.code), {
+      method:'PUT',
+      headers:{ 'Content-Type':'application/json' },
+      body:JSON.stringify(newRoom)
+    });
+    if(!res.ok){
+      const detail = await res.text().catch(()=> '');
+      console.error('Firebase save failed:', res.status, detail);
+      showToast(`บันทึกห้องไม่สำเร็จ (${res.status})`);
+      return false;
+    }
     room = newRoom;
     return true;
   }catch(e){
-    console.error('saveRoom failed:', e);
-    showToast('บันทึกห้องไม่สำเร็จ');
+    console.error('Firebase connection error:', e);
+    showToast('เชื่อมต่อห้องออนไลน์ไม่ได้ ลองใหม่อีกครั้ง');
     return false;
   }
 }
+
 async function loadRoom(code){
   try{
-    const value = await roomStorage.get(ROOM_PREFIX+code);
-    if(!value) return null;
-    return JSON.parse(value);
+    const res = await fetchWithTimeout(firebaseRoomUrl(code), { method:'GET' });
+    if(!res.ok){
+      console.error('Firebase load failed:', res.status);
+      return null;
+    }
+    const data = await res.json();
+    return data || null;
   }catch(e){
-    console.error('loadRoom failed:', e);
+    console.error('Firebase load error:', e);
     return null;
   }
 }

@@ -1012,6 +1012,147 @@ body::after{width:260px;height:260px;right:-90px;bottom:8%;background:radial-gra
   font-size:32px;
   filter:drop-shadow(0 2px 0 #fff7);
 }
+
+/* ===== V20 CUTE CARDS: friendly action-card symbols ===== */
+.card-action-art{
+  overflow:visible!important;
+  position:relative!important;
+}
+.cute-card-symbol{
+  width:100%;
+  height:100%;
+  position:relative;
+  display:grid;
+  place-items:center;
+  border-radius:14px;
+  isolation:isolate;
+}
+.cute-card-symbol .cute-main{
+  font-size:34px;
+  line-height:1;
+  transform:translateY(-4px);
+  filter:drop-shadow(0 3px 0 rgba(255,255,255,.85)) drop-shadow(0 3px 2px rgba(66,39,20,.16));
+}
+.cute-card-symbol .cute-overlay{
+  position:absolute;
+  right:-8px;
+  bottom:8px;
+  width:27px;
+  height:27px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:#fffdf4;
+  border:2px solid #7a5637;
+  font-size:15px;
+  box-shadow:0 3px 0 rgba(91,55,31,.24);
+}
+.cute-card-symbol .cute-burst{
+  position:absolute;
+  right:-9px;
+  top:-7px;
+  font-size:23px;
+  transform:rotate(8deg);
+  filter:drop-shadow(0 2px 0 #fff);
+}
+.cute-card-symbol .cute-x{
+  position:absolute;
+  right:-4px;
+  top:-3px;
+  width:23px;
+  height:23px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:#fff7f6;
+  border:2px solid #c8453a;
+  color:#c8453a;
+  font-size:13px;
+  font-weight:1000;
+  box-shadow:0 2px 0 #b84b43;
+}
+.cute-card-symbol .cute-crack{
+  background:#fff0ed;
+  border-color:#c64b42;
+}
+.cute-card-symbol .cute-spark{
+  position:absolute;
+  left:-7px;
+  top:-8px;
+  font-size:20px;
+  animation:twinkle 1.7s ease-in-out infinite;
+}
+.cute-card-symbol .cute-mini-label{
+  position:absolute;
+  left:50%;
+  bottom:-13px;
+  transform:translateX(-50%);
+  white-space:nowrap;
+  border-radius:999px;
+  padding:2px 7px;
+  background:#fffdf5;
+  border:1.5px solid #8a6749;
+  color:#533821;
+  font-size:8.5px;
+  line-height:1.25;
+  font-weight:1000;
+  letter-spacing:.01em;
+  box-shadow:0 2px 0 rgba(96,59,33,.12);
+}
+.card-tone-map .cute-mini-label{border-color:#5a95b6;color:#2d6688;background:#eefaff}
+.card-tone-rock .cute-mini-label{border-color:#bd7149;color:#8f452c;background:#fff4e9}
+.card-tone-sab .cute-mini-label{border-color:#c65e56;color:#8c332c;background:#fff0ee}
+.card-tone-help .cute-mini-label{border-color:#5e9a62;color:#35703b;background:#f1fff1}
+
+.card-tone-sab .card-action-art{
+  box-shadow:inset 0 0 0 3px #fff8,0 4px 0 #93443d,0 0 0 3px #ffd7d2!important;
+}
+.card-tone-help .card-action-art{
+  box-shadow:inset 0 0 0 3px #fff8,0 4px 0 #4d8051,0 0 0 3px #d9f6db!important;
+}
+.card-tone-map .card-action-art{
+  box-shadow:inset 0 0 0 3px #fff8,0 4px 0 #4e87a2,0 0 0 3px #d6f0ff!important;
+}
+.card-tone-rock .card-action-art{
+  box-shadow:inset 0 0 0 3px #fff8,0 4px 0 #9e5736,0 0 0 3px #ffe1c7!important;
+}
+
+/* Make action cards easier to scan like the illustrated reference */
+.gcard.card-pro:not(.card-tone-path):not(.card-tone-block) .card-pro-art{
+  min-height:82px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+.gcard.card-pro:not(.card-tone-path):not(.card-tone-block) .card-action-art{
+  width:78px!important;
+  height:78px!important;
+}
+.gcard.card-pro:not(.card-tone-path):not(.card-tone-block) .card-pro-name{
+  font-size:14px!important;
+  font-weight:1000!important;
+}
+.gcard.card-pro:not(.card-tone-path):not(.card-tone-block) .card-pro-desc{
+  font-size:10px!important;
+  font-weight:850!important;
+}
+
+@media(max-width:760px){
+  .gcard.card-pro:not(.card-tone-path):not(.card-tone-block){
+    min-height:202px!important;
+    height:202px!important;
+  }
+  .gcard.card-pro:not(.card-tone-path):not(.card-tone-block) .card-pro-art{
+    min-height:96px!important;
+  }
+  .gcard.card-pro:not(.card-tone-path):not(.card-tone-block) .card-action-art{
+    width:88px!important;
+    height:88px!important;
+  }
+  .cute-card-symbol .cute-main{font-size:42px}
+  .cute-card-symbol .cute-overlay{width:30px;height:30px;font-size:17px;right:-7px}
+  .cute-card-symbol .cute-mini-label{font-size:9.5px;bottom:-14px}
+}
 .card-art-path{
   width:64px!important;height:64px!important;
   margin:0!important;
@@ -1520,7 +1661,7 @@ const DECK_RECIPE = [
 ];
 const HAND_SIZE = 6;
 const MAX_ROUNDS = 3;
-const APP_VERSION = 'V20 DYNAMIC GOALS';
+const APP_VERSION = 'V20 CUTE CARDS';
 
 /* ============================== STATE ============================== */
 let myId = sessionStorage.getItem('deepDigPlayerId') || crypto.randomUUID();
@@ -2310,13 +2451,52 @@ function cardIcon(card){
   if(card.type==='repair') return '🔧';
   return '❓';
 }
+
+function renderCuteActionIcon(card){
+  if(!card) return '<div class="cute-card-symbol"><span class="cute-main">❓</span></div>';
+
+  if(card.type==='rockfall'){
+    return `<div class="cute-card-symbol cute-rockfall" aria-hidden="true">
+      <span class="cute-main">🪨</span><span class="cute-burst">💥</span>
+      <span class="cute-mini-label">พังทาง</span>
+    </div>`;
+  }
+
+  if(card.type==='map'){
+    return `<div class="cute-card-symbol cute-map" aria-hidden="true">
+      <span class="cute-main">🗺️</span><span class="cute-overlay">🔍</span>
+      <span class="cute-mini-label">แอบดู</span>
+    </div>`;
+  }
+
+  if(card.type==='break'){
+    return `<div class="cute-card-symbol cute-break" aria-hidden="true">
+      <span class="cute-main">${TOOL_ICON[card.tool] || '🛠️'}</span>
+      <span class="cute-overlay cute-crack">⚡</span>
+      <span class="cute-x">✖</span>
+      <span class="cute-mini-label">ทำให้เสีย</span>
+    </div>`;
+  }
+
+  if(card.type==='repair'){
+    return `<div class="cute-card-symbol cute-repair" aria-hidden="true">
+      <span class="cute-main">${TOOL_ICON[card.tool] || '🛠️'}</span>
+      <span class="cute-overlay">🔧</span>
+      <span class="cute-spark">✨</span>
+      <span class="cute-mini-label">ซ่อม</span>
+    </div>`;
+  }
+
+  return `<div class="cute-card-symbol"><span class="cute-main">${cardIcon(card)}</span></div>`;
+}
+
 function cardLabel(card){
   const names = { straight:'ทางตรง', bend:'ทางเลี้ยว', tjunction:'สามแพร่ง', cross:'สี่แพร่ง', blocked:'ทางตัน' };
   if(card.kind==='path') return names[card.type];
-  if(card.type==='rockfall') return 'หินถล่ม';
-  if(card.type==='map') return 'แผนที่ลับ';
-  if(card.type==='break') return `ทำลาย ${TOOL_ICON[card.tool]}`;
-  if(card.type==='repair') return `ซ่อม ${TOOL_ICON[card.tool]}`;
+  if(card.type==='rockfall') return 'หินถล่ม 💥';
+  if(card.type==='map') return 'แผนที่ลับ 🔍';
+  if(card.type==='break') return `ทำให้เสีย ${TOOL_ICON[card.tool]}`;
+  if(card.type==='repair') return `ซ่อม ${TOOL_ICON[card.tool]} ✨`;
   return '';
 }
 
@@ -2368,7 +2548,7 @@ function renderHand(r){
       c.type==='rockfall' ? 'card-tone-rock' : '';
     const visual = isPath
       ? renderPathTile(c, selected ? ui.rotation : 0, 'card-art-path')
-      : `<div class="card-action-art"><span>${cardIcon(c)}</span></div>`;
+      : `<div class="card-action-art">${renderCuteActionIcon(c)}</div>`;
     const reason = !isMyTurn
       ? 'ยังไม่ถึงตาของคุณ'
       : (blockedByTool ? 'เครื่องมือเสีย: เลือกไพ่ได้ แต่ต้องทิ้งหรือซ่อมก่อนวางทาง' : cardDescription(c));

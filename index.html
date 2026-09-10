@@ -677,7 +677,7 @@ const DECK_RECIPE = [
 ];
 const HAND_SIZE = 6;
 const MAX_ROUNDS = 3;
-const APP_VERSION = 'V11';
+const APP_VERSION = 'V12';
 
 /* ============================== STATE ============================== */
 let myId = sessionStorage.getItem('deepDigPlayerId') || crypto.randomUUID();
@@ -686,6 +686,9 @@ let myName = '';
 let roomCode = null;
 let room = null; // latest fetched room object
 let pollTimer = null;
+let pollBusy = false;
+let lastRoomSnapshot = '';
+let lastRemoteUpdateAt = 0;
 let ui = {
   screen: 'home', // home | lobby | game | gameover
   selectedCardUid: null,
@@ -735,8 +738,14 @@ async function fetchWithTimeout(url, options={}, timeoutMs=10000){
   }
 }
 
+function roomSnapshot(r){
+  try { return JSON.stringify(r); } catch(e) { return ''; }
+}
+
 async function saveRoom(newRoom){
   try{
+    newRoom.rev = Number(newRoom.rev || 0) + 1;
+    newRoom.updatedAt = Date.now();
     const res = await fetchWithTimeout(firebaseRoomUrl(newRoom.code), {
       method:'PUT',
       headers:{ 'Content-Type':'application/json' },
@@ -749,6 +758,8 @@ async function saveRoom(newRoom){
       return false;
     }
     room = newRoom;
+    lastRoomSnapshot = roomSnapshot(newRoom);
+    lastRemoteUpdateAt = Date.now();
     return true;
   }catch(e){
     console.error('Firebase connection error:', e);
@@ -759,7 +770,7 @@ async function saveRoom(newRoom){
 
 async function loadRoom(code){
   try{
-    const res = await fetchWithTimeout(firebaseRoomUrl(code), { method:'GET' });
+    const res = await fetchWithTimeout(firebaseRoomUrl(code), { method:'GET', cache:'no-store' });
     if(!res.ok){
       console.error('Firebase load failed:', res.status);
       return null;
@@ -772,15 +783,37 @@ async function loadRoom(code){
   }
 }
 
+function shouldKeepSelection(fresh){
+  if(!ui.selectedCardUid || fresh?.phase!=='playing' || !fresh?.game) return false;
+  const hand = fresh.game.hands?.[myId] || [];
+  return hand.some(c=>c.uid===ui.selectedCardUid) && currentPlayerId(fresh)===myId;
+}
+
 async function pollLoop(){
-  if(!roomCode) return;
-  const fresh = await loadRoom(roomCode);
-  if(fresh){ room = fresh; render(); }
+  if(!roomCode || pollBusy) return;
+  pollBusy = true;
+  try{
+    const fresh = await loadRoom(roomCode);
+    if(!fresh) return;
+    const snap = roomSnapshot(fresh);
+    // Critical fix: do NOT rebuild the DOM when Firebase data did not change.
+    // The old 900ms forced render could destroy a button/cell between pointer-down and click.
+    if(snap === lastRoomSnapshot) return;
+    const keepSelection = shouldKeepSelection(fresh);
+    room = fresh;
+    lastRoomSnapshot = snap;
+    lastRemoteUpdateAt = Date.now();
+    if(!keepSelection){ ui.selectedCardUid=null; ui.rotation=0; ui.targetMode=null; }
+    render();
+  } finally {
+    pollBusy = false;
+  }
 }
 function startPolling(){
   clearInterval(pollTimer);
+  lastRoomSnapshot = roomSnapshot(room);
   pollLoop();
-  pollTimer = setInterval(pollLoop, 900);
+  pollTimer = setInterval(pollLoop, 650);
 }
 
 /* ============================== GAME SETUP ============================== */
@@ -1235,15 +1268,19 @@ function renderLobby(){
 }
 async function startGame(){
   ui.loading=true; render();
-  let fresh = await loadRoom(roomCode);
-  if(!fresh) return;
+  const fresh = await loadRoom(roomCode);
+  if(!fresh){ ui.loading=false; showToast('โหลดห้องไม่สำเร็จ'); render(); return; }
+  const me = fresh.players.find(p=>p.id===myId);
+  if(!me?.isHost){ ui.loading=false; showToast('เฉพาะโฮสต์เท่านั้นที่เริ่มเกมได้'); render(); return; }
+  if(fresh.players.length < 3){ ui.loading=false; showToast('ต้องมีอย่างน้อย 3 คน'); render(); return; }
   startNewRound(fresh);
-  await saveRoom(fresh);
+  const ok = await saveRoom(fresh);
   ui.loading=false;
-  render();
+  if(ok){ showToast('🎮 เริ่มเกมแล้ว กำลังซิงก์ผู้เล่นทุกคน'); render(); }
 }
 async function leaveRoom(){
   clearInterval(pollTimer);
+  pollBusy=false; lastRoomSnapshot='';
   roomCode = null; room = null; ui.screen='home';
   render();
 }
@@ -1493,7 +1530,7 @@ function renderGame(){
   }
 
   const heroAvatars=r.players.slice(0,3).map(p=>avatarFor(p.id)).join('');
-  return `<div class="v11-version">${APP_VERSION}</div>
+  return `<div class="v11-version">${APP_VERSION} • SYNC</div>
     <header class="v11-hero">
       <div class="v11-logo"><strong>DEEP DIG</strong><span>SABOTEUR</span><em>ขุด สนุก ลุ้น โพรงลับ! 💎</em></div>
       <div class="v11-hero-miners">${heroAvatars}<div class="v11-spark">✨</div></div>
@@ -1590,26 +1627,30 @@ function attachHandlers(){
   if(el('btnDiscardSelected')) el('btnDiscardSelected').onclick=()=>{const c=getSelectedCard();if(c)submitAction(r=>doDiscard(r,c.uid),null);};
 
   document.querySelectorAll('[data-card-select="1"]').forEach(cardEl=>{
-    cardEl.onclick=ev=>{
-      ev.preventDefault();ev.stopPropagation();
+    const selectCard = ev=>{
+      ev.preventDefault(); ev.stopPropagation();
       if(cardEl.disabled||cardEl.classList.contains('disabled')) return;
       const uidv=cardEl.getAttribute('data-uid');
       const handNow=room?.game?.hands?.[myId]||[];
       const card=handNow.find(c=>c.uid===uidv);
       if(!card){showToast('ไพ่ใบนี้ไม่อยู่ในมือแล้ว');return;}
-      if(currentPlayerId(room)!==myId){showToast('⏳ ยังไม่ถึงตาของคุณ');return;}
+      if(currentPlayerId(room)!==myId){showToast(`⏳ ตอนนี้เป็นตาของ ${playerName(room,currentPlayerId(room))}`);return;}
       ui.selectedCardUid=(ui.selectedCardUid===uidv)?null:uidv;
       ui.targetMode=null;
       ui.rotation=card.kind==='path'?bestRotationForCard(room,card):0;
       render();
     };
+    // pointerdown happens before a background sync can replace the DOM node.
+    cardEl.onpointerdown=selectCard;
+    cardEl.onclick=ev=>{ ev.preventDefault(); };
   });
 
   document.querySelectorAll('[data-break-target]').forEach(x=>x.onclick=()=>{const c=getSelectedCard();if(c)submitAction(r=>doBreak(r,c.uid,c.tool,x.getAttribute('data-break-target')),null);});
   document.querySelectorAll('[data-repair-target]').forEach(x=>x.onclick=()=>{const c=getSelectedCard();if(c)submitAction(r=>doRepair(r,c.uid,c.tool,x.getAttribute('data-repair-target')),null);});
 
   document.querySelectorAll('.cell').forEach(cell=>{
-    cell.onclick=()=>{
+    const handleCell = ev=>{
+      if(ev){ ev.preventDefault(); ev.stopPropagation(); }
       if(!room||room.phase!=='playing') return;
       const x=Number(cell.dataset.x), y=Number(cell.dataset.y), key=cell.dataset.key;
       const selected=getSelectedCard();
@@ -1628,6 +1669,8 @@ function attachHandlers(){
       if(key===START_POS){showToast('🏠 จุดเริ่มขุด — ต่อทางจากรอบ ๆ จุดนี้');return;}
       if(GOAL_POS.includes(key)){const goal=room.game.goals[key];showToast(goal?.revealed?(goal.isGold?'💎 เจอทองแล้ว!':'🪨 ทางตัน'):'🎁 โพรงลับ — ใช้ไพ่แผนที่เพื่อดู');}
     };
+    cell.onpointerdown=handleCell;
+    cell.onclick=ev=>{ ev.preventDefault(); };
   });
 }
 

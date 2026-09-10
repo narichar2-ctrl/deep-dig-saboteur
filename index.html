@@ -1451,6 +1451,20 @@ body::after{width:260px;height:260px;right:-90px;bottom:8%;background:radial-gra
   }
 }
 
+
+/* V20 dynamic goals + mobile auto-fit */
+.mine-map-shell .board{grid-template-columns:repeat(var(--board-cols),var(--map-cell))!important;grid-template-rows:repeat(var(--board-rows),var(--map-cell))!important;}
+.mine-map-shell .cell{width:var(--map-cell)!important;height:var(--map-cell)!important;min-width:var(--map-cell)!important;min-height:var(--map-cell)!important;}
+.mine-map-shell .cell .stub.N,.mine-map-shell .cell .stub.S{width:22%!important;height:52%!important;left:39%!important;}
+.mine-map-shell .cell .stub.E,.mine-map-shell .cell .stub.W{height:22%!important;width:52%!important;top:39%!important;}
+@media(max-width:980px){
+.mine-map-shell .board-wrap{overflow:hidden!important;max-height:none!important;padding:7px!important;}
+.mine-map-shell .board{width:100%!important;min-width:0!important;height:auto!important;min-height:0!important;grid-template-columns:repeat(var(--board-cols),minmax(0,1fr))!important;grid-template-rows:repeat(var(--board-rows),auto)!important;gap:2px!important;justify-content:stretch!important;}
+.mine-map-shell .cell{width:auto!important;height:auto!important;min-width:0!important;min-height:0!important;aspect-ratio:1/1!important;border-radius:7px!important;}
+.mine-map-footer::after{content:"📱 กระดานปรับขนาดอัตโนมัติตามจำนวนผู้เล่น — เห็นครบโดยไม่ต้องเลื่อน"!important;}
+.mine-map-shell .board[data-cols="13"] .goal-marker .goal-label,.mine-map-shell .board[data-cols="13"] .start-marker .marker-label{display:none!important;}
+.mine-map-shell .board[data-cols="13"] .goal-marker .goal-icon,.mine-map-shell .board[data-cols="13"] .start-marker .marker-icon{font-size:clamp(.7rem,3vw,1.1rem)!important;}
+}
 </style>
 </head>
 <body>
@@ -1463,9 +1477,25 @@ body::after{width:260px;height:260px;right:-90px;bottom:8%;background:radial-gra
 const DIRS = ['N','E','S','W'];
 const OPP = { N:'S', E:'W', S:'N', W:'E' };
 const DELTA = { N:[0,-1], E:[1,0], S:[0,1], W:[-1,0] };
-const GOAL_POS = ['6,-1','6,0','6,1'];
 const START_POS = '0,0';
-const BOARD_MIN_X = -2, BOARD_MAX_X = 6, BOARD_MIN_Y = -4, BOARD_MAX_Y = 4;
+const LEGACY_BOARD_CONFIG = { minX:-2, maxX:6, minY:-4, maxY:4, goalX:6, goalYs:[-1,0,1] };
+function boardConfigForPlayers(n){
+  if(n<=4) return { minX:-2, maxX:6, minY:-4, maxY:4, goalX:6, goalYs:[-1,0,1] };
+  if(n<=7) return { minX:-2, maxX:8, minY:-4, maxY:4, goalX:8, goalYs:[-2,-1,0,1] };
+  return { minX:-2, maxX:10, minY:-4, maxY:4, goalX:10, goalYs:[-2,-1,0,1,2] };
+}
+function boardConfigFromExistingGoals(r){
+  const keys=Object.keys(r?.game?.goals||{});
+  if(!keys.length) return null;
+  const pts=keys.map(k=>k.split(',').map(Number)).filter(a=>a.length===2&&a.every(Number.isFinite));
+  if(!pts.length) return null;
+  const goalX=Math.max(...pts.map(a=>a[0]));
+  const goalYs=pts.filter(a=>a[0]===goalX).map(a=>a[1]).sort((a,b)=>a-b);
+  return {minX:-2,maxX:goalX,minY:-4,maxY:4,goalX,goalYs:goalYs.length?goalYs:[-1,0,1]};
+}
+function getBoardConfig(r){ return r?.game?.boardConfig || boardConfigFromExistingGoals(r) || boardConfigForPlayers(r?.players?.length||3) || LEGACY_BOARD_CONFIG; }
+function getGoalPositions(r){ const existing=Object.keys(r?.game?.goals||{}); if(existing.length) return existing; const cfg=getBoardConfig(r); return cfg.goalYs.map(y=>`${cfg.goalX},${y}`); }
+function isGoalKey(r,key){ return !!r?.game?.goals?.[key]; }
 const ROOM_PREFIX = 'saboteur_room_';
 const TOOLS = ['pickaxe','lantern','cart'];
 const TOOL_ICON = { pickaxe:'⛏️', lantern:'🏮', cart:'🛒' };
@@ -1490,7 +1520,7 @@ const DECK_RECIPE = [
 ];
 const HAND_SIZE = 6;
 const MAX_ROUNDS = 3;
-const APP_VERSION = 'V19 PATH CLEAR';
+const APP_VERSION = 'V20 DYNAMIC GOALS';
 
 /* ============================== STATE ============================== */
 let myId = sessionStorage.getItem('deepDigPlayerId') || crypto.randomUUID();
@@ -1720,15 +1750,17 @@ function startNewRound(r){
   const hands = {};
   players.forEach(p=>{ hands[p.id] = deck.splice(0, HAND_SIZE); });
 
-  const goldIdx = Math.floor(Math.random()*3);
+  const boardConfig = boardConfigForPlayers(n);
+  const goalPositions = boardConfig.goalYs.map(y=>`${boardConfig.goalX},${y}`);
+  const goldIdx = Math.floor(Math.random()*goalPositions.length);
   const goals = {};
-  GOAL_POS.forEach((pos,i)=>{ goals[pos] = { isGold: i===goldIdx, revealed:false }; });
+  goalPositions.forEach((pos,i)=>{ goals[pos] = { isGold: i===goldIdx, revealed:false }; });
 
   const board = {};
   board[START_POS] = { type:'start', N:true,E:true,S:true,W:true };
 
   r.game = {
-    roles, deck, discard:[], hands, board, goals,
+    roles, deck, discard:[], hands, board, goals, boardConfig,
     brokenTools: {}, // playerId -> [tool,...]
     turnOrder: players.map(p=>p.id),
     turnIndex: 0,
@@ -1755,7 +1787,7 @@ function getCellStruct(r, x, y){
   if(g.goals[key]) return g.goals[key].revealed ? (g.goals[key].isGold ? {type:'goal', N:false,E:false,S:false,W:false} : {type:'goal-rock', N:false,E:false,S:false,W:false}) : null; // unrevealed = unknown, no constraint
   return g.board[key] || null;
 }
-function isGoalPos(x,y){ return GOAL_POS.includes(cellKey(x,y)); }
+function isGoalPos(r,x,y){ return isGoalKey(r,cellKey(x,y)); }
 function rotateConn(base, rot){
   // rot: 0,1,2,3 = number of 90deg clockwise turns
   const order = ['N','E','S','W'];
@@ -1802,7 +1834,8 @@ function isConnectedToStart(r, x, y){
 }
 function canPlaceAt(r, x, y, conn){
   const key=cellKey(x,y);
-  if(!r?.game || x<BOARD_MIN_X||x>BOARD_MAX_X||y<BOARD_MIN_Y||y>BOARD_MAX_Y) return false;
+  const cfg=getBoardConfig(r);
+  if(!r?.game || x<cfg.minX||x>cfg.maxX||y<cfg.minY||y>cfg.maxY) return false;
   if(key===START_POS || r.game.board[key] || r.game.goals[key]) return false;
   let touches=false, connects=false;
   for(const d of DIRS){
@@ -1820,8 +1853,9 @@ function canPlaceAt(r, x, y, conn){
 }
 function allPlaceableCells(r){
   const out = [];
-  for(let x=BOARD_MIN_X;x<=BOARD_MAX_X;x++){
-    for(let y=BOARD_MIN_Y;y<=BOARD_MAX_Y;y++){
+  const cfg=getBoardConfig(r);
+  for(let x=cfg.minX;x<=cfg.maxX;x++){
+    for(let y=cfg.minY;y<=cfg.maxY;y++){
       const key=cellKey(x,y);
       if(key===START_POS) continue;
       if(r.game.board[key]) continue;
@@ -1904,7 +1938,7 @@ function doPlacePath(r, cardUid, x, y, rot){
   for(const d of DIRS){
     const [dx,dy]=DELTA[d];
     const nkey = cellKey(x+dx,y+dy);
-    if(GOAL_POS.includes(nkey) && conn[d] && !g.goals[nkey].revealed){
+    if(isGoalKey(r,nkey) && conn[d] && !g.goals[nkey].revealed){
       g.goals[nkey].revealed = true;
       if(g.goals[nkey].isGold){
         g.winner='diggers'; r.phase='roundEnd'; g.finderId = myId;
@@ -1929,7 +1963,7 @@ function doDiscard(r, cardUid){
 function doRockfall(r, cardUid, x, y){
   const g = r.game;
   const key = cellKey(x,y);
-  if(key===START_POS || GOAL_POS.includes(key)) throw new Error('cannot target');
+  if(key===START_POS || isGoalKey(r,key)) throw new Error('cannot target');
   if(!g.board[key]) throw new Error('empty cell');
   delete g.board[key];
   g.hands[myId] = g.hands[myId].filter(c=>c.uid!==cardUid);
@@ -2184,7 +2218,7 @@ function renderCell(r, x, y){
   if(key===START_POS){
     cls += ' start';
     content = `<div class="start-marker" title="จุดเริ่มต้น"><span class="marker-icon">🏡</span><span class="marker-label">เริ่มขุด!</span></div>`;
-  } else if(GOAL_POS.includes(key)){
+  } else if(isGoalKey(r,key)){
     const goal = r.game.goals[key];
     cls += ' goal';
     if(goal.revealed){
@@ -2211,27 +2245,30 @@ function renderCell(r, x, y){
     else cls += ' empty-void';
   }
   if(ui.targetMode==='rockfall' && r.game.board[key] && key!==START_POS){ cls += ' target-select'; }
-  if(ui.targetMode==='map' && GOAL_POS.includes(key)){ cls += ' target-select'; }
+  if(ui.targetMode==='map' && isGoalKey(r,key)){ cls += ' target-select'; }
   return `<div class="${cls}" data-x="${x}" data-y="${y}" data-key="${key}" onclick="cellClickDirect(${x},${y},'${key}')">${stubs}${content}</div>`;
 }
 function renderBoard(r){
+  const cfg=getBoardConfig(r);
+  const cols=cfg.maxX-cfg.minX+1, rows=cfg.maxY-cfg.minY+1;
+  const desktopCell=cols<=9?60:(cols<=11?52:46);
   let cells = '';
-  for(let y=BOARD_MIN_Y;y<=BOARD_MAX_Y;y++){
-    for(let x=BOARD_MIN_X;x<=BOARD_MAX_X;x++){
+  for(let y=cfg.minY;y<=cfg.maxY;y++){
+    for(let x=cfg.minX;x<=cfg.maxX;x++){
       cells += renderCell(r,x,y);
     }
   }
   return `<section class="mine-map-shell">
     <div class="mine-map-head">
       <div class="mine-map-title"><span class="mine-map-icon">⛏️</span><div><strong>แผนที่เหมืองลึก</strong><small>ขุดเส้นทางจากค่ายไปหาโพรงลับ</small></div></div>
-      <div class="mine-depth">ชั้นใต้ดิน <b>${r.round}</b> / ${MAX_ROUNDS}</div>
+      <div class="mine-depth">ชั้นใต้ดิน <b>${r.round}</b> / ${MAX_ROUNDS} · ❓ ${getGoalPositions(r).length} โพรง</div>
     </div>
     <div class="mine-map-frame">
       <div class="mine-map-corner tl">🪨</div>
       <div class="mine-map-corner tr">💎</div>
       <div class="mine-map-corner bl">🦴</div>
       <div class="mine-map-corner br">✨</div>
-      <div class="board-wrap"><div class="board">${cells}</div></div>
+      <div class="board-wrap"><div class="board" data-cols="${cols}" style="--board-cols:${cols};--board-rows:${rows};--map-cell:${desktopCell}px">${cells}</div></div>
     </div>
     <div class="mine-map-footer">
       <span>🏡 จุดเริ่ม</span><span>🟫 ทางขุด</span><span>🪨 ทางตัน</span><span>❓ โพรงลับ</span>
@@ -2451,8 +2488,9 @@ function renderRoomInfoV11(r){
 
 function countValidPathTargets(r, conn){
   let n=0;
-  for(let x=BOARD_MIN_X;x<=BOARD_MAX_X;x++){
-    for(let y=BOARD_MIN_Y;y<=BOARD_MAX_Y;y++){
+  const cfg=getBoardConfig(r);
+  for(let x=cfg.minX;x<=cfg.maxX;x++){
+    for(let y=cfg.minY;y<=cfg.maxY;y++){
       if(canPlaceAt(r,x,y,conn)) n++;
     }
   }
@@ -2589,7 +2627,7 @@ function cellClickDirect(x,y,key){
   const selected=getSelectedCard();
   if(!selected){
     if(key===START_POS) showToast('🏡 จุดเริ่มต้นของเหมือง');
-    else if(GOAL_POS.includes(key)) showToast('🎁 โพรงลับ ใช้ไพ่แผนที่เพื่อแอบดูได้');
+    else if(isGoalKey(room,key)) showToast('🎁 โพรงลับ ใช้ไพ่แผนที่เพื่อแอบดูได้');
     else showToast('🃏 เลือกไพ่จากด้านขวาก่อน');
     return;
   }
@@ -2603,10 +2641,10 @@ function cellClickDirect(x,y,key){
     submitAction(r=>doPlacePath(r,uidv,x,y,rot),null);
     return;
   }
-  if(selected.type==='rockfall' && room.game.board[key] && key!==START_POS && !GOAL_POS.includes(key)){
+  if(selected.type==='rockfall' && room.game.board[key] && key!==START_POS && !isGoalKey(room,key)){
     submitAction(r=>doRockfall(r,selected.uid,x,y),null); return;
   }
-  if(selected.type==='map' && GOAL_POS.includes(key)){
+  if(selected.type==='map' && isGoalKey(room,key)){
     submitAction(r=>doMap(r,selected.uid,key),null); return;
   }
 }

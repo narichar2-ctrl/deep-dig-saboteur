@@ -662,6 +662,22 @@ body::after{width:260px;height:260px;right:-90px;bottom:8%;background:radial-gra
 @media(max-width:980px){:root{--board-cell:clamp(38px,9.3vw,52px)}.v11-center .board-wrap{overflow:auto!important}.v11-hand-panel .hand{grid-template-columns:repeat(6,90px)!important}.v11-right{order:0}.v11-center{order:1}.v11-left{order:2}}
 
 </style>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+
+<style>
+/* V14 functional layout */
+:root{--board-cell:clamp(40px,4.2vw,54px)!important}
+#app{max-width:1220px!important;margin:0 auto!important;padding:10px 12px 28px!important}
+.v11-layout{grid-template-columns:190px minmax(0,1fr) 300px!important;gap:12px!important}
+.v11-center .board{gap:3px!important}
+.gcard,.cell{cursor:pointer!important}
+.gcard.disabled{opacity:.55!important;cursor:not-allowed!important}
+.gcard.selected{outline:4px solid #42b8ff!important;transform:translateY(-5px)!important}
+.cell.path-valid-now,.cell.placeable{outline:4px solid #54d86b!important;box-shadow:0 0 0 4px #caffcc,0 0 18px #4cff7c!important;cursor:pointer!important}
+@media(max-width:1100px){.v11-layout{grid-template-columns:170px minmax(0,1fr) 270px!important}:root{--board-cell:44px!important}}
+@media(max-width:900px){.v11-layout{grid-template-columns:1fr!important}.v11-left,.v11-right{display:block!important}.v11-center{order:1}.v11-right{order:2}.v11-left{order:3}}
+</style>
 </head>
 <body>
 <div id="app"></div>
@@ -698,7 +714,7 @@ const DECK_RECIPE = [
 ];
 const HAND_SIZE = 6;
 const MAX_ROUNDS = 3;
-const APP_VERSION = 'V13';
+const APP_VERSION = 'V14';
 
 /* ============================== STATE ============================== */
 let myId = sessionStorage.getItem('deepDigPlayerId') || crypto.randomUUID();
@@ -740,117 +756,113 @@ function showToast(msg, ms=2600){
 }
 
 /* ============================== FIREBASE REALTIME DATABASE ============================== */
-// ใช้ Firebase Realtime Database ผ่าน REST API เพื่อให้ GitHub Pages เล่นข้ามเครื่องได้
-// Project: deep-dig-saboteur / Region: asia-southeast1 (Singapore)
 const FIREBASE_DB_URL = 'https://deep-dig-saboteur-default-rtdb.asia-southeast1.firebasedatabase.app';
-
-function firebaseRoomUrl(code){
-  const key = ROOM_PREFIX + String(code || '').toUpperCase();
-  return `${FIREBASE_DB_URL}/${encodeURIComponent(key)}.json`;
-}
-
-async function fetchWithTimeout(url, options={}, timeoutMs=10000){
-  const controller = new AbortController();
-  const timer = setTimeout(()=>controller.abort(), timeoutMs);
-  try{
-    return await fetch(url, { ...options, signal: controller.signal, cache:'no-store' });
-  } finally {
-    clearTimeout(timer);
+const firebaseConfig = {
+  projectId: 'deep-dig-saboteur',
+  databaseURL: FIREBASE_DB_URL
+};
+let firebaseReady = false;
+let db = null;
+let roomListenerRef = null;
+let roomListenerFn = null;
+try{
+  if(typeof firebase !== 'undefined'){
+    if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    db = firebase.database();
+    firebaseReady = true;
   }
-}
+}catch(e){ console.error('Firebase init failed', e); }
 
-function roomSnapshot(r){
-  try { return JSON.stringify(r); } catch(e) { return ''; }
+function firebaseRoomKey(code){ return ROOM_PREFIX + String(code||'').toUpperCase(); }
+function firebaseRoomRef(code){
+  if(!firebaseReady || !db) throw new Error('Firebase ยังไม่พร้อม');
+  return db.ref(firebaseRoomKey(code));
 }
+function roomSnapshot(r){ try{return JSON.stringify(r);}catch(e){return '';} }
 
 async function saveRoom(newRoom){
   try{
-    newRoom.rev = Number(newRoom.rev || 0) + 1;
+    newRoom.rev = Number(newRoom.rev||0)+1;
     newRoom.updatedAt = Date.now();
-    const res = await fetchWithTimeout(firebaseRoomUrl(newRoom.code), {
-      method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(newRoom)
-    });
-    if(!res.ok){ throw new Error(`Firebase ${res.status}`); }
-    room = newRoom; lastRoomSnapshot = roomSnapshot(newRoom); lastRemoteUpdateAt = Date.now();
+    await firebaseRoomRef(newRoom.code).set(newRoom);
+    room = structuredClone(newRoom);
+    lastRoomSnapshot = roomSnapshot(room);
+    lastRemoteUpdateAt = Date.now();
     return true;
-  }catch(e){ console.error(e); showToast('เชื่อมต่อห้องออนไลน์ไม่ได้'); return false; }
+  }catch(e){
+    console.error('Firebase save error',e);
+    showToast('เชื่อมต่อห้องออนไลน์ไม่ได้');
+    return false;
+  }
 }
 
 async function loadRoom(code){
   try{
-    const res = await fetchWithTimeout(firebaseRoomUrl(code), {method:'GET',cache:'no-store'});
-    if(!res.ok) return null;
-    return (await res.json()) || null;
-  }catch(e){ console.error(e); return null; }
+    const snap = await firebaseRoomRef(code).once('value');
+    return snap.exists() ? snap.val() : null;
+  }catch(e){ console.error('Firebase load error',e); return null; }
 }
 
-async function atomicRoomUpdate(code, updater, retries=6){
-  for(let attempt=0; attempt<retries; attempt++){
-    const url=firebaseRoomUrl(code);
-    try{
-      const getRes=await fetchWithTimeout(url,{method:'GET',headers:{'X-Firebase-ETag':'true'},cache:'no-store'});
-      if(!getRes.ok) throw new Error(`GET ${getRes.status}`);
-      const etag=getRes.headers.get('ETag');
-      const current=await getRes.json();
-      if(!current) return {ok:false,reason:'missing'};
-      const next=structuredClone(current);
-      const result=updater(next);
-      if(result===false) return {ok:false,reason:'cancelled',room:current};
-      next.rev=Number(current.rev||0)+1; next.updatedAt=Date.now();
-      const headers={'Content-Type':'application/json'}; if(etag) headers['If-Match']=etag;
-      const putRes=await fetchWithTimeout(url,{method:'PUT',headers,body:JSON.stringify(next)});
-      if(putRes.status===412) continue;
-      if(!putRes.ok) throw new Error(`PUT ${putRes.status}`);
-      room=next; lastRoomSnapshot=roomSnapshot(next); lastRemoteUpdateAt=Date.now();
-      return {ok:true,room:next};
-    }catch(e){
-      console.error('atomic update',attempt,e);
-      if(attempt===retries-1) return {ok:false,reason:e.message};
-      await new Promise(r=>setTimeout(r,120*(attempt+1)));
-    }
+async function atomicRoomUpdate(code, updater){
+  try{
+    let finalRoom = null;
+    const result = await firebaseRoomRef(code).transaction(current=>{
+      if(current==null) return;
+      const next = structuredClone(current);
+      const outcome = updater(next);
+      if(outcome===false) return;
+      next.rev = Number(current.rev||0)+1;
+      next.updatedAt = Date.now();
+      finalRoom = next;
+      return next;
+    }, undefined, false);
+    if(!result.committed) return {ok:false,reason:'cancelled',room:result.snapshot?.val?.()||null};
+    const saved = result.snapshot.val();
+    room = saved;
+    lastRoomSnapshot = roomSnapshot(saved);
+    lastRemoteUpdateAt = Date.now();
+    return {ok:true,room:saved};
+  }catch(e){
+    console.error('Firebase transaction error',e);
+    return {ok:false,reason:e.message};
   }
-  return {ok:false,reason:'retry'};
 }
 
-let roomStream=null;
 function stopRoomSync(){
   clearInterval(pollTimer); pollTimer=null; pollBusy=false;
-  if(roomStream){ try{roomStream.close();}catch(e){} roomStream=null; }
-}
-function applyRemoteRoom(fresh){
-  if(!fresh) return;
-  const snap=roomSnapshot(fresh);
-  if(snap===lastRoomSnapshot) return;
-  const keep=shouldKeepSelection(fresh);
-  room=fresh; lastRoomSnapshot=snap; lastRemoteUpdateAt=Date.now();
-  if(!keep){ui.selectedCardUid=null;ui.rotation=0;ui.targetMode=null;}
-  render();
-}
-function startRoomStream(){
-  if(!roomCode || typeof EventSource==='undefined') return false;
-  try{
-    if(roomStream) roomStream.close();
-    roomStream=new EventSource(firebaseRoomUrl(roomCode));
-    roomStream.addEventListener('put',ev=>{
-      try{const payload=JSON.parse(ev.data); if(payload.path==='/' && payload.data) applyRemoteRoom(payload.data);}catch(e){console.error(e)}
-    });
-    roomStream.addEventListener('patch',()=>pollLoop());
-    roomStream.onerror=()=>{};
-    return true;
-  }catch(e){console.error(e);return false;}
+  if(roomListenerRef && roomListenerFn){ try{roomListenerRef.off('value',roomListenerFn);}catch(e){} }
+  roomListenerRef=null; roomListenerFn=null;
 }
 function shouldKeepSelection(fresh){
   if(!ui.selectedCardUid || fresh?.phase!=='playing' || !fresh?.game) return false;
   const hand=fresh.game.hands?.[myId]||[];
   return hand.some(c=>c.uid===ui.selectedCardUid) && currentPlayerId(fresh)===myId;
 }
-async function pollLoop(){
-  if(!roomCode||pollBusy)return; pollBusy=true;
-  try{const fresh=await loadRoom(roomCode); if(fresh) applyRemoteRoom(fresh);}finally{pollBusy=false;}
+function applyRemoteRoom(fresh){
+  if(!fresh) return;
+  const snap=roomSnapshot(fresh);
+  if(snap===lastRoomSnapshot) return;
+  const oldPhase=room?.phase;
+  const keep=shouldKeepSelection(fresh);
+  room=fresh; lastRoomSnapshot=snap; lastRemoteUpdateAt=Date.now();
+  if(!keep){ui.selectedCardUid=null;ui.rotation=0;ui.targetMode=null;}
+  if(oldPhase==='lobby' && fresh.phase==='playing') ui.screen='game';
+  render();
 }
 function startPolling(){
-  stopRoomSync(); lastRoomSnapshot=roomSnapshot(room); startRoomStream();
-  pollLoop(); pollTimer=setInterval(pollLoop,1200);
+  stopRoomSync();
+  if(!roomCode || !firebaseReady) return;
+  lastRoomSnapshot=roomSnapshot(room);
+  roomListenerRef=firebaseRoomRef(roomCode);
+  roomListenerFn=snap=>{
+    if(snap.exists()) applyRemoteRoom(snap.val());
+  };
+  roomListenerRef.on('value',roomListenerFn,err=>console.error('Firebase listener error',err));
+  // fallback heartbeat in case a browser suspends the realtime socket
+  pollTimer=setInterval(async()=>{
+    if(pollBusy||!roomCode)return; pollBusy=true;
+    try{const fresh=await loadRoom(roomCode); if(fresh) applyRemoteRoom(fresh);}finally{pollBusy=false;}
+  },4000);
 }
 
 /* ============================== GAME SETUP ============================== */
@@ -1331,7 +1343,7 @@ function renderCell(r, x, y){
   }
   if(ui.targetMode==='rockfall' && r.game.board[key] && key!==START_POS){ cls += ' target-select'; }
   if(ui.targetMode==='map' && GOAL_POS.includes(key)){ cls += ' target-select'; }
-  return `<div class="${cls}" data-x="${x}" data-y="${y}" data-key="${key}">${stubs}${content}</div>`;
+  return `<div class="${cls}" data-x="${x}" data-y="${y}" data-key="${key}" onclick="playBoardCell(${x},${y})">${stubs}${content}</div>`;
 }
 function renderBoard(r){
   let cells = '';
@@ -1392,7 +1404,7 @@ function renderHand(r){
     let extraCls = c.kind==='action' ? (c.type==='break'?'action sab':(c.type==='repair'?'action fix':'action')) : '';
     const visual = isPath ? renderPathTile(c, selected ? ui.rotation : 0) : `<div class="icon">${cardIcon(c)}</div>`;
     const reason = blockedByTool ? 'เครื่องมือคุณเสีย จึงเล่นไพ่ทางเดินไม่ได้' : (!isMyTurn ? 'ยังไม่ถึงตาของคุณ' : 'คลิกเพื่อเลือกไพ่');
-    return `<button type="button" class="gcard ${extraCls} ${selected?'selected':''} ${disabled?'disabled':''}" data-uid="${c.uid}" data-card-select="1" title="${reason}" aria-pressed="${selected?'true':'false'}" ${disabled?'disabled':''}>
+    return `<button type="button" class="gcard ${extraCls} ${selected?'selected':''} ${disabled?'disabled':''}" data-uid="${c.uid}" data-card-select="1" title="${reason}" aria-pressed="${selected?'true':'false'}" onclick="selectCardByUid('${c.uid}')">
       ${visual}
       <div class="card-name">${cardLabel(c)}</div>
       <div class="card-kind">${isPath ? (selected ? `หมุน ${ui.rotation*90}°` : 'ไพ่ทางเดิน') : 'ไพ่คำสั่ง'}</div>
@@ -1621,6 +1633,45 @@ function handlePathCellClick(elm){
   submitAction(r=>doPlacePath(r, uidToPlay, x, y, rotationToPlay), null);
 }
 
+
+function selectCardByUid(uidv){
+  if(!room || room.phase!=='playing') return;
+  if(currentPlayerId(room)!==myId){ showToast(`⏳ ตอนนี้เป็นตาของ ${playerName(room,currentPlayerId(room))}`); return; }
+  const hand=room.game?.hands?.[myId]||[];
+  const card=hand.find(c=>c.uid===uidv);
+  if(!card){ showToast('หาไพ่ใบนี้ไม่เจอ ลองรีเฟรชหน้า'); return; }
+  const broken=room.game?.brokenTools?.[myId]||[];
+  if(card.kind==='path' && broken.length){ showToast('🔧 เครื่องมือเสียอยู่ จึงวางไพ่ทางไม่ได้'); return; }
+  ui.selectedCardUid=(ui.selectedCardUid===uidv)?null:uidv;
+  ui.targetMode=null;
+  ui.rotation=card.kind==='path'?bestRotationForCard(room,card):0;
+  if(card.kind==='action'){
+    if(card.type==='rockfall') ui.targetMode='rockfall';
+    else if(card.type==='map') ui.targetMode='map';
+    else if(card.type==='break') ui.targetMode='break';
+    else if(card.type==='repair') ui.targetMode='repair';
+  }
+  render();
+}
+
+function playBoardCell(x,y){
+  if(!room || room.phase!=='playing') return;
+  if(currentPlayerId(room)!==myId){ showToast('⏳ ยังไม่ถึงตาของคุณ'); return; }
+  const key=cellKey(Number(x),Number(y));
+  const selected=getSelectedCard();
+  if(!selected){ showToast('🃏 เลือกไพ่ก่อน'); return; }
+  if(selected.kind==='path'){
+    const conn=rotateConn(PATH_SHAPES[selected.type],ui.rotation);
+    if(!canPlaceAt(room,Number(x),Number(y),conn)){
+      showToast('❌ ช่องนี้ต่อไม่ได้ — ลองหมุนไพ่หรือเลือกช่องสีเขียว'); return;
+    }
+    const uidv=selected.uid,rot=ui.rotation;
+    submitAction(r=>doPlacePath(r,uidv,Number(x),Number(y),rot),null); return;
+  }
+  if(selected.type==='rockfall' && room.game.board[key] && key!==START_POS){submitAction(r=>doRockfall(r,selected.uid,Number(x),Number(y)),null);return;}
+  if(selected.type==='map' && GOAL_POS.includes(key)){submitAction(r=>doMap(r,selected.uid,key),null);return;}
+}
+
 function attachHandlers(){
   const el=id=>document.getElementById(id);
   if(el('btnCreate'))el('btnCreate').onclick=createRoom;
@@ -1636,36 +1687,8 @@ function attachHandlers(){
   if(el('btnDiscardSelected'))el('btnDiscardSelected').onclick=()=>{const c=getSelectedCard();if(c)submitAction(r=>doDiscard(r,c.uid),null);};
   if(el('btnNextRound'))el('btnNextRound').onclick=async()=>{const result=await atomicRoomUpdate(roomCode,fresh=>{fresh.round+=1;startNewRound(fresh);return true;});if(result.ok){room=result.room;render();}};
   if(el('btnFinishGame'))el('btnFinishGame').onclick=async()=>{const result=await atomicRoomUpdate(roomCode,fresh=>{fresh.phase='gameOver';return true;});if(result.ok){room=result.room;render();}};
-
-  const app=document.getElementById('app');
-  app.onpointerdown=ev=>{
-    const cardEl=ev.target.closest?.('[data-card-select="1"]');
-    if(cardEl){
-      ev.preventDefault();
-      if(cardEl.disabled||cardEl.classList.contains('disabled')){showToast('ไพ่ใบนี้ยังเล่นไม่ได้');return;}
-      const uidv=cardEl.dataset.uid, hand=room?.game?.hands?.[myId]||[], card=hand.find(c=>c.uid===uidv);
-      if(!card)return;
-      if(currentPlayerId(room)!==myId){showToast(`⏳ ตอนนี้เป็นตาของ ${playerName(room,currentPlayerId(room))}`);return;}
-      ui.selectedCardUid=ui.selectedCardUid===uidv?null:uidv; ui.targetMode=null; ui.rotation=card.kind==='path'?bestRotationForCard(room,card):0; render(); return;
-    }
-    const cell=ev.target.closest?.('.cell');
-    if(cell&&room?.phase==='playing'){
-      ev.preventDefault();
-      const x=Number(cell.dataset.x),y=Number(cell.dataset.y),key=cell.dataset.key,selected=getSelectedCard();
-      if(selected?.kind==='path'&&currentPlayerId(room)===myId){
-        const conn=rotateConn(PATH_SHAPES[selected.type],ui.rotation);
-        if(canPlaceAt(room,x,y,conn)){const uidv=selected.uid,rot=ui.rotation;submitAction(r=>doPlacePath(r,uidv,x,y,rot),null);return;}
-        if(key!==START_POS&&!room.game.board[key]&&!room.game.goals[key])showToast('❌ ช่องนี้ต่อทางไม่ได้ เลือกช่องสีเขียว');
-        return;
-      }
-      if(ui.targetMode==='rockfall'&&room.game.board[key]&&key!==START_POS){const c=getSelectedCard();if(c)submitAction(r=>doRockfall(r,c.uid,x,y),null);return;}
-      if(ui.targetMode==='map'&&GOAL_POS.includes(key)){const c=getSelectedCard();if(c)submitAction(r=>doMap(r,c.uid,key),null);return;}
-    }
-  };
-  app.onclick=ev=>{
-    const bt=ev.target.closest?.('[data-break-target]'); if(bt){const c=getSelectedCard();if(c)submitAction(r=>doBreak(r,c.uid,c.tool,bt.dataset.breakTarget),null);return;}
-    const rt=ev.target.closest?.('[data-repair-target]'); if(rt){const c=getSelectedCard();if(c)submitAction(r=>doRepair(r,c.uid,c.tool,rt.dataset.repairTarget),null);return;}
-  };
+  document.querySelectorAll('[data-break-target]').forEach(b=>b.onclick=()=>{const c=getSelectedCard();if(c)submitAction(r=>doBreak(r,c.uid,c.tool,b.dataset.breakTarget),null);});
+  document.querySelectorAll('[data-repair-target]').forEach(b=>b.onclick=()=>{const c=getSelectedCard();if(c)submitAction(r=>doRepair(r,c.uid,c.tool,b.dataset.repairTarget),null);});
 }
 
 // Auto reconnect on refresh within the same tab/session

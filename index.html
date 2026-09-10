@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Deep Dig V8 Kawaii UI: character pack + pastel mine board, game logic preserved -->
 <title>Deep Dig — Saboteur Online (Firebase)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
@@ -497,6 +498,89 @@ button.gcard:disabled{pointer-events:none;}
 .cell.goal::before{content:"";position:absolute;inset:-5px;border:2px dashed #fff9;border-radius:14px;pointer-events:none}
 .cell.endpoint-clicked{animation:endpointPulse .28s ease}
 @keyframes endpointPulse{50%{transform:scale(.9)}}
+
+  /* V7 clearer path placement */
+  .cell.placeable{outline:4px solid #64d86f!important;outline-offset:-5px;box-shadow:inset 0 0 0 4px #eaffd8,0 0 18px #7cff86;cursor:pointer!important;animation:validSpot 1s ease-in-out infinite;position:relative}
+  .cell.placeable::before{content:'＋';position:absolute;inset:0;display:grid;place-items:center;font-size:1.8rem;font-weight:1000;color:#2e9a42;text-shadow:0 2px #fff;z-index:8;pointer-events:none}
+  @keyframes validSpot{50%{transform:scale(.96);filter:brightness(1.12)}}
+  .place-status{margin-top:8px;padding:8px 12px;border:2px solid #7acb74;border-radius:12px;background:#efffe9;color:#356534;font-weight:900;display:inline-block}
+
+
+/* ==================== V8 KAWAII CHARACTER PACK ==================== */
+:root{
+  --kawaii-pink:#ffb8cf; --kawaii-blue:#8fd3ff; --kawaii-yellow:#ffd96a;
+  --kawaii-mint:#9be7ba; --kawaii-lilac:#cbb6ff; --cream:#fffaf0;
+}
+body::before,body::after{content:"";position:fixed;z-index:-1;border-radius:50%;filter:blur(1px);opacity:.48}
+body::before{width:220px;height:220px;left:-70px;top:18%;background:radial-gradient(circle,#fff5a8,transparent 70%)}
+body::after{width:260px;height:260px;right:-90px;bottom:8%;background:radial-gradient(circle,#d7c6ff,transparent 70%)}
+
+/* little mascot avatar */
+.cute-avatar{--hat:#f6b63e;--shirt:#79c69a;position:relative;display:inline-flex;width:34px;height:34px;flex:0 0 34px;vertical-align:middle;align-items:center;justify-content:center;margin-right:5px;filter:drop-shadow(0 2px 0 #fff8)}
+.cute-avatar .av-face{position:absolute;left:6px;top:10px;width:22px;height:20px;border-radius:48% 48% 46% 46%;background:#ffe0bd;border:2px solid #704a32;box-sizing:border-box}
+.cute-avatar .av-hair{position:absolute;left:7px;top:9px;width:20px;height:9px;border-radius:50% 50% 30% 30%;background:#74452f;border:2px solid #704a32;border-bottom:0;box-sizing:border-box}
+.cute-avatar .av-hat{position:absolute;left:4px;top:2px;width:26px;height:11px;border-radius:13px 13px 7px 7px;background:var(--hat);border:2px solid #704a32;box-sizing:border-box}
+.cute-avatar .av-hat::before{content:"";position:absolute;left:8px;top:-3px;width:7px;height:7px;border-radius:50%;background:#fff8ca;border:2px solid #704a32}
+.cute-avatar .av-hat::after{content:"";position:absolute;left:-3px;right:-3px;bottom:-3px;height:4px;border-radius:5px;background:var(--hat);border:2px solid #704a32}
+.cute-avatar .av-eye{position:absolute;top:17px;width:3px;height:4px;border-radius:50%;background:#4a3024;z-index:3}
+.cute-avatar .av-eye.l{left:11px}.cute-avatar .av-eye.r{right:11px}
+.cute-avatar .av-cheek{position:absolute;top:22px;width:5px;height:3px;border-radius:50%;background:#ff9ca8;opacity:.8;z-index:3}
+.cute-avatar .av-cheek.l{left:7px}.cute-avatar .av-cheek.r{right:7px}
+.cute-avatar .av-smile{position:absolute;left:15px;top:22px;width:5px;height:3px;border:0;border-bottom:2px solid #704a32;border-radius:0 0 8px 8px;z-index:3}
+.cute-avatar.sab .av-hat{--hat:#5c5575}.cute-avatar.sab .av-face{background:#f1caa2}.cute-avatar.sab .av-smile{transform:rotate(-10deg)}
+.player-row .cute-avatar{width:38px;height:38px;flex-basis:38px;transform:translateY(1px)}
+
+/* player cards become cute pastel roster */
+.player-row{min-height:48px;padding:7px 9px;border:2px solid #d9b98c;border-radius:15px;background:linear-gradient(135deg,#fffefa,#fff4e3);box-shadow:0 3px 0 #d6ad79;margin:7px 0}
+.player-row:nth-of-type(4n+1){background:linear-gradient(135deg,#f3fff0,#dff7d6)}
+.player-row:nth-of-type(4n+2){background:linear-gradient(135deg,#eef8ff,#dcecff)}
+.player-row:nth-of-type(4n+3){background:linear-gradient(135deg,#fff0f6,#ffddea)}
+.player-row:nth-of-type(4n){background:linear-gradient(135deg,#f6f0ff,#eadcff)}
+.player-row.current{outline:3px solid #7bd46a;box-shadow:0 0 0 4px #cffff0,0 4px 0 #63ac56;animation:kawaiiPulse 1.4s ease-in-out infinite}
+@keyframes kawaiiPulse{50%{transform:translateY(-1px);filter:brightness(1.04)}}
+
+/* top game header inspired by the reference mockup */
+.topbar{background:linear-gradient(180deg,#fff9ea,#ffe4b8)!important;border:4px solid #744b2f!important;box-shadow:0 6px 0 #c88b4c,0 12px 28px #79502d22!important;padding:10px 16px!important}
+.topbar .brand h1::before{content:"DEEP DIG  ";font-family:'Baloo 2',sans-serif;color:#e68c23;font-weight:1000;letter-spacing:.02em;text-shadow:1px 2px #fff}
+.round-badge{background:linear-gradient(180deg,#fff4b8,#ffd35f)!important;border:3px solid #8b5a32!important;box-shadow:0 3px 0 #c38a32!important}
+
+/* decorative mine scene above board */
+.game-grid>div:first-child::before{content:"🏮   💎   ⛏️   🌼   🪨   ✨";display:block;text-align:center;font-size:1.05rem;letter-spacing:10px;margin:-2px 0 7px;color:#7b573c;filter:drop-shadow(0 1px 0 #fff)}
+.board-wrap{background:linear-gradient(180deg,#7a472a,#5e351f)!important;border:5px solid #6c4027!important;box-shadow:inset 0 0 0 5px #a86538,0 7px 0 #4f2f20,0 16px 30px #4a2d1d2b!important}
+.board{background-color:#b77a44!important;background-image:radial-gradient(circle,#e8b970 2px,transparent 2.3px),linear-gradient(#ffffff08 1px,transparent 1px),linear-gradient(90deg,#ffffff08 1px,transparent 1px)!important;background-size:28px 28px,62px 62px,62px 62px!important}
+.cell.empty-void::after{content:""}
+.cell.empty-void:nth-child(11n+2)::before{content:"🪨";opacity:.42;font-size:.85rem}.cell.empty-void:nth-child(17n+4)::before{content:"🦴";opacity:.32;font-size:.8rem}.cell.empty-void:nth-child(23n+8)::before{content:"✨";opacity:.28;font-size:.7rem}
+
+/* cute start and mystery goals */
+.start-marker .marker-icon{font-size:1.55rem!important}.start-marker .marker-label{background:#fff6b9!important;color:#754314!important;border-color:#d58b2d!important;font-size:.48rem!important}
+.cell.start{background:radial-gradient(circle,#f5ffbe 0 48%,#9bea86 49% 100%)!important;box-shadow:0 0 0 3px #eaffca,0 0 18px #baff87,inset 0 0 0 2px #6eba59!important;animation:startGlow 1.8s ease-in-out infinite}
+@keyframes startGlow{50%{box-shadow:0 0 0 4px #fff5b0,0 0 26px #d6ff8e,inset 0 0 0 2px #6eba59}}
+.cell.goal{background:linear-gradient(155deg,#e3c6ff,#b890f2)!important;border-color:#7652b6!important;box-shadow:0 4px 0 #6841a5,0 0 12px #d7b5ff66!important}
+.goal-marker.secret .goal-icon{font-size:1.7rem!important}.goal-marker.secret .goal-label{background:#fff3c7!important;color:#70451f!important;border-color:#d79b3b!important}
+.cell.goal.gold{background:radial-gradient(circle,#fff5ac,#ffc942)!important;box-shadow:0 0 22px #ffd43c!important}
+
+/* kawaii hand cards */
+.gcard{border-radius:18px!important;border-width:3px!important;box-shadow:0 5px 0 #b3875f,0 8px 13px #6e452522!important;background:linear-gradient(180deg,#fffefa,#fff4df)!important;transition:transform .15s ease,box-shadow .15s ease!important}
+.gcard:hover:not(.disabled){transform:translateY(-7px) rotate(-1deg)!important;box-shadow:0 10px 0 #b3875f,0 14px 20px #6e45252c!important}
+.gcard.selected{outline:4px solid #62baff!important;box-shadow:0 0 0 7px #ccecff,0 9px 0 #4b95d4!important;transform:translateY(-10px) scale(1.035)!important}
+.card-name{font-weight:1000!important}.card-kind{border-radius:999px;background:#fff2c9;padding:2px 5px}
+.card-select-hint{background:#e7f8ff!important;color:#3773a8!important;border-radius:999px;padding:2px 5px;font-weight:900}
+
+/* role panel and role character staging */
+.role-cartoon{width:210px!important;height:210px!important;background:radial-gradient(circle,#fff9cc 0 42%,#ffefb8 43% 54%,transparent 55%)!important;position:relative}
+.role-cartoon::before,.role-cartoon::after{position:absolute;content:"✨";font-size:1.2rem;animation:twinkle 1.7s infinite}.role-cartoon::before{left:16px;top:26px}.role-cartoon::after{right:18px;top:48px;animation-delay:.7s}
+.role-cartoon svg{width:100%;height:100%;filter:drop-shadow(0 7px 0 #00000013)}
+.panel-box h3{background:linear-gradient(90deg,#fff3c1,#f4ddff);margin:-12px -12px 12px!important;padding:11px 13px;border-radius:17px 17px 0 0;border-bottom:2px solid #deb078}
+
+/* friendlier banner */
+.turn-banner.mine{background:linear-gradient(90deg,#c9ffd0,#fff39a)!important;border-color:#60b84f!important;box-shadow:0 5px 0 #63b455!important}
+.turn-banner.mine::before{content:"🐹 ";font-size:1.25rem}
+
+/* room lobby cuteness */
+.lobby-player{border-radius:18px!important;background:linear-gradient(135deg,#fffdf6,#ffeecf)!important;box-shadow:0 4px 0 #ddb078!important}
+
+@media(max-width:760px){.cute-avatar{width:30px;height:30px;flex-basis:30px}.role-cartoon{width:170px!important;height:170px!important}.topbar .brand h1::before{content:"DIG  ";}.game-grid>div:first-child::before{letter-spacing:5px;font-size:.9rem}}
+
 </style>
 </head>
 <body>
@@ -536,7 +620,8 @@ const HAND_SIZE = 6;
 const MAX_ROUNDS = 3;
 
 /* ============================== STATE ============================== */
-let myId = crypto.randomUUID();
+let myId = sessionStorage.getItem('deepDigPlayerId') || crypto.randomUUID();
+sessionStorage.setItem('deepDigPlayerId', myId);
 let myName = '';
 let roomCode = null;
 let room = null; // latest fetched room object
@@ -843,7 +928,7 @@ async function submitAction(mutator, logMsg){
   }catch(e){
     console.error(e);
     ui.loading=false;
-    showToast('เกิดข้อผิดพลาด ลองใหม่');
+    showToast(e?.message==='invalid placement' ? '❌ ช่องนี้ต่อทางไม่ได้ ลองหมุนไพ่หรือเลือกช่องสีเขียว' : 'เกิดข้อผิดพลาด: '+(e?.message||'ลองใหม่'));
     render();
   }
 }
@@ -927,100 +1012,48 @@ function doRepair(r, cardUid, tool, targetId){
 }
 
 /* ============================== AVATARS ============================== */
-const AVATAR_SET = ['🐹','🦔','🐻','🐰','🦊','🐨','🐼','🐸','🐷','🐵','🦁','🐯'];
+const AVATAR_COLORS = ['#f5b73b','#5fc0e8','#ff9fc3','#84cc7d','#b89cf3','#f2a15f','#74b8ff','#f6cc63'];
 function avatarFor(id){
-  let h = 0; for(let i=0;i<id.length;i++) h = (h*31 + id.charCodeAt(i)) >>> 0;
-  return AVATAR_SET[h % AVATAR_SET.length];
+  let h=0; for(let i=0;i<id.length;i++) h=(h*31+id.charCodeAt(i))>>>0;
+  const hat=AVATAR_COLORS[h%AVATAR_COLORS.length];
+  return `<span class="cute-avatar" style="--hat:${hat}" aria-hidden="true"><i class="av-hat"></i><i class="av-hair"></i><i class="av-face"></i><i class="av-eye l"></i><i class="av-eye r"></i><i class="av-cheek l"></i><i class="av-cheek r"></i><i class="av-smile"></i></span>`;
 }
 
 /* ============================== CARTOON ROLE ART (inline SVG) ============================== */
 const SVG_MINER = `
-<svg viewBox="0 0 212 230" xmlns="http://www.w3.org/2000/svg">
-  <ellipse cx="90" cy="215" rx="58" ry="9" fill="#00000018"/>
-  <!-- boots -->
-  <ellipse cx="63" cy="198" rx="17" ry="11" fill="#5a4634"/>
-  <ellipse cx="107" cy="198" rx="17" ry="11" fill="#5a4634"/>
-  <!-- body: tunic -->
-  <path d="M50 130 Q85 112 120 130 L128 190 Q85 205 42 190 Z" fill="#4f9e78"/>
-  <!-- belt -->
-  <rect x="46" y="168" width="78" height="12" fill="#6b4a2f" rx="3"/>
-  <circle cx="85" cy="174" r="7" fill="#e0b323" stroke="#a8790f" stroke-width="1.5"/>
-  <!-- far arm -->
-  <ellipse cx="46" cy="160" rx="12" ry="16" fill="#4f9e78" transform="rotate(12 46 160)"/>
-  <circle cx="42" cy="174" r="9" fill="#f0c49a"/>
-  <!-- near arm holding pickaxe -->
-  <line x1="114" y1="148" x2="152" y2="170" stroke="#4f9e78" stroke-width="20" stroke-linecap="round"/>
-  <circle cx="152" cy="170" r="12" fill="#f0c49a" stroke="#c98a5a" stroke-width="2"/>
-  <line x1="152" y1="170" x2="178" y2="94" stroke="#a9702f" stroke-width="9" stroke-linecap="round"/>
-  <path d="M156 90 Q178 68 200 90 L190 104 Q178 86 166 104 Z" fill="#b7c2c9" stroke="#7d8a92" stroke-width="2"/>
-  <!-- head -->
-  <circle cx="85" cy="98" r="46" fill="#f0c49a"/>
-  <!-- big ears -->
-  <ellipse cx="41" cy="98" rx="8" ry="12" fill="#f0c49a"/>
-  <ellipse cx="129" cy="98" rx="8" ry="12" fill="#f0c49a"/>
-  <!-- blush -->
-  <ellipse cx="53" cy="108" rx="9" ry="5.5" fill="#ffb3ac" opacity="0.65"/>
-  <ellipse cx="117" cy="108" rx="9" ry="5.5" fill="#ffb3ac" opacity="0.65"/>
-  <!-- eyes -->
-  <circle cx="68" cy="90" r="8.5" fill="#3a2415"/>
-  <circle cx="102" cy="90" r="8.5" fill="#3a2415"/>
-  <circle cx="71" cy="86" r="3" fill="#fff"/>
-  <circle cx="105" cy="86" r="3" fill="#fff"/>
-  <!-- eyebrows -->
-  <path d="M58 76 Q68 70 78 77" stroke="#8a8a8a" stroke-width="3" fill="none" stroke-linecap="round"/>
-  <path d="M92 77 Q102 70 112 76" stroke="#8a8a8a" stroke-width="3" fill="none" stroke-linecap="round"/>
-  <!-- nose -->
-  <ellipse cx="85" cy="103" rx="8" ry="6.5" fill="#e0a86a"/>
-  <!-- big fluffy beard -->
-  <path d="M40 112 Q85 100 130 112 Q134 150 122 178 Q108 200 85 202 Q62 200 48 178 Q36 150 40 112 Z" fill="#eef0f2"/>
-  <path d="M52 130 Q85 122 118 130 Q120 150 112 168" fill="none" stroke="#d8dcdf" stroke-width="2" opacity="0.6"/>
-  <path d="M55 145 Q85 138 115 145" fill="none" stroke="#d8dcdf" stroke-width="2" opacity="0.6"/>
-  <!-- mustache/smile -->
-  <path d="M66 116 Q85 128 104 116" stroke="#d8dcdf" stroke-width="7" fill="none" stroke-linecap="round"/>
-  <!-- pointy hood/hat -->
-  <path d="M38 78 Q42 20 85 8 Q128 20 132 78 Q108 58 85 56 Q62 58 38 78 Z" fill="#3f7d5c" stroke="#2f5c44" stroke-width="2.5"/>
-  <circle cx="85" cy="10" r="7" fill="#e0b323" stroke="#a8790f" stroke-width="2"/>
-</svg>
-`;
+<svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+ <ellipse cx="110" cy="203" rx="57" ry="10" fill="#0002"/>
+ <path d="M72 145 Q110 126 148 145 L153 190 Q110 207 67 190Z" fill="#f2a65a" stroke="#71472e" stroke-width="4"/>
+ <path d="M84 149v45M136 149v45" stroke="#3f89b6" stroke-width="13" stroke-linecap="round"/>
+ <circle cx="110" cy="103" r="55" fill="#ffd9b6" stroke="#70462e" stroke-width="4"/>
+ <path d="M62 94 Q64 49 110 40 Q156 49 158 94 Q138 72 110 70 Q82 72 62 94Z" fill="#f7b538" stroke="#70462e" stroke-width="4"/>
+ <path d="M57 92 Q110 79 163 92" stroke="#d88422" stroke-width="10" stroke-linecap="round"/>
+ <circle cx="110" cy="52" r="17" fill="#fff7ba" stroke="#70462e" stroke-width="4"/><circle cx="110" cy="52" r="10" fill="#fffde6"/>
+ <circle cx="89" cy="104" r="9" fill="#4a3023"/><circle cx="131" cy="104" r="9" fill="#4a3023"/><circle cx="92" cy="100" r="3" fill="white"/><circle cx="134" cy="100" r="3" fill="white"/>
+ <ellipse cx="75" cy="119" rx="12" ry="7" fill="#ff9eaa" opacity=".75"/><ellipse cx="145" cy="119" rx="12" ry="7" fill="#ff9eaa" opacity=".75"/>
+ <path d="M98 119 Q110 133 122 119" fill="none" stroke="#7a4732" stroke-width="4" stroke-linecap="round"/>
+ <path d="M60 156 Q39 164 34 184" stroke="#f2a65a" stroke-width="16" stroke-linecap="round"/><circle cx="31" cy="187" r="9" fill="#ffd9b6" stroke="#70462e" stroke-width="3"/>
+ <path d="M153 157 Q171 163 178 179" stroke="#f2a65a" stroke-width="16" stroke-linecap="round"/><circle cx="180" cy="183" r="9" fill="#ffd9b6" stroke="#70462e" stroke-width="3"/>
+ <path d="M181 184 L200 132" stroke="#9b6638" stroke-width="8" stroke-linecap="round"/><path d="M184 128 Q201 112 213 128" fill="none" stroke="#97a9b2" stroke-width="10" stroke-linecap="round"/>
+ <path d="M78 185h-18M142 185h18" stroke="#68412c" stroke-width="12" stroke-linecap="round"/>
+ <text x="110" y="24" text-anchor="middle" font-size="18">✨</text>
+</svg>`;
 const SVG_SABOTEUR = `
-<svg viewBox="0 0 212 230" xmlns="http://www.w3.org/2000/svg">
-  <ellipse cx="90" cy="215" rx="58" ry="9" fill="#00000018"/>
-  <ellipse cx="63" cy="198" rx="17" ry="11" fill="#3a2e24"/>
-  <ellipse cx="107" cy="198" rx="17" ry="11" fill="#3a2e24"/>
-  <path d="M50 130 Q85 112 120 130 L128 190 Q85 205 42 190 Z" fill="#7a4a6b"/>
-  <rect x="46" y="168" width="78" height="12" fill="#3a2c22" rx="3"/>
-  <circle cx="85" cy="174" r="7" fill="#8b93aa" stroke="#565d70" stroke-width="1.5"/>
-  <ellipse cx="46" cy="160" rx="12" ry="16" fill="#7a4a6b" transform="rotate(12 46 160)"/>
-  <circle cx="42" cy="174" r="9" fill="#e0b98a"/>
-  <line x1="114" y1="148" x2="152" y2="170" stroke="#7a4a6b" stroke-width="20" stroke-linecap="round"/>
-  <circle cx="152" cy="170" r="12" fill="#e0b98a" stroke="#a97a4a" stroke-width="2"/>
-  <line x1="152" y1="170" x2="178" y2="94" stroke="#5a4a3a" stroke-width="9" stroke-linecap="round"/>
-  <path d="M156 90 Q178 68 200 90 L190 104 Q178 86 166 104 Z" fill="#6b6f75" stroke="#333638" stroke-width="2"/>
-  <circle cx="85" cy="98" r="46" fill="#e0b98a"/>
-  <ellipse cx="41" cy="98" rx="8" ry="12" fill="#e0b98a"/>
-  <ellipse cx="129" cy="98" rx="8" ry="12" fill="#e0b98a"/>
-  <ellipse cx="53" cy="108" rx="9" ry="5.5" fill="#ff9c92" opacity="0.55"/>
-  <ellipse cx="117" cy="108" rx="9" ry="5.5" fill="#ff9c92" opacity="0.55"/>
-  <!-- sly eyes -->
-  <path d="M60 88 Q68 82 78 88 L78 94 Q68 90 60 94 Z" fill="#3a2415"/>
-  <path d="M92 88 Q102 82 110 88 L110 94 Q102 90 92 94 Z" fill="#3a2415"/>
-  <circle cx="72" cy="90" r="2.3" fill="#fff"/>
-  <circle cx="104" cy="90" r="2.3" fill="#fff"/>
-  <path d="M58 74 Q68 80 78 75" stroke="#5a4030" stroke-width="3" fill="none" stroke-linecap="round"/>
-  <path d="M92 75 Q102 80 112 74" stroke="#5a4030" stroke-width="3" fill="none" stroke-linecap="round"/>
-  <ellipse cx="85" cy="103" rx="8" ry="6.5" fill="#c99a68"/>
-  <!-- dark beard -->
-  <path d="M40 112 Q85 100 130 112 Q134 150 122 178 Q108 200 85 202 Q62 200 48 178 Q36 150 40 112 Z" fill="#4a3b2e"/>
-  <path d="M52 130 Q85 122 118 130 Q120 150 112 168" fill="none" stroke="#392c22" stroke-width="2" opacity="0.6"/>
-  <path d="M55 145 Q85 138 115 145" fill="none" stroke="#392c22" stroke-width="2" opacity="0.6"/>
-  <!-- smirk -->
-  <path d="M68 118 Q85 124 100 114" stroke="#2a2018" stroke-width="6" fill="none" stroke-linecap="round"/>
-  <path d="M96 116 L100 122 L103 115 Z" fill="#fff" opacity="0.9"/>
-  <!-- dark pointy hood -->
-  <path d="M38 78 Q42 20 85 8 Q128 20 132 78 Q108 58 85 56 Q62 58 38 78 Z" fill="#2e2a3a" stroke="#1c1926" stroke-width="2.5"/>
-  <circle cx="85" cy="10" r="7" fill="#8b93aa" stroke="#565d70" stroke-width="2"/>
-</svg>
-`;
+<svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+ <ellipse cx="110" cy="203" rx="57" ry="10" fill="#0002"/>
+ <path d="M70 145 Q110 126 150 145 L156 192 Q110 206 64 192Z" fill="#5b526f" stroke="#3b304a" stroke-width="4"/>
+ <circle cx="110" cy="105" r="54" fill="#e7bc92" stroke="#4a3327" stroke-width="4"/>
+ <path d="M60 98 Q63 46 110 35 Q157 46 160 98 Q140 72 110 70 Q80 72 60 98Z" fill="#3f3a52" stroke="#2b2637" stroke-width="4"/>
+ <path d="M53 96 Q110 81 167 96" stroke="#2f2a3d" stroke-width="11" stroke-linecap="round"/>
+ <circle cx="110" cy="49" r="14" fill="#ffe477" stroke="#3b304a" stroke-width="4"/>
+ <path d="M79 103 Q89 95 99 103" stroke="#39271f" stroke-width="6" stroke-linecap="round"/><path d="M121 103 Q131 95 141 103" stroke="#39271f" stroke-width="6" stroke-linecap="round"/>
+ <ellipse cx="76" cy="121" rx="11" ry="6" fill="#e98c9d" opacity=".55"/><ellipse cx="144" cy="121" rx="11" ry="6" fill="#e98c9d" opacity=".55"/>
+ <path d="M98 121 Q114 128 127 116" fill="none" stroke="#4b2e24" stroke-width="4" stroke-linecap="round"/>
+ <path d="M71 154 Q48 165 42 183" stroke="#5b526f" stroke-width="16" stroke-linecap="round"/><circle cx="39" cy="187" r="9" fill="#e7bc92"/>
+ <path d="M151 155 Q174 163 181 181" stroke="#5b526f" stroke-width="16" stroke-linecap="round"/><circle cx="184" cy="184" r="9" fill="#e7bc92"/>
+ <path d="M185 184 L202 138" stroke="#6f563d" stroke-width="8" stroke-linecap="round"/><path d="M188 135 Q202 121 215 135" fill="none" stroke="#6d7782" stroke-width="9" stroke-linecap="round"/>
+ <text x="110" y="23" text-anchor="middle" font-size="18">😈</text>
+</svg>`;
 
 /* ============================== SCREENS: HOME ============================== */
 function renderHome(){
@@ -1147,7 +1180,7 @@ function renderCell(r, x, y){
   let cls = 'cell', content = '', stubs = '';
   if(key===START_POS){
     cls += ' start';
-    content = `<div class="start-marker" title="จุดเริ่มต้น"><span class="marker-icon">🐹⛏️</span><span class="marker-label">ฐานนักขุด</span></div>`;
+    content = `<div class="start-marker" title="จุดเริ่มต้น"><span class="marker-icon">🏡⛏️</span><span class="marker-label">เริ่มขุด!</span></div>`;
   } else if(GOAL_POS.includes(key)){
     const goal = r.game.goals[key];
     cls += ' goal';
@@ -1283,6 +1316,16 @@ function renderSidePanel(r){
   </div>`;
 }
 
+function countValidPathTargets(r, conn){
+  let n=0;
+  for(let x=BOARD_MIN_X;x<=BOARD_MAX_X;x++){
+    for(let y=BOARD_MIN_Y;y<=BOARD_MAX_Y;y++){
+      if(canPlaceAt(r,x,y,conn)) n++;
+    }
+  }
+  return n;
+}
+
 function renderGame(){
   const r = room;
   const g = r.game;
@@ -1309,7 +1352,8 @@ function renderGame(){
           <button class="small" id="btnRotateR">ขวา 90° ⟳</button>
           <button class="ghost small" id="btnCancelSel">ยกเลิก</button>
         </div>
-        <p class="hint">✅ วางได้เฉพาะช่องเส้นประที่ทางเดินของไพ่เชื่อมตรงกับไพ่ข้างเคียงทุกด้าน และเชื่อมถึงทางจากจุดเริ่ม</p>`;
+        <p class="hint">✅ คลิก <b>ช่องสีเขียวกระพริบ</b> เพื่อวางทาง หากไม่มีช่องสีเขียวให้กดหมุนไพ่ 90°</p>
+        <div class="place-status">🟢 ช่องที่วางได้ตอนนี้: <b>${countValidPathTargets(r, previewConn)}</b> ช่อง</div>`;
         ui.targetMode = 'place';
       } else if(selectedCard.type==='rockfall'){
         controls = `<p class="hint">คลิกไพ่ทางเดินบนกระดาน (ที่ไม่ใช่จุดเริ่ม/โพรงทอง) เพื่อทำลาย</p>
@@ -1366,7 +1410,7 @@ function renderGame(){
 
   return `
   <div class="topbar">
-    <div class="brand" style="margin:0;"><span class="mascot" style="font-size:2rem;">🐹</span><h1 style="font-size:1.6rem;">${r.code}</h1></div>
+    <div class="brand" style="margin:0;"><span class="cute-avatar" style="--hat:#f7b538;transform:scale(1.25);margin-right:10px"><i class="av-hat"></i><i class="av-hair"></i><i class="av-face"></i><i class="av-eye l"></i><i class="av-eye r"></i><i class="av-cheek l"></i><i class="av-cheek r"></i><i class="av-smile"></i></span><h1 style="font-size:1.6rem;">${r.code}</h1></div>
     <div class="round-badge">🎲 ยกที่ ${r.round}/${MAX_ROUNDS} · 🃏 เหลือ ${g.deck.length} ใบ</div>
   </div>
   ${r.phase==='playing' ? `<div class="turn-banner ${isMyTurn?'mine':''}">${isMyTurn ? '🌟 ตาของคุณแล้ว! เลือกไพ่แล้วลุยเลย ⛏️' : `⏳ รอ ${avatarFor(currentPlayerId(r))} ${escapeHtml(playerName(r,currentPlayerId(r)))}`}</div>` : ''}
@@ -1510,9 +1554,14 @@ function attachHandlers(){
       const x = parseInt(elm.getAttribute('data-x'));
       const y = parseInt(elm.getAttribute('data-y'));
       const key = elm.getAttribute('data-key');
-      if(ui.targetMode==='place' && elm.classList.contains('target-select')){
-        const card = getSelectedCard();
-        submitAction(r=>doPlacePath(r, card.uid, x, y, ui.rotation), null);
+      const selectedNow = getSelectedCard();
+      if(selectedNow?.kind==='path' && currentPlayerId(room)===myId){
+        const conn = rotateConn(PATH_SHAPES[selectedNow.type], ui.rotation);
+        if(canPlaceAt(room, x, y, conn)){
+          submitAction(r=>doPlacePath(r, selectedNow.uid, x, y, ui.rotation), null);
+        } else if(!room.game.board[key] && !room.game.goals[key] && key!==START_POS){
+          showToast('❌ ตรงนี้ต่อทางไม่ได้ — ลองกดหมุนไพ่ แล้วเลือกช่องสีเขียว');
+        }
       } else if(ui.targetMode==='rockfall' && elm.classList.contains('target-select')){
         const card = getSelectedCard();
         submitAction(r=>doRockfall(r, card.uid, x, y), null);

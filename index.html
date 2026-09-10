@@ -675,6 +675,464 @@ body::after{width:260px;height:260px;right:-90px;bottom:8%;background:radial-gra
 .v11-version{background:#2d7a49!important;color:#fff!important}
 @media(max-width:1200px){:root{--board-cell:46px!important}.v11-layout{grid-template-columns:190px minmax(0,1fr) 290px!important}}
 @media(max-width:980px){.v11-layout{grid-template-columns:1fr!important}.v11-center .board-wrap{overflow:auto!important}.v11-right,.v11-left{position:static!important}}
+
+/* ==================== MAP BEAUTY REFRESH — visual only ==================== */
+.mine-map-shell{
+  position:relative;
+  border-radius:24px;
+  background:linear-gradient(180deg,#fff5d9 0%,#f7dfad 100%);
+  border:4px solid #70452c;
+  box-shadow:0 7px 0 #9a603b,0 15px 30px #45271326;
+  overflow:hidden;
+}
+.mine-map-head{
+  min-height:62px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:9px 14px 10px;
+  background:
+    radial-gradient(circle at 15% 20%,#fff8 0 2px,transparent 3px),
+    linear-gradient(180deg,#ffe9ac,#e8b868);
+  border-bottom:3px solid #8a562f;
+  color:#57331f;
+}
+.mine-map-title{display:flex;align-items:center;gap:10px}
+.mine-map-icon{
+  width:42px;height:42px;display:grid;place-items:center;
+  border-radius:50%;
+  background:#fff8d9;
+  border:3px solid #8a562f;
+  box-shadow:0 3px 0 #b8783d;
+  font-size:22px;
+}
+.mine-map-title strong{display:block;font-size:17px;line-height:1.05;font-weight:1000}
+.mine-map-title small{display:block;margin-top:3px;font-size:10px;color:#7a573d;font-weight:800}
+.mine-depth{
+  flex:0 0 auto;
+  border-radius:999px;
+  padding:6px 10px;
+  background:#5a3523;
+  color:#fff1cc;
+  border:2px solid #3f271b;
+  box-shadow:inset 0 0 0 2px #8b5a38;
+  font-size:10px;
+  font-weight:900;
+}
+.mine-depth b{color:#ffd56b;font-size:13px}
+
+.mine-map-frame{
+  position:relative;
+  padding:12px;
+  background:
+    radial-gradient(circle at 10% 15%,#d99c60 0 2px,transparent 2.5px),
+    radial-gradient(circle at 80% 30%,#75452e 0 2px,transparent 2.5px),
+    linear-gradient(135deg,#5b3524,#3b241b 55%,#503020);
+  background-size:27px 27px,39px 39px,auto;
+  box-shadow:inset 0 0 28px #1d100caa;
+}
+.mine-map-frame::before{
+  content:"";
+  position:absolute;
+  inset:7px;
+  border:2px dashed #c58c55;
+  border-radius:18px;
+  pointer-events:none;
+  opacity:.55;
+}
+.mine-map-corner{
+  position:absolute;
+  z-index:9;
+  width:30px;height:30px;
+  display:grid;place-items:center;
+  font-size:17px;
+  filter:drop-shadow(0 2px 1px #24130d);
+  pointer-events:none;
+}
+.mine-map-corner.tl{left:4px;top:2px}
+.mine-map-corner.tr{right:4px;top:2px}
+.mine-map-corner.bl{left:5px;bottom:3px}
+.mine-map-corner.br{right:5px;bottom:3px}
+
+.mine-map-shell .board-wrap{
+  position:relative!important;
+  margin:0!important;
+  padding:13px!important;
+  border-radius:20px!important;
+  border:4px solid #2f1b14!important;
+  background:
+    linear-gradient(180deg,#7a482d,#58331f)!important;
+  box-shadow:
+    inset 0 0 0 4px #aa6f42,
+    inset 0 0 26px #21120c99,
+    0 5px 0 #26150f!important;
+  overflow:auto!important;
+}
+.mine-map-shell .board{
+  position:relative;
+  border:3px solid #2f1b14!important;
+  border-radius:16px!important;
+  overflow:visible!important;
+  background:
+    radial-gradient(circle at 14px 14px,#d59a5d 0 1.8px,transparent 2.2px),
+    radial-gradient(circle at 70% 30%,#74462d55 0 2px,transparent 2.5px),
+    linear-gradient(#ffffff0b 1px,transparent 1px),
+    linear-gradient(90deg,#ffffff0b 1px,transparent 1px),
+    linear-gradient(145deg,#a9683f,#8b5233)!important;
+  background-size:26px 26px,37px 37px,var(--board-cell) var(--board-cell),var(--board-cell) var(--board-cell),auto!important;
+  box-shadow:inset 0 0 34px #321b1190;
+}
+.mine-map-shell .cell{
+  border-radius:12px!important;
+  transition:transform .14s ease,filter .14s ease,box-shadow .14s ease!important;
+}
+.mine-map-shell .cell.empty-void{
+  border:1px solid #ffffff10!important;
+  background:linear-gradient(145deg,#ad70433a,#6d402c2a)!important;
+}
+.mine-map-shell .cell.empty-void:nth-child(7n+2)::before{
+  content:"·";color:#e8b374;font-size:18px;opacity:.55
+}
+.mine-map-shell .cell.empty-void:nth-child(13n+5)::before{
+  content:"✦";color:#ffd784;font-size:10px;opacity:.45
+}
+.mine-map-shell .cell.path{
+  border:3px solid #55301e!important;
+  background:
+    radial-gradient(circle at 28% 26%,#dba467 0 2px,transparent 3px),
+    linear-gradient(145deg,#c68349,#a65f35)!important;
+  box-shadow:
+    inset 0 0 0 2px #e0aa6b66,
+    0 3px 0 #633821,
+    0 4px 8px #2d180f77!important;
+}
+.mine-map-shell .cell.path .stub{
+  background:linear-gradient(90deg,#4b2b1c,#6b3b24,#4b2b1c)!important;
+  box-shadow:inset 0 0 0 1px #2d190f,0 1px 1px #e7ae6b55;
+  border-radius:5px!important;
+}
+.mine-map-shell .cell.blocked{
+  border:3px solid #5f5141!important;
+  background:linear-gradient(145deg,#b9a48a,#87725c)!important;
+  box-shadow:inset 0 0 0 2px #d8c9b6,0 3px 0 #5c4a3a!important;
+}
+.mine-map-shell .cell.start{
+  border:3px solid #398d46!important;
+  background:radial-gradient(circle at 50% 38%,#eeffd6 0 32%,#98e37e 33% 70%,#63bd60 71%)!important;
+  box-shadow:
+    0 0 0 3px #dffff0,
+    0 0 22px #7ef18f,
+    0 4px 0 #367b3d!important;
+}
+.mine-map-shell .start-marker .marker-icon{font-size:1.7rem!important}
+.mine-map-shell .start-marker .marker-label{
+  background:#fff7bc!important;
+  border:2px solid #ad7a25!important;
+  color:#65410f!important;
+  box-shadow:0 2px 0 #af792a;
+}
+.mine-map-shell .cell.goal{
+  border:3px solid #6d43ac!important;
+  background:radial-gradient(circle at 45% 35%,#f1e3ff,#c59af4 60%,#9b65d7)!important;
+  box-shadow:
+    inset 0 0 0 2px #f7edff,
+    0 4px 0 #58348e,
+    0 0 18px #d5b1ff88!important;
+}
+.mine-map-shell .cell.goal .goal-icon{font-size:1.6rem!important}
+.mine-map-shell .cell.goal .goal-label{
+  background:#fff4c9!important;
+  border:2px solid #a06a28!important;
+  color:#694117!important;
+}
+.mine-map-shell .cell.goal.gold{
+  background:radial-gradient(circle,#fffbd1 0 25%,#ffd95b 26% 65%,#e8a820 66%)!important;
+  box-shadow:0 0 0 3px #fff1a2,0 0 30px #ffd74b,0 4px 0 #a86f11!important;
+}
+.mine-map-shell .cell.placeable,
+.mine-map-shell .cell.path-valid-now{
+  z-index:8!important;
+  outline:3px solid #62ed77!important;
+  outline-offset:-3px!important;
+  background:radial-gradient(circle,#ecffe9 0 28%,#bff5b7 29% 100%)!important;
+  box-shadow:0 0 0 4px #e9ffe9,0 0 24px #67f27d!important;
+}
+.mine-map-shell .cell.placeable::before,
+.mine-map-shell .cell.path-valid-now::before{
+  background:#efffeccc!important;
+  color:#159939!important;
+  border:2px dashed #37c859;
+  inset:7px!important;
+  border-radius:10px!important;
+}
+.mine-map-shell .cell.placeable::after,
+.mine-map-shell .cell.path-valid-now::after{
+  content:"วาง"!important;
+  background:#1faa47!important;
+  border:1px solid #dffff0;
+  box-shadow:0 2px 0 #116f2c;
+}
+.mine-map-footer{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:6px;
+  padding:8px 10px 10px;
+  background:linear-gradient(180deg,#f8e4b9,#efd092);
+  border-top:3px solid #8a562f;
+}
+.mine-map-footer span{
+  font-size:9px;
+  font-weight:900;
+  color:#62422d;
+  background:#fff7e4;
+  border:1.5px solid #c49159;
+  border-radius:999px;
+  padding:3px 7px;
+  box-shadow:0 2px 0 #d2a66f;
+}
+.v11-center>.legend{display:none!important}
+.board-hint{display:none!important}
+
+@media(max-width:620px){
+  .mine-map-shell{border-radius:18px}
+  .mine-map-head{padding:7px 9px;min-height:52px}
+  .mine-map-icon{width:34px;height:34px;font-size:18px}
+  .mine-map-title strong{font-size:14px}
+  .mine-map-title small{display:none}
+  .mine-depth{font-size:9px;padding:5px 7px}
+  .mine-map-frame{padding:8px}
+  .mine-map-shell .board-wrap{padding:8px!important;border-radius:15px!important}
+  .mine-map-footer{gap:4px;padding:7px 5px}
+  .mine-map-footer span{font-size:8px;padding:2px 5px}
+}
+
+
+/* ==================== CARD BEAUTY REFRESH — visual + clearer copy only ==================== */
+.card-hand-head{
+  margin:8px 10px 4px!important;
+  padding:8px 10px!important;
+  background:linear-gradient(90deg,#fff3c9,#ffe1ee)!important;
+  border:2px solid #d9ae73!important;
+  border-radius:14px!important;
+}
+.card-hand-grid{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:10px!important;
+  padding:10px!important;
+  margin:0!important;
+  align-items:stretch!important;
+}
+.gcard.card-pro{
+  width:100%!important;
+  height:190px!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:8px!important;
+  border:3px solid #7b5237!important;
+  border-radius:18px!important;
+  background:linear-gradient(180deg,#fffdf7,#f8e9d1)!important;
+  box-shadow:0 6px 0 #9a6b48,0 10px 16px #4d2e1d22!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  justify-content:flex-start!important;
+  gap:5px!important;
+  overflow:hidden!important;
+  position:relative!important;
+  text-align:left!important;
+}
+.gcard.card-pro::before{
+  content:"";
+  position:absolute;
+  inset:5px;
+  border:1.5px solid #ffffffaa;
+  border-radius:13px;
+  pointer-events:none;
+}
+.gcard.card-pro:hover:not(:disabled){
+  transform:translateY(-5px)!important;
+  box-shadow:0 10px 0 #9a6b48,0 15px 24px #4d2e1d2e!important;
+}
+.gcard.card-pro.selected{
+  transform:translateY(-6px) scale(1.025)!important;
+  outline:4px solid #66bdf7!important;
+  box-shadow:0 0 0 6px #d6f0ff,0 9px 0 #3e8ec7,0 14px 22px #286e9f3d!important;
+}
+.card-pro-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:5px;
+  min-height:22px;
+  position:relative;
+  z-index:2;
+}
+.card-pro-badge{
+  display:inline-flex;
+  align-items:center;
+  border-radius:999px;
+  padding:3px 7px;
+  font-size:9px;
+  line-height:1;
+  font-weight:1000;
+  background:#fff8e6;
+  border:1.5px solid #c99b60;
+  color:#65442d;
+}
+.card-pro-dot{
+  width:22px;height:22px;
+  display:grid;place-items:center;
+  border-radius:50%;
+  background:#fff9dc;
+  border:1.5px solid #d6a85b;
+  color:#b4771f;
+  font-size:11px;
+  font-weight:1000;
+}
+.card-pro-art{
+  min-height:66px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+}
+.card-action-art{
+  width:64px;height:64px;
+  border-radius:18px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(145deg,#fff7d7,#eac37a);
+  border:3px solid #80542f;
+  box-shadow:inset 0 0 0 3px #fff8,0 4px 0 #9c6838;
+}
+.card-action-art span{
+  font-size:32px;
+  filter:drop-shadow(0 2px 0 #fff7);
+}
+.card-art-path{
+  width:64px!important;height:64px!important;
+  margin:0!important;
+  border-radius:17px!important;
+  background:linear-gradient(145deg,#d49a5b,#a96535)!important;
+  border:3px solid #684026!important;
+  box-shadow:inset 0 0 0 3px #efbd79,0 4px 0 #754729!important;
+  position:relative!important;
+  flex:0 0 auto!important;
+}
+.card-art-path .stub{
+  background:linear-gradient(90deg,#4d2d1f,#6d3d29,#4d2d1f)!important;
+  box-shadow:inset 0 0 0 1px #2c190f;
+}
+.card-art-path .path-center{
+  position:absolute;
+  width:20px;height:20px;
+  border-radius:7px;
+  left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  background:#593420;
+  border:2px solid #392116;
+  z-index:3;
+}
+.card-pro-name{
+  position:relative;
+  z-index:2;
+  font-size:13px;
+  line-height:1.05;
+  font-weight:1000;
+  color:#4f321f;
+  text-align:center;
+}
+.card-pro-desc{
+  position:relative;
+  z-index:2;
+  min-height:30px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  font-size:9.5px;
+  line-height:1.25;
+  font-weight:800;
+  color:#735844;
+  padding:0 2px;
+}
+.card-pro-hint,.card-pro-warning{
+  margin-top:auto;
+  position:relative;
+  z-index:2;
+  border-radius:10px;
+  padding:5px 6px;
+  text-align:center;
+  font-size:9px;
+  line-height:1.15;
+  font-weight:1000;
+}
+.card-pro-hint{
+  background:#eef9ff;
+  border:1.5px solid #8bc4e5;
+  color:#356f93;
+}
+.card-pro-warning{
+  background:#fff0e4;
+  border:1.5px solid #e6a36d;
+  color:#a35320;
+}
+
+/* Card categories: same card structure, different visual cues */
+.card-tone-path{background:linear-gradient(180deg,#fff8e9,#f1d2a8)!important}
+.card-tone-path .card-pro-badge{background:#fff0be;border-color:#d99a38;color:#84530d}
+.card-tone-block{background:linear-gradient(180deg,#f7f1e9,#d7c7b6)!important}
+.card-tone-block .card-pro-badge{background:#eee3d5;border-color:#9b8269;color:#604d3b}
+.card-tone-map{background:linear-gradient(180deg,#eef8ff,#d8ecff)!important;border-color:#4f8eb5!important}
+.card-tone-map .card-pro-badge{background:#e2f3ff;border-color:#79b2d5;color:#356d90}
+.card-tone-map .card-action-art{background:linear-gradient(145deg,#e9fbff,#9edbf1);border-color:#4f8ea8}
+.card-tone-rock{background:linear-gradient(180deg,#fff3e8,#ffd4b7)!important;border-color:#b7653d!important}
+.card-tone-rock .card-pro-badge{background:#ffe4d2;border-color:#df8c61;color:#984a2c}
+.card-tone-rock .card-action-art{background:linear-gradient(145deg,#fff1c4,#ffb56e);border-color:#a45a35}
+.card-tone-sab{background:linear-gradient(180deg,#fff0ef,#ffc8c2)!important;border-color:#a94f46!important}
+.card-tone-sab .card-pro-badge{background:#ffe0dd;border-color:#d8746b;color:#8f3932}
+.card-tone-sab .card-action-art{background:linear-gradient(145deg,#ffe5df,#ef8a7e);border-color:#95463f}
+.card-tone-help{background:linear-gradient(180deg,#effff0,#c9efca)!important;border-color:#57905c!important}
+.card-tone-help .card-pro-badge{background:#e5f8e5;border-color:#79af7c;color:#3e7242}
+.card-tone-help .card-action-art{background:linear-gradient(145deg,#f3fff1,#98dca0);border-color:#4f8653}
+
+/* Keep disabled cards readable instead of fading almost completely */
+.gcard.card-pro:disabled{
+  opacity:.62!important;
+  filter:saturate(.72)!important;
+}
+.gcard.card-pro:disabled .card-pro-desc{
+  color:#6e6257!important;
+}
+@media(max-width:1180px){
+  .gcard.card-pro{height:176px!important}
+  .card-pro-art{min-height:58px}
+  .card-art-path,.card-action-art{width:56px!important;height:56px!important}
+  .card-action-art span{font-size:28px}
+  .card-pro-desc{font-size:9px}
+}
+@media(max-width:980px){
+  .card-hand-grid{
+    grid-template-columns:repeat(6,120px)!important;
+    overflow-x:auto!important;
+    padding-bottom:14px!important;
+  }
+  .gcard.card-pro{height:178px!important}
+}
+@media(max-width:620px){
+  .card-hand-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    overflow:visible!important;
+    gap:8px!important;
+  }
+  .gcard.card-pro{height:168px!important;padding:7px!important}
+  .card-pro-name{font-size:12px}
+  .card-pro-desc{font-size:9px;min-height:28px}
+}
+
 </style>
 </head>
 <body>
@@ -714,7 +1172,7 @@ const DECK_RECIPE = [
 ];
 const HAND_SIZE = 6;
 const MAX_ROUNDS = 3;
-const APP_VERSION = 'V19';
+const APP_VERSION = 'V19 MAP+CARDS';
 
 /* ============================== STATE ============================== */
 let myId = sessionStorage.getItem('deepDigPlayerId') || crypto.randomUUID();
@@ -1445,7 +1903,22 @@ function renderBoard(r){
       cells += renderCell(r,x,y);
     }
   }
-  return `<div class="board-wrap"><div class="board">${cells}</div></div><div class="board-hint">🗺️ เลื่อนซ้าย–ขวาเพื่อสำรวจเหมืองทั้งหมด ✨</div>`;
+  return `<section class="mine-map-shell">
+    <div class="mine-map-head">
+      <div class="mine-map-title"><span class="mine-map-icon">⛏️</span><div><strong>แผนที่เหมืองลึก</strong><small>ขุดเส้นทางจากค่ายไปหาโพรงลับ</small></div></div>
+      <div class="mine-depth">ชั้นใต้ดิน <b>${r.round}</b> / ${MAX_ROUNDS}</div>
+    </div>
+    <div class="mine-map-frame">
+      <div class="mine-map-corner tl">🪨</div>
+      <div class="mine-map-corner tr">💎</div>
+      <div class="mine-map-corner bl">🦴</div>
+      <div class="mine-map-corner br">✨</div>
+      <div class="board-wrap"><div class="board">${cells}</div></div>
+    </div>
+    <div class="mine-map-footer">
+      <span>🏡 จุดเริ่ม</span><span>🟫 ทางขุด</span><span>🪨 ทางตัน</span><span>❓ โพรงลับ</span>
+    </div>
+  </section>`;
 }
 function getSelectedCard(){
   if(!room || !ui.selectedCardUid) return null;
@@ -1477,13 +1950,45 @@ function cardIcon(card){
   return '❓';
 }
 function cardLabel(card){
-  const names = { straight:'ทางตรง', bend:'ทางเลี้ยว', tjunction:'สามแพร่ง', cross:'สี่แพร่ง', blocked:'หินถล่ม' };
+  const names = { straight:'ทางตรง', bend:'ทางเลี้ยว', tjunction:'สามแพร่ง', cross:'สี่แพร่ง', blocked:'ทางตัน' };
   if(card.kind==='path') return names[card.type];
-  if(card.type==='rockfall') return 'Rockfall';
-  if(card.type==='map') return 'แผนที่';
-  if(card.type==='break') return `หัก ${TOOL_ICON[card.tool]}`;
+  if(card.type==='rockfall') return 'หินถล่ม';
+  if(card.type==='map') return 'แผนที่ลับ';
+  if(card.type==='break') return `ทำลาย ${TOOL_ICON[card.tool]}`;
   if(card.type==='repair') return `ซ่อม ${TOOL_ICON[card.tool]}`;
   return '';
+}
+
+function cardDescription(card){
+  if(!card) return '';
+  if(card.kind==='path'){
+    const d={
+      straight:'ต่ออุโมงค์เป็นเส้นตรง',
+      bend:'เลี้ยวอุโมงค์ไปอีกด้าน',
+      tjunction:'แตกทางออกเป็น 3 ด้าน',
+      cross:'เชื่อมทางได้ทั้ง 4 ด้าน',
+      blocked:'วางเป็นทางตันเพื่อขวางทาง'
+    };
+    return d[card.type] || 'ใช้ต่อเส้นทางในเหมือง';
+  }
+  if(card.type==='rockfall') return 'ทำลายไพ่ทาง 1 ใบบนกระดาน';
+  if(card.type==='map') return 'แอบดูว่าโพรงลับเป็นทองหรือหิน';
+  if(card.type==='break') return `ทำให้ ${toolName(card.tool)} ของผู้เล่นอื่นเสีย`;
+  if(card.type==='repair') return `ซ่อม ${toolName(card.tool)} ที่เสียให้ใช้งานได้`;
+  return '';
+}
+
+function toolName(tool){
+  return ({pickaxe:'พลั่วขุด',lantern:'ตะเกียง',cart:'รถเข็น'})[tool] || 'เครื่องมือ';
+}
+
+function cardBadge(card){
+  if(card?.kind==='path') return card.type==='blocked' ? 'ทางตัน' : 'ไพ่ทาง';
+  if(card?.type==='map') return 'สืบข้อมูล';
+  if(card?.type==='rockfall') return 'ทำลายทาง';
+  if(card?.type==='break') return 'ก่อกวน';
+  if(card?.type==='repair') return 'ช่วยเหลือ';
+  return 'ไพ่';
 }
 function renderHand(r){
   const isMyTurn = r.phase==='playing' && currentPlayerId(r)===myId;
@@ -1493,20 +1998,43 @@ function renderHand(r){
     const isPath = c.kind==='path';
     const blockedByTool = isPath && myBroken.length>0;
     const selected = ui.selectedCardUid===c.uid;
-    // V19: a broken tool must NOT make the whole path card unclickable.
-    // The player can still select the card and discard it to end the turn.
     const disabled = !isMyTurn;
-    let extraCls = c.kind==='action' ? (c.type==='break'?'action sab':(c.type==='repair'?'action fix':'action')) : '';
-    const visual = isPath ? renderPathTile(c, selected ? ui.rotation : 0) : `<div class="icon">${cardIcon(c)}</div>`;
-    const reason = !isMyTurn ? 'ยังไม่ถึงตาของคุณ' : (blockedByTool ? 'เครื่องมือเสีย: เลือกไพ่ได้ แต่ต้องทิ้งหรือซ่อมก่อนวางทาง' : 'คลิกเพื่อเลือกไพ่');
-    return `<button type="button" class="gcard ${extraCls} ${selected?'selected':''} ${disabled?'disabled':''}" data-uid="${c.uid}" data-card-select="1" onclick="selectCardDirect('${c.uid}')" title="${reason}" aria-pressed="${selected?'true':'false'}" ${disabled?'disabled':''}>
-      ${visual}
-      <div class="card-name">${cardLabel(c)}</div>
-      <div class="card-kind">${isPath ? (selected ? `หมุน ${ui.rotation*90}°` : 'ไพ่ทางเดิน') : 'ไพ่คำสั่ง'}</div>
-      ${!disabled ? `<div class="card-select-hint">${selected?'✓ เลือกแล้ว':(blockedByTool?'เลือกเพื่อทิ้ง':'แตะเพื่อเลือก')}</div>` : ''}
-    </button>`;
+    const tone =
+      c.kind==='path' ? (c.type==='blocked'?'card-tone-block':'card-tone-path') :
+      c.type==='repair' ? 'card-tone-help' :
+      c.type==='break' ? 'card-tone-sab' :
+      c.type==='map' ? 'card-tone-map' :
+      c.type==='rockfall' ? 'card-tone-rock' : '';
+    const visual = isPath
+      ? renderPathTile(c, selected ? ui.rotation : 0, 'card-art-path')
+      : `<div class="card-action-art"><span>${cardIcon(c)}</span></div>`;
+    const reason = !isMyTurn
+      ? 'ยังไม่ถึงตาของคุณ'
+      : (blockedByTool ? 'เครื่องมือเสีย: เลือกไพ่ได้ แต่ต้องทิ้งหรือซ่อมก่อนวางทาง' : cardDescription(c));
+    return `<button type="button"
+      class="gcard card-pro ${tone} ${selected?'selected':''} ${disabled?'disabled':''}"
+      data-uid="${c.uid}" data-card-select="1"
+      onclick="selectCardDirect('${c.uid}')"
+      title="${escapeHtml(reason)}"
+      aria-pressed="${selected?'true':'false'}"
+      ${disabled?'disabled':''}>
+        <div class="card-pro-top">
+          <span class="card-pro-badge">${cardBadge(c)}</span>
+          <span class="card-pro-dot">${selected?'✓':'✦'}</span>
+        </div>
+        <div class="card-pro-art">${visual}</div>
+        <div class="card-pro-name">${cardLabel(c)}</div>
+        <div class="card-pro-desc">${cardDescription(c)}</div>
+        ${blockedByTool
+          ? `<div class="card-pro-warning">🛠️ เครื่องมือเสีย<br><b>เลือกเพื่อทิ้งได้</b></div>`
+          : `<div class="card-pro-hint">${selected?'✓ เลือกแล้ว':'แตะเพื่อเลือก'}</div>`}
+      </button>`;
   }).join('');
-  return `<div class="hand-head"><div class="hand-title">🃏 ไพ่ในมือของคุณ</div><div class="hand-count">${myHand.length} ใบ</div></div><div class="hand">${cards}</div>`;
+  return `<div class="hand-head card-hand-head">
+    <div class="hand-title">🃏 ไพ่ในมือของคุณ</div>
+    <div class="hand-count">${myHand.length} ใบ</div>
+  </div>
+  <div class="hand card-hand-grid">${cards}</div>`;
 }
 
 function renderSidePanel(r){

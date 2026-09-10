@@ -482,6 +482,21 @@ button.gcard:disabled{pointer-events:none;}
 .gcard.selected .card-select-hint{background:#dff8c9;border-color:#71b85d;color:#27591e;}
 .gcard:focus-visible{outline:4px solid #55a8ff;outline-offset:3px;}
 
+
+/* V6: interactive cute start & goal */
+.cell.start,.cell.goal{cursor:pointer;overflow:visible;transition:transform .15s ease,box-shadow .15s ease,filter .15s ease}
+.cell.start:hover,.cell.goal:hover{transform:translateY(-2px) scale(1.06);filter:saturate(1.12);z-index:8}
+.cell.start{background:linear-gradient(145deg,#c8f7a8,#83d975);border:3px solid #4f9b45;box-shadow:inset 0 0 0 3px #f7ffd9,0 4px 0 #4f9b45}
+.cell.goal{background:linear-gradient(145deg,#e6c6ff,#bc8af0);border:3px solid #7d51bb;box-shadow:inset 0 0 0 3px #f8edff,0 4px 0 #7d51bb}
+.start-marker,.goal-marker{inset:-3px;pointer-events:none}
+.start-marker .marker-icon,.goal-marker .goal-icon{font-size:1.65rem}
+.start-marker .marker-label,.goal-marker .goal-label{font-size:.5rem;line-height:1.05;padding:3px 6px;box-shadow:0 2px 0 rgba(0,0,0,.10)}
+.start-marker::before{content:"✨"}.start-marker::after{content:"🌱"}
+.goal-marker.secret::before{content:"⭐"}.goal-marker.secret::after{content:"✨"}
+.cell.start::before{content:"";position:absolute;inset:-5px;border:2px dashed #fff9;border-radius:14px;pointer-events:none}
+.cell.goal::before{content:"";position:absolute;inset:-5px;border:2px dashed #fff9;border-radius:14px;pointer-events:none}
+.cell.endpoint-clicked{animation:endpointPulse .28s ease}
+@keyframes endpointPulse{50%{transform:scale(.9)}}
 </style>
 </head>
 <body>
@@ -1132,7 +1147,7 @@ function renderCell(r, x, y){
   let cls = 'cell', content = '', stubs = '';
   if(key===START_POS){
     cls += ' start';
-    content = `<div class="start-marker" title="จุดเริ่มต้น"><span class="marker-icon">⛏️</span><span class="marker-label">เริ่มขุด!</span></div>`;
+    content = `<div class="start-marker" title="จุดเริ่มต้น"><span class="marker-icon">🐹⛏️</span><span class="marker-label">ฐานนักขุด</span></div>`;
   } else if(GOAL_POS.includes(key)){
     const goal = r.game.goals[key];
     cls += ' goal';
@@ -1360,8 +1375,8 @@ function renderGame(){
     <div>
       ${renderBoard(r)}
       <div class="legend">
-        <span><span class="swatch" style="background:var(--grass);"></span>⛏️ จุดเริ่มน่ารัก</span>
-        <span><span class="swatch" style="background:var(--purple);"></span>🎁 หีบปริศนา (ยังไม่เปิด)</span>
+        <span><span class="swatch" style="background:var(--grass);"></span>🐹 ฐานนักขุด</span>
+        <span><span class="swatch" style="background:var(--purple);"></span>🎁 โพรงลับ (คลิกดูคำใบ้)</span>
         <span><span class="swatch" style="background:var(--dirt);"></span>⛏️ ทางเดิน</span>
         <span><span class="swatch" style="background:#c9b389;"></span>🪵 หินถล่ม/ปิดตาย</span>
       </div>
@@ -1442,6 +1457,22 @@ function attachHandlers(){
   if(el('btnRotateL')) el('btnRotateL').onclick = ()=>{ ui.rotation = (ui.rotation+3)%4; render(); };
   if(el('btnRotateR')) el('btnRotateR').onclick = ()=>{ ui.rotation = (ui.rotation+1)%4; render(); };
 
+
+  // V6 fallback: event delegation makes card selection reliable even after re-render.
+  const appRoot = document.getElementById('app');
+  if(appRoot){
+    appRoot.onclick = (ev)=>{
+      const cardEl = ev.target.closest?.('[data-card-select="1"]');
+      if(!cardEl || cardEl.disabled || cardEl.classList.contains('disabled')) return;
+      // Existing per-card onclick handles normal clicks. This fallback is only used if no handler is attached.
+      if(typeof cardEl.onclick === 'function') return;
+      const uidv = cardEl.getAttribute('data-uid');
+      const handNow = room?.game?.hands?.[myId] || [];
+      if(!uidv || !handNow.some(c=>c.uid===uidv)) return;
+      ui.selectedCardUid = (ui.selectedCardUid===uidv) ? null : uidv;
+      ui.rotation = 0; ui.targetMode = null; render();
+    };
+  }
   document.querySelectorAll('[data-card-select="1"]').forEach(elm=>{
     if(elm.disabled || elm.classList.contains('disabled')) return;
     elm.onclick = (ev)=>{
@@ -1488,6 +1519,14 @@ function attachHandlers(){
       } else if(ui.targetMode==='map' && elm.classList.contains('target-select')){
         const card = getSelectedCard();
         submitAction(r=>doMap(r, card.uid, key), null);
+      } else if(key===START_POS){
+        elm.classList.add('endpoint-clicked');
+        showToast('🐹⛏️ ฐานนักขุด — ทางทุกเส้นเริ่มจากตรงนี้!');
+      } else if(GOAL_POS.includes(key)){
+        elm.classList.add('endpoint-clicked');
+        const goal = room?.game?.goals?.[key];
+        if(goal?.revealed) showToast(goal.isGold ? '💎 โพรงทองถูกเปิดแล้ว!' : '🪨 โพรงนี้เป็นทางตัน');
+        else showToast('🎁 โพรงลับ! ใช้ไพ่แผนที่เพื่อแอบดูได้');
       }
     };
   });

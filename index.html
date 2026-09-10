@@ -714,7 +714,7 @@ const DECK_RECIPE = [
 ];
 const HAND_SIZE = 6;
 const MAX_ROUNDS = 3;
-const APP_VERSION = 'V17';
+const APP_VERSION = 'V18';
 
 /* ============================== STATE ============================== */
 let myId = sessionStorage.getItem('deepDigPlayerId') || crypto.randomUUID();
@@ -1487,8 +1487,8 @@ function cardLabel(card){
 }
 function renderHand(r){
   const isMyTurn = r.phase==='playing' && currentPlayerId(r)===myId;
-  const myHand = r.game.hands[myId] || [];
-  const myBroken = r.game.brokenTools[myId] || [];
+  const myHand = r.game?.hands?.[myId] || [];
+  const myBroken = r.game?.brokenTools?.[myId] || [];
   const cards = myHand.map(c=>{
     const isPath = c.kind==='path';
     const blockedByTool = isPath && myBroken.length>0;
@@ -1508,14 +1508,15 @@ function renderHand(r){
 }
 
 function renderSidePanel(r){
-  const g = r.game;
-  const myRole = g.roles[myId];
+  const g = r.game||{};
+  g.roles=g.roles||{}; g.hands=g.hands||{}; g.brokenTools=g.brokenTools||{};
+  const myRole = (g.roles||{})[myId];
   const players = r.players.map(p=>{
     const isCur = r.phase==='playing' && currentPlayerId(r)===p.id;
-    const broken = (g.brokenTools[p.id]||[]);
+    const broken = (g.brokenTools?.[p.id]||[]);
     const roleKnown = p.id===myId; // only reveal own role in UI (others hidden even though technically in shared data)
     const roleTag = roleKnown ? `<span class="role-tag ${myRole==='saboteur'?'sab':'dig'}">${myRole==='saboteur'?'ซาโบเทอร์':'นักขุด'}</span>` : '';
-    const hand = g.hands[p.id] || [];
+    const hand = g.hands?.[p.id] || [];
     const ownHand = p.id===myId;
     const handSummary = ownHand
       ? hand.map(c=>`<span class="mini-card-chip" title="${escapeHtml(cardLabel(c))}">${cardMiniSummary(c)}</span>`).join('')
@@ -1557,12 +1558,13 @@ function bestRotationForCard(r, card){
 }
 
 function renderPlayersPanel(r){
-  const g=r.game;
-  const myRole=g.roles[myId];
+  const g=r.game||{};
+  g.roles=g.roles||{}; g.hands=g.hands||{}; g.brokenTools=g.brokenTools||{};
+  const myRole=(g.roles||{})[myId];
   const rows=r.players.map((p,i)=>{
     const isCur=r.phase==='playing' && currentPlayerId(r)===p.id;
-    const broken=(g.brokenTools[p.id]||[]);
-    const hand=g.hands[p.id]||[];
+    const broken=(g.brokenTools?.[p.id]||[]);
+    const hand=g.hands?.[p.id]||[];
     const roleTag=p.id===myId ? `<span class="role-tag ${myRole==='saboteur'?'sab':'dig'}">${myRole==='saboteur'?'ซาโบเทอร์':'นักขุด'}</span>` : '';
     return `<div class="v11-player ${isCur?'current':''}">
       <div class="v11-player-main">${avatarFor(p.id)}<div><b>${escapeHtml(p.name)}</b><div class="v11-player-sub">${isCur?'กำลังเล่น...':'รอเล่น'} ${roleTag}</div></div></div>
@@ -1574,7 +1576,7 @@ function renderPlayersPanel(r){
 }
 
 function renderRolePanelV11(r){
-  const isSab=r.game.roles[myId]==='saboteur';
+  const isSab=r.game?.roles?.[myId]==='saboteur';
   return `<section class="v11-panel v11-role"><div class="v11-panel-title">🎭 บทบาทของคุณ</div>
     <div class="v11-role-art">${roleArt(isSab)}</div>
     <div class="v11-role-name ${isSab?'sab':''}">${isSab?'คุณคือซาโบเทอร์!':'คุณคือนักขุดทอง!'}</div>
@@ -1624,10 +1626,10 @@ function renderGame(){
       } else if(selectedCard.type==='map'){
         controls=`<div class="v11-action-title">🗺️ แผนที่</div><p class="hint">คลิกโพรงลับด้านขวา 1 ช่องเพื่อแอบดู</p><div class="rotate-row"><button class="ghost small" id="btnDiscardSelected">ทิ้งใบนี้</button><button class="ghost small" id="btnCancelSel">ยกเลิก</button></div>`; ui.targetMode='map';
       } else if(selectedCard.type==='break'){
-        const targets=r.players.filter(p=>p.id!==myId && !(g.brokenTools[p.id]||[]).includes(selectedCard.tool));
+        const targets=r.players.filter(p=>p.id!==myId && !(g.brokenTools?.[p.id]||[]).includes(selectedCard.tool));
         controls=`<div class="v11-action-title">😈 ทำเครื่องมือเสีย</div><div class="row">${targets.map(p=>`<button class="small" data-break-target="${p.id}">${escapeHtml(p.name)} ${TOOL_ICON[selectedCard.tool]}</button>`).join('')||'<span class="hint">ไม่มีเป้าหมาย</span>'}</div><div class="rotate-row"><button class="ghost small" id="btnDiscardSelected">ทิ้งใบนี้</button><button class="ghost small" id="btnCancelSel">ยกเลิก</button></div>`; ui.targetMode='break';
       } else if(selectedCard.type==='repair'){
-        const targets=r.players.filter(p=>(g.brokenTools[p.id]||[]).includes(selectedCard.tool));
+        const targets=r.players.filter(p=>(g.brokenTools?.[p.id]||[]).includes(selectedCard.tool));
         controls=`<div class="v11-action-title">🔧 ซ่อมเครื่องมือ</div><div class="row">${targets.map(p=>`<button class="small" data-repair-target="${p.id}">${escapeHtml(p.name)} ${TOOL_ICON[selectedCard.tool]}</button>`).join('')||'<span class="hint">ไม่มีใครต้องซ่อม</span>'}</div><div class="rotate-row"><button class="ghost small" id="btnDiscardSelected">ทิ้งใบนี้</button><button class="ghost small" id="btnCancelSel">ยกเลิก</button></div>`; ui.targetMode='repair';
       }
     } else if(isMyTurn){
@@ -1646,7 +1648,7 @@ function renderGame(){
   }
 
   const heroAvatars=r.players.slice(0,3).map(p=>avatarFor(p.id)).join('');
-  return `<div class="v11-version">${APP_VERSION} • REALTIME</div>
+  return `<div class="v11-version">${APP_VERSION} • REALTIME SAFE</div>
     <header class="v11-hero">
       <div class="v11-logo"><strong>DEEP DIG</strong><span>SABOTEUR</span><em>ขุด สนุก ลุ้น โพรงลับ! 💎</em></div>
       <div class="v11-hero-miners">${heroAvatars}<div class="v11-spark">✨</div></div>

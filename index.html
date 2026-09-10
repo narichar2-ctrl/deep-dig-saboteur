@@ -1133,6 +1133,324 @@ body::after{width:260px;height:260px;right:-90px;bottom:8%;background:radial-gra
   .card-pro-desc{font-size:9px;min-height:28px}
 }
 
+
+/* ==================== MOBILE PLAYABILITY REFRESH ==================== */
+@media(max-width:760px){
+
+  /* ไพ่: ทำรูปทางให้ใหญ่และอ่านชัดบนมือถือ */
+  .card-hand-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px!important;
+    padding:10px!important;
+    overflow:visible!important;
+  }
+  .gcard.card-pro{
+    height:198px!important;
+    min-height:198px!important;
+    padding:8px!important;
+  }
+  .card-pro-art{min-height:82px!important}
+  .card-art-path{
+    width:80px!important;
+    height:80px!important;
+    border-width:4px!important;
+  }
+  .card-art-path .path-center{
+    width:26px!important;
+    height:26px!important;
+    border-width:3px!important;
+  }
+  .card-art-path .stub.N,
+  .card-art-path .stub.S{
+    width:16px!important;
+    height:52%!important;
+    left:calc(50% - 8px)!important;
+  }
+  .card-art-path .stub.E,
+  .card-art-path .stub.W{
+    height:16px!important;
+    width:52%!important;
+    top:calc(50% - 8px)!important;
+  }
+  .card-action-art{
+    width:76px!important;
+    height:76px!important;
+  }
+  .card-action-art span{font-size:36px!important}
+  .card-pro-name{font-size:14px!important}
+  .card-pro-desc{
+    min-height:34px!important;
+    font-size:10.5px!important;
+    line-height:1.3!important;
+  }
+  .card-pro-hint,.card-pro-warning{
+    font-size:10px!important;
+    padding:6px!important;
+  }
+  .gcard.card-pro.selected{
+    outline:4px solid #2ea7ff!important;
+    box-shadow:0 0 0 7px #d8f1ff,0 9px 0 #267fbd,0 14px 24px #1f6fa63d!important;
+  }
+
+  /* Map: ไม่บีบ 9x9 ให้เล็กลง ให้เลื่อนจริงแทน */
+  .mine-map-shell{
+    width:100%!important;
+    overflow:hidden!important;
+  }
+  .mine-map-frame{padding:7px!important}
+  .mine-map-shell .board-wrap{
+    width:100%!important;
+    max-width:100%!important;
+    max-height:68vh!important;
+    overflow:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+    touch-action:pan-x pan-y!important;
+    overscroll-behavior:contain!important;
+    padding:8px!important;
+  }
+  .mine-map-shell .board{
+    width:max-content!important;
+    min-width:max-content!important;
+    height:max-content!important;
+    min-height:max-content!important;
+    grid-template-columns:repeat(9,60px)!important;
+    grid-template-rows:repeat(9,60px)!important;
+    gap:4px!important;
+    justify-content:start!important;
+    overflow:visible!important;
+  }
+  .mine-map-shell .cell{
+    width:60px!important;
+    height:60px!important;
+    min-width:60px!important;
+    min-height:60px!important;
+  }
+  .mine-map-shell .cell .stub.N,
+  .mine-map-shell .cell .stub.S{
+    width:14px!important;
+    height:52%!important;
+    left:calc(50% - 7px)!important;
+  }
+  .mine-map-shell .cell .stub.E,
+  .mine-map-shell .cell .stub.W{
+    height:14px!important;
+    width:52%!important;
+    top:calc(50% - 7px)!important;
+  }
+
+  .mine-map-footer::after{
+    content:"👆 ลากแผนที่เพื่อเลื่อน ซ้าย • ขวา • ขึ้น • ลง";
+    display:block;
+    width:100%;
+    margin-top:5px;
+    padding:6px 8px;
+    border-radius:10px;
+    background:#5d3825;
+    color:#fff2cf;
+    text-align:center;
+    font-size:10px;
+    font-weight:900;
+    box-sizing:border-box;
+  }
+
+  /* ลำดับบนมือถือ: ไพ่ -> แผนที่ -> ผู้เล่น */
+  .v11-layout{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:12px!important;
+  }
+  .v11-right{order:1!important;width:100%!important}
+  .v11-center{order:2!important;width:100%!important}
+  .v11-left{order:3!important;width:100%!important}
+  .v11-hand-panel{position:static!important;width:100%!important}
+}
+
+@media(max-width:430px){
+  .gcard.card-pro{height:190px!important}
+  .card-art-path{width:74px!important;height:74px!important}
+  .mine-map-shell .board{
+    grid-template-columns:repeat(9,58px)!important;
+    grid-template-rows:repeat(9,58px)!important;
+  }
+  .mine-map-shell .cell{
+    width:58px!important;
+    height:58px!important;
+    min-width:58px!important;
+    min-height:58px!important;
+  }
+}
+
+
+/* ==================== PATH CARD CLARITY REFRESH ==================== */
+/* High contrast: light tile + dark tunnel, readable even on small phones */
+.card-art-path.path-card-visual,
+.path-tile-mini.path-card-visual,
+.path-preview-tile.path-card-visual{
+  background:
+    radial-gradient(circle at 20% 18%,#fff5d9 0 2px,transparent 2.5px),
+    linear-gradient(145deg,#f6deb0,#dca96c)!important;
+  border:4px solid #5a351f!important;
+  box-shadow:
+    inset 0 0 0 3px #fff2c8,
+    0 4px 0 #704224,
+    0 7px 12px #3a211633!important;
+  overflow:visible!important;
+}
+
+/* Thick tunnel pieces */
+.path-card-visual .stub{
+  background:#3b2418!important;
+  border-radius:999px!important;
+  box-shadow:
+    inset 0 0 0 2px #1f130d,
+    0 0 0 1px #f2c98555!important;
+  z-index:2!important;
+}
+.path-card-visual .stub i{
+  position:absolute;
+  inset:3px;
+  border-radius:999px;
+  background:linear-gradient(90deg,#68432c,#4a2d1e,#68432c);
+  opacity:.95;
+}
+.path-card-visual .stub.N i,
+.path-card-visual .stub.S i{
+  background:linear-gradient(180deg,#68432c,#4a2d1e,#68432c);
+}
+
+/* Large central junction */
+.path-card-visual .path-center{
+  width:28px!important;
+  height:28px!important;
+  border-radius:50%!important;
+  background:#3b2418!important;
+  border:3px solid #1f130d!important;
+  box-shadow:inset 0 0 0 3px #6f4930,0 2px 0 #8d5b36!important;
+  z-index:4!important;
+}
+
+/* Bright dots show exactly where the exits are */
+.path-card-visual .exit-dot{
+  position:absolute;
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  background:#ffdf5c;
+  border:2px solid #6e471d;
+  box-shadow:0 0 0 2px #fff4b4,0 0 8px #ffd84f;
+  z-index:6;
+  pointer-events:none;
+}
+.path-card-visual .exit-dot.N{top:-6px;left:50%;transform:translateX(-50%)}
+.path-card-visual .exit-dot.S{bottom:-6px;left:50%;transform:translateX(-50%)}
+.path-card-visual .exit-dot.E{right:-6px;top:50%;transform:translateY(-50%)}
+.path-card-visual .exit-dot.W{left:-6px;top:50%;transform:translateY(-50%)}
+
+/* Blocked card should look completely different */
+.path-card-visual.blocked-visual{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex-direction:column!important;
+  gap:2px!important;
+  background:
+    radial-gradient(circle at 35% 30%,#e9e0d2 0 4px,transparent 5px),
+    linear-gradient(145deg,#c8b7a2,#8e7964)!important;
+  border-color:#54473a!important;
+}
+.blocked-visual .path-blocked-mark{
+  font-size:34px!important;
+  line-height:1!important;
+  filter:drop-shadow(0 2px 0 #fff8);
+}
+.blocked-visual .blocked-label{
+  font-size:9px;
+  font-weight:1000;
+  color:#47382d;
+  background:#fff4ddcc;
+  border:1px solid #7c6753;
+  border-radius:999px;
+  padding:2px 5px;
+}
+
+/* In hand, make the path picture the hero of the card */
+.gcard.card-pro.card-tone-path .card-pro-art,
+.gcard.card-pro.card-tone-block .card-pro-art{
+  min-height:92px!important;
+}
+.gcard.card-pro.card-tone-path .card-art-path,
+.gcard.card-pro.card-tone-block .card-art-path{
+  width:88px!important;
+  height:88px!important;
+}
+
+/* Stronger labels for path cards */
+.gcard.card-pro.card-tone-path .card-pro-name,
+.gcard.card-pro.card-tone-block .card-pro-name{
+  font-size:15px!important;
+  color:#3f2719!important;
+  letter-spacing:.01em;
+}
+.gcard.card-pro.card-tone-path .card-pro-desc,
+.gcard.card-pro.card-tone-block .card-pro-desc{
+  font-size:10.5px!important;
+  font-weight:900!important;
+  color:#68452e!important;
+}
+
+/* Selected path card: unmistakable */
+.gcard.card-pro.card-tone-path.selected,
+.gcard.card-pro.card-tone-block.selected{
+  outline:5px solid #18a7ff!important;
+  box-shadow:
+    0 0 0 8px #dff4ff,
+    0 10px 0 #287fb5,
+    0 16px 26px #1f6c9e44!important;
+}
+
+/* Mobile: make path art even larger while keeping two cards per row */
+@media(max-width:760px){
+  .gcard.card-pro.card-tone-path,
+  .gcard.card-pro.card-tone-block{
+    min-height:212px!important;
+    height:212px!important;
+  }
+  .gcard.card-pro.card-tone-path .card-pro-art,
+  .gcard.card-pro.card-tone-block .card-pro-art{
+    min-height:104px!important;
+  }
+  .gcard.card-pro.card-tone-path .card-art-path,
+  .gcard.card-pro.card-tone-block .card-art-path{
+    width:96px!important;
+    height:96px!important;
+  }
+  .path-card-visual .path-center{
+    width:32px!important;
+    height:32px!important;
+  }
+  .path-card-visual .exit-dot{
+    width:14px!important;
+    height:14px!important;
+  }
+  .gcard.card-pro.card-tone-path .card-pro-name,
+  .gcard.card-pro.card-tone-block .card-pro-name{
+    font-size:16px!important;
+  }
+}
+
+@media(max-width:430px){
+  .gcard.card-pro.card-tone-path,
+  .gcard.card-pro.card-tone-block{
+    min-height:205px!important;
+    height:205px!important;
+  }
+  .gcard.card-pro.card-tone-path .card-art-path,
+  .gcard.card-pro.card-tone-block .card-art-path{
+    width:90px!important;
+    height:90px!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1172,7 +1490,7 @@ const DECK_RECIPE = [
 ];
 const HAND_SIZE = 6;
 const MAX_ROUNDS = 3;
-const APP_VERSION = 'V19 MAP+CARDS';
+const APP_VERSION = 'V19 PATH CLEAR';
 
 /* ============================== STATE ============================== */
 let myId = sessionStorage.getItem('deepDigPlayerId') || crypto.randomUUID();
@@ -1933,9 +2251,15 @@ function connectionLabel(conn){
 function renderPathTile(card, rot=0, cls='path-tile-mini'){
   const base = PATH_SHAPES[card?.type] || {N:false,E:false,S:false,W:false};
   const conn = rotateConn(base, rot);
-  if(card?.type==='blocked') return `<div class="${cls}"><div class="path-blocked-mark">🪨</div></div>`;
-  const stubs = DIRS.filter(d=>conn[d]).map(d=>`<span class="stub ${d}"></span>`).join('');
-  return `<div class="${cls}">${stubs}<span class="path-center"></span></div>`;
+  if(card?.type==='blocked'){
+    return `<div class="${cls} path-card-visual blocked-visual">
+      <div class="path-blocked-mark">🪨</div>
+      <span class="blocked-label">ทางตัน</span>
+    </div>`;
+  }
+  const stubs = DIRS.filter(d=>conn[d]).map(d=>`<span class="stub ${d}"><i></i></span>`).join('');
+  const exits = DIRS.filter(d=>conn[d]).map(d=>`<span class="exit-dot ${d}"></span>`).join('');
+  return `<div class="${cls} path-card-visual">${stubs}<span class="path-center"></span>${exits}</div>`;
 }
 function cardMiniSummary(card){
   if(card.kind==='path') return PATH_SHAPES[card.type]?.icon || '🛤️';

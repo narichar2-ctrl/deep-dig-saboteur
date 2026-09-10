@@ -714,7 +714,7 @@ const DECK_RECIPE = [
 ];
 const HAND_SIZE = 6;
 const MAX_ROUNDS = 3;
-const APP_VERSION = 'V16';
+const APP_VERSION = 'V17';
 
 /* ============================== STATE ============================== */
 let myId = sessionStorage.getItem('deepDigPlayerId') || crypto.randomUUID();
@@ -761,7 +761,7 @@ function showToast(msg, ms=2600){
 }
 
 /* ============================== FIREBASE REALTIME DATABASE ============================== */
-// V16: use the official Firebase JS SDK instead of REST polling.
+// V17: Firebase realtime SDK + restore Firebase-dropped empty collections before render.
 // This gives true realtime room sync and Firebase transactions for room updates.
 const firebaseConfig = {
   apiKey: "AIzaSyBsZ6ttXuFzANPtGGNxsZvi6kP-NeuVBUQ",
@@ -797,13 +797,22 @@ function normalizeRoomData(data){
   if(!Array.isArray(data.log)) data.log = data.log ? Object.values(data.log) : [];
   if(data.game){
     const g=data.game;
+    // Firebase removes empty objects/arrays when saving. Restore every game collection
+    // before rendering so expressions such as g.brokenTools[playerId] are always safe.
+    if(!g.roles || typeof g.roles!=='object') g.roles = {};
+    if(!g.hands || typeof g.hands!=='object') g.hands = {};
+    if(!g.brokenTools || typeof g.brokenTools!=='object') g.brokenTools = {};
+    if(!g.board || typeof g.board!=='object') g.board = {};
+    if(!g.goals || typeof g.goals!=='object') g.goals = {};
+    if(!Array.isArray(g.deck)) g.deck = g.deck ? Object.values(g.deck) : [];
+    if(!Array.isArray(g.discard)) g.discard = g.discard ? Object.values(g.discard) : [];
     if(!Array.isArray(g.turnOrder)) g.turnOrder = g.turnOrder ? Object.values(g.turnOrder) : [];
-    if(g.hands && typeof g.hands==='object'){
-      Object.keys(g.hands).forEach(k=>{ if(!Array.isArray(g.hands[k])) g.hands[k]=g.hands[k]?Object.values(g.hands[k]):[]; });
-    }
-    if(g.brokenTools && typeof g.brokenTools==='object'){
-      Object.keys(g.brokenTools).forEach(k=>{ if(!Array.isArray(g.brokenTools[k])) g.brokenTools[k]=g.brokenTools[k]?Object.values(g.brokenTools[k]):[]; });
-    }
+    Object.keys(g.hands).forEach(k=>{ if(!Array.isArray(g.hands[k])) g.hands[k]=g.hands[k]?Object.values(g.hands[k]):[]; });
+    Object.keys(g.brokenTools).forEach(k=>{ if(!Array.isArray(g.brokenTools[k])) g.brokenTools[k]=g.brokenTools[k]?Object.values(g.brokenTools[k]):[]; });
+    data.players.forEach(p=>{
+      if(!Array.isArray(g.hands[p.id])) g.hands[p.id]=g.hands[p.id]?Object.values(g.hands[p.id]):[];
+      if(!Array.isArray(g.brokenTools[p.id])) g.brokenTools[p.id]=g.brokenTools[p.id]?Object.values(g.brokenTools[p.id]):[];
+    });
   }
   return data;
 }

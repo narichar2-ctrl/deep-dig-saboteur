@@ -2028,6 +2028,7 @@ body::after{width:260px;height:260px;right:-90px;bottom:8%;background:radial-gra
 <div id="app"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 <script>
 /* ============================== CONSTANTS ============================== */
@@ -2138,16 +2139,38 @@ const firebaseConfig = {
 };
 let firebaseReady=false;
 let db=null;
+let auth=null;
+let firebaseUid='';
 let roomListenerRef=null;
 let roomListenerCb=null;
 let lastFirebaseError='';
 try{
   if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  auth=firebase.auth();
   db=firebase.database();
   firebaseReady=true;
 }catch(e){
   console.error('Firebase init failed',e);
   lastFirebaseError=e?.message||String(e);
+}
+
+
+async function ensureAnonymousLogin(){
+  if(!firebaseReady || !auth) throw new Error('Firebase Auth ยังไม่พร้อม');
+  if(auth.currentUser){
+    firebaseUid=auth.currentUser.uid;
+    return auth.currentUser;
+  }
+  const credential=await auth.signInAnonymously();
+  firebaseUid=credential.user.uid;
+  return credential.user;
+}
+
+if(auth){
+  auth.onAuthStateChanged(user=>{
+    firebaseUid=user?.uid||'';
+    if(user) console.log('Firebase Anonymous UID:', firebaseUid);
+  });
 }
 
 function roomPath(code){ return ROOM_PREFIX + String(code||'').toUpperCase(); }
@@ -2183,6 +2206,7 @@ function normalizeRoomData(data){
 async function saveRoom(newRoom){
   if(!firebaseReady){ showToast('Firebase ยังไม่พร้อม: '+lastFirebaseError); return false; }
   try{
+    await ensureAnonymousLogin();
     newRoom.rev=Number(newRoom.rev||0)+1;
     newRoom.updatedAt=Date.now();
     await roomRef(newRoom.code).set(newRoom);
@@ -2201,6 +2225,7 @@ async function saveRoom(newRoom){
 async function loadRoom(code){
   if(!firebaseReady) return null;
   try{
+    await ensureAnonymousLogin();
     const snap=await roomRef(code).once('value');
     return normalizeRoomData(snap.val());
   }catch(e){
@@ -2214,6 +2239,7 @@ async function atomicRoomUpdate(code, updater){
   if(!firebaseReady) return {ok:false,reason:'firebase'};
   let userError=null;
   try{
+    await ensureAnonymousLogin();
     const result=await roomRef(code).transaction(current=>{
       if(current==null) return; // abort missing room
       const next=normalizeRoomData(structuredClone(current));
@@ -2695,15 +2721,19 @@ function renderHome(){
 function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 
 async function createRoom(){
+  try{ await ensureAnonymousLogin(); }
+  catch(e){ showToast('เข้าสู่ระบบ Firebase ไม่สำเร็จ: '+(e?.message||e)); return; }
   newPlayerIdentity();
   const nameInput=document.getElementById('nameInput'); myName=(nameInput?.value||'').trim()||'Player';
   const code=genRoomCode();
-  const newRoom={code,players:[{id:myId,name:myName,gold:0,isHost:true}],phase:'lobby',round:1,log:[`${myName} สร้างห้อง ${code}`],game:null,rev:0,updatedAt:Date.now()};
+  const newRoom={code,players:[{id:myId,name:myName,gold:0,isHost:true,authUid:firebaseUid}],phase:'lobby',round:1,log:[`${myName} สร้างห้อง ${code}`],game:null,rev:0,updatedAt:Date.now()};
   roomCode=code; const ok=await saveRoom(newRoom);
   if(ok){sessionStorage.setItem('deepDigRoomCode',code);sessionStorage.setItem('deepDigPlayerName',myName);ui.screen='lobby';startPolling();render();}
 }
 async function joinRoom(){
   if(ui.loading) return;
+  try{ await ensureAnonymousLogin(); }
+  catch(e){ showToast('เข้าสู่ระบบ Firebase ไม่สำเร็จ: '+(e?.message||e)); return; }
   const nameInput=document.getElementById('nameInput'),codeInput=document.getElementById('codeInput');
   myName=(nameInput?.value||'').trim()||'Player';
   const code=(codeInput?.value||'').trim().toUpperCase().replace(/\s+/g,'');
@@ -2721,7 +2751,7 @@ async function joinRoom(){
 
     // Create the identity only after the room has been verified. This makes retries stable.
     newPlayerIdentity();
-    fresh.players.push({id:myId,name:myName,gold:0,isHost:false});
+    fresh.players.push({id:myId,name:myName,gold:0,isHost:false,authUid:firebaseUid});
     pushLog(fresh,`${myName} เข้าร่วมห้อง`);
 
     let ok=await saveRoom(fresh);
@@ -2732,7 +2762,7 @@ async function joinRoom(){
         const r=normalizeRoomData(retry);
         if(!r.players.some(p=>p.id===myId)){
           if(r.players.length>=10){ if(errEl) errEl.textContent='ห้องเต็มแล้ว'; return; }
-          r.players.push({id:myId,name:myName,gold:0,isHost:false});
+          r.players.push({id:myId,name:myName,gold:0,isHost:false,authUid:firebaseUid});
           pushLog(r,`${myName} เข้าร่วมห้อง`);
         }
         ok=await saveRoom(r);
@@ -3355,7 +3385,16 @@ function attachHandlers(){
 
 // Auto reconnect on refresh within the same tab/session
 (async()=>{
-  if(!firebaseReady){ ui.error='Firebase SDK โหลดไม่สำเร็จ: '+lastFirebaseError; }
+  if(!firebaseReady){
+    ui.error='Firebase SDK โหลดไม่สำเร็จ: '+lastFirebaseError;
+  }else{
+    try{
+      await ensureAnonymousLogin();
+    }catch(e){
+      console.error('Anonymous login failed',e);
+      ui.error='Firebase Anonymous Login ไม่สำเร็จ: '+(e?.message||String(e));
+    }
+  }
   const savedCode=sessionStorage.getItem('deepDigRoomCode');
   const savedName=sessionStorage.getItem('deepDigPlayerName');
   if(savedCode){

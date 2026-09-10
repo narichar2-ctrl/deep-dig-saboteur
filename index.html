@@ -1606,6 +1606,158 @@ body::after{width:260px;height:260px;right:-90px;bottom:8%;background:radial-gra
 .mine-map-shell .board[data-cols="13"] .goal-marker .goal-label,.mine-map-shell .board[data-cols="13"] .start-marker .marker-label{display:none!important;}
 .mine-map-shell .board[data-cols="13"] .goal-marker .goal-icon,.mine-map-shell .board[data-cols="13"] .start-marker .marker-icon{font-size:clamp(.7rem,3vw,1.1rem)!important;}
 }
+
+/* ==================== V21 MOBILE SIX-CARD FIX ==================== */
+.v11-role-round-badge{
+  display:inline-block;
+  margin:8px auto 2px;
+  padding:5px 10px;
+  border-radius:999px;
+  background:#fff2ba;
+  border:2px solid #d89a38;
+  color:#72470f;
+  font-size:11px;
+  font-weight:1000;
+}
+
+@media(max-width:760px){
+  /* Always show the starting 6-card hand as two compact rows: 3 + 3 */
+  .v11-hand-panel .hand.card-hand-grid,
+  .card-hand-grid{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    grid-auto-flow:row!important;
+    gap:6px!important;
+    padding:8px!important;
+    overflow:visible!important;
+    max-height:none!important;
+  }
+
+  .v11-hand-panel .gcard.card-pro,
+  .gcard.card-pro{
+    width:100%!important;
+    min-width:0!important;
+    height:158px!important;
+    min-height:158px!important;
+    padding:6px!important;
+    border-width:2px!important;
+    border-radius:14px!important;
+  }
+
+  .gcard.card-pro .card-pro-top{min-height:18px!important}
+  .gcard.card-pro .card-pro-badge{
+    font-size:8px!important;
+    padding:2px 5px!important;
+  }
+  .gcard.card-pro .card-pro-dot{font-size:10px!important}
+
+  .gcard.card-pro .card-pro-art{
+    min-height:60px!important;
+    height:60px!important;
+    margin:1px 0 2px!important;
+  }
+
+  .gcard.card-pro.card-tone-path .card-pro-art,
+  .gcard.card-pro.card-tone-block .card-pro-art{
+    min-height:60px!important;
+    height:60px!important;
+  }
+
+  .gcard.card-pro.card-tone-path .card-art-path,
+  .gcard.card-pro.card-tone-block .card-art-path,
+  .gcard.card-pro .card-art-path{
+    width:58px!important;
+    height:58px!important;
+    border-width:3px!important;
+  }
+
+  .gcard.card-pro:not(.card-tone-path):not(.card-tone-block) .card-action-art,
+  .gcard.card-pro .card-action-art{
+    width:58px!important;
+    height:58px!important;
+  }
+
+  .cute-card-symbol .cute-main{font-size:30px!important}
+  .cute-card-symbol .cute-overlay{
+    width:22px!important;
+    height:22px!important;
+    font-size:12px!important;
+    right:-6px!important;
+    bottom:5px!important;
+  }
+  .cute-card-symbol .cute-burst{font-size:18px!important}
+  .cute-card-symbol .cute-x{
+    width:19px!important;
+    height:19px!important;
+    font-size:10px!important;
+  }
+  .cute-card-symbol .cute-mini-label{
+    font-size:7px!important;
+    bottom:-11px!important;
+    padding:1px 5px!important;
+  }
+
+  .gcard.card-pro .card-pro-name,
+  .gcard.card-pro.card-tone-path .card-pro-name,
+  .gcard.card-pro.card-tone-block .card-pro-name{
+    font-size:10px!important;
+    line-height:1.15!important;
+    min-height:22px!important;
+  }
+
+  .gcard.card-pro .card-pro-desc,
+  .gcard.card-pro.card-tone-path .card-pro-desc,
+  .gcard.card-pro.card-tone-block .card-pro-desc{
+    font-size:7.4px!important;
+    line-height:1.15!important;
+    min-height:18px!important;
+    max-height:20px!important;
+    overflow:hidden!important;
+    display:-webkit-box!important;
+    -webkit-line-clamp:2!important;
+    -webkit-box-orient:vertical!important;
+  }
+
+  .gcard.card-pro .card-pro-hint,
+  .gcard.card-pro .card-pro-warning{
+    font-size:7.5px!important;
+    line-height:1.1!important;
+    padding:3px!important;
+    min-height:22px!important;
+  }
+
+  .path-card-visual .path-center{
+    width:20px!important;
+    height:20px!important;
+  }
+  .path-card-visual .exit-dot{
+    width:9px!important;
+    height:9px!important;
+  }
+}
+
+@media(max-width:390px){
+  .v11-hand-panel .gcard.card-pro,
+  .gcard.card-pro{
+    height:150px!important;
+    min-height:150px!important;
+    padding:5px!important;
+  }
+  .gcard.card-pro .card-pro-art,
+  .gcard.card-pro.card-tone-path .card-pro-art,
+  .gcard.card-pro.card-tone-block .card-pro-art{
+    min-height:55px!important;
+    height:55px!important;
+  }
+  .gcard.card-pro.card-tone-path .card-art-path,
+  .gcard.card-pro.card-tone-block .card-art-path,
+  .gcard.card-pro .card-art-path,
+  .gcard.card-pro .card-action-art{
+    width:53px!important;
+    height:53px!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1661,7 +1813,7 @@ const DECK_RECIPE = [
 ];
 const HAND_SIZE = 6;
 const MAX_ROUNDS = 3;
-const APP_VERSION = 'V20 CUTE CARDS';
+const APP_VERSION = 'V21 MOBILE + ROUND ROLE FIX';
 
 /* ============================== STATE ============================== */
 let myId = sessionStorage.getItem('deepDigPlayerId') || crypto.randomUUID();
@@ -1837,9 +1989,20 @@ function applyRemoteRoom(fresh){
   if(snap===lastRoomSnapshot) return;
   const keep=shouldKeepSelection(fresh);
   const oldPhase=room?.phase;
+  const oldRound=Number(room?.round||0);
   room=fresh; lastRoomSnapshot=snap; lastRemoteUpdateAt=Date.now();
   if(!keep){ui.selectedCardUid=null;ui.rotation=0;ui.targetMode=null;}
   if(oldPhase==='lobby' && fresh.phase==='playing') ui.screen='game';
+
+  const newRound=Number(fresh?.round||0);
+  if(oldRound>0 && newRound>oldRound && fresh.phase==='playing'){
+    const myNewRole=fresh.game?.roles?.[myId];
+    ui.toast = myNewRole==='saboteur'
+      ? `🎭 ยก ${newRound}: บทใหม่ของคุณคือ ซาโบเทอร์!`
+      : `⛏️ ยก ${newRound}: บทใหม่ของคุณคือ นักขุดทอง!`;
+    clearTimeout(window._toastT);
+    window._toastT=setTimeout(()=>{ui.toast=null;render();},4200);
+  }
   render();
 }
 function shouldKeepSelection(fresh){
@@ -1883,9 +2046,32 @@ function startNewRound(r){
   const players = r.players;
   const n = players.length;
   const nSab = saboteurCount(n);
-  const shuffledIds = shuffle(players.map(p=>p.id));
+
+  // Re-deal roles every round. When possible, avoid repeating the exact same
+  // saboteur set from the previous round so the new round visibly changes.
+  const previousRoles = r.game?.roles || {};
+  const previousSaboteurs = players.filter(p=>previousRoles[p.id]==='saboteur').map(p=>p.id);
+
+  let saboteurIds = [];
+  const ids = players.map(p=>p.id);
+
+  if(previousSaboteurs.length){
+    const previousDiggers = shuffle(ids.filter(id=>previousRoles[id]!=='saboteur'));
+    // Prefer choosing new saboteurs from last round's diggers.
+    saboteurIds = previousDiggers.slice(0, nSab);
+
+    // Fallback only if player counts/roles are unusual.
+    if(saboteurIds.length < nSab){
+      const remaining = shuffle(ids.filter(id=>!saboteurIds.includes(id)));
+      saboteurIds.push(...remaining.slice(0, nSab - saboteurIds.length));
+    }
+  } else {
+    saboteurIds = shuffle(ids).slice(0, nSab);
+  }
+
+  const sabSet = new Set(saboteurIds);
   const roles = {};
-  shuffledIds.forEach((id,i)=>{ roles[id] = i < nSab ? 'saboteur' : 'digger'; });
+  ids.forEach(id=>{ roles[id] = sabSet.has(id) ? 'saboteur' : 'digger'; });
 
   const deck = buildDeck();
   const hands = {};
@@ -2648,7 +2834,8 @@ function renderPlayersPanel(r){
 
 function renderRolePanelV11(r){
   const isSab=r.game?.roles?.[myId]==='saboteur';
-  return `<section class="v11-panel v11-role"><div class="v11-panel-title">🎭 บทบาทของคุณ</div>
+  return `<section class="v11-panel v11-role"><div class="v11-panel-title">🎭 บทบาทของคุณ <span>ยก ${r.round}</span></div>
+    <div class="v11-role-round-badge">🎲 แจกบทใหม่แล้วสำหรับยก ${r.round}</div>
     <div class="v11-role-art">${roleArt(isSab)}</div>
     <div class="v11-role-name ${isSab?'sab':''}">${isSab?'คุณคือซาโบเทอร์!':'คุณคือนักขุดทอง!'}</div>
     <div class="v11-role-text">${isSab?'แอบขัดขวางทางขุดโดยอย่าให้ใครจับได้ 😈':'ขุดทางให้ถึงโพรงทองให้เจอ 💎'}</div>
@@ -2842,7 +3029,16 @@ function attachHandlers(){
   if(el('btnRotateL'))el('btnRotateL').onclick=()=>{ui.rotation=(ui.rotation+3)%4;render();};
   if(el('btnRotateR'))el('btnRotateR').onclick=()=>{ui.rotation=(ui.rotation+1)%4;render();};
   if(el('btnDiscardSelected'))el('btnDiscardSelected').onclick=()=>{const c=getSelectedCard();if(c)submitAction(r=>doDiscard(r,c.uid),null);};
-  if(el('btnNextRound'))el('btnNextRound').onclick=async()=>{const result=await atomicRoomUpdate(roomCode,fresh=>{fresh.round+=1;startNewRound(fresh);return true;});if(result.ok){room=result.room;render();}};
+  if(el('btnNextRound'))el('btnNextRound').onclick=async()=>{
+    const result=await atomicRoomUpdate(roomCode,fresh=>{fresh.round+=1;startNewRound(fresh);return true;});
+    if(result.ok){
+      room=result.room;
+      const myNewRole=room.game?.roles?.[myId];
+      showToast(myNewRole==='saboteur'
+        ? `🎭 ยก ${room.round}: บทใหม่ของคุณคือ ซาโบเทอร์!`
+        : `⛏️ ยก ${room.round}: บทใหม่ของคุณคือ นักขุดทอง!`, 4200);
+    }
+  };
   if(el('btnFinishGame'))el('btnFinishGame').onclick=async()=>{const result=await atomicRoomUpdate(roomCode,fresh=>{fresh.phase='gameOver';return true;});if(result.ok){room=result.room;render();}};
   document.querySelectorAll('[data-break-target]').forEach(b=>b.onclick=()=>{const c=getSelectedCard();if(c)submitAction(r=>doBreak(r,c.uid,c.tool,b.dataset.breakTarget),null);});
   document.querySelectorAll('[data-repair-target]').forEach(b=>b.onclick=()=>{const c=getSelectedCard();if(c)submitAction(r=>doRepair(r,c.uid,c.tool,b.dataset.repairTarget),null);});

@@ -624,6 +624,22 @@ body::after{width:260px;height:260px;right:-90px;bottom:8%;background:radial-gra
 
 @media(max-width:760px){.design-hero{border-radius:18px}.design-hero img{height:120px}.design-hero-badge{font-size:.7rem;left:10px;bottom:8px;padding:5px 8px}}
 
+
+/* ============================== V11 DESIGN + PLAYABILITY ============================== */
+.v11-version{position:fixed;right:8px;bottom:8px;z-index:9999;background:#5d3825;color:#fff;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:900;opacity:.72}
+.v11-hero{display:grid;grid-template-columns:1.05fr 1fr .85fr;align-items:center;gap:16px;min-height:145px;padding:16px 20px;margin-bottom:12px;border:5px solid #6d4329;border-radius:26px;background:linear-gradient(180deg,#dff2ff 0 53%,#ead5b8 53% 100%);box-shadow:0 8px 0 #b47442,0 14px 24px #5f3a2430;overflow:hidden;position:relative}
+.v11-hero:before{content:"";position:absolute;inset:auto 0 0;height:55px;background:radial-gradient(circle at 10% 70%,#66a25c 0 18px,transparent 19px),radial-gradient(circle at 22% 80%,#7bb96b 0 25px,transparent 26px),radial-gradient(circle at 70% 75%,#61985a 0 24px,transparent 25px),linear-gradient(#bd8c5d,#8b5d3e)}
+.v11-logo,.v11-hero-miners,.v11-sign{position:relative;z-index:2}.v11-logo strong{display:block;font-size:clamp(30px,4vw,58px);line-height:.88;color:#f8a629;text-shadow:0 4px 0 #6a3d24,2px 0 #6a3d24,-2px 0 #6a3d24;font-family:Fredoka,'Noto Sans Thai',sans-serif}.v11-logo span{display:block;font-weight:1000;font-size:20px;letter-spacing:1px;color:#49301f}.v11-logo em{display:inline-block;margin-top:9px;padding:6px 12px;border-radius:10px;background:#8b5737;color:#fff6d5;font-style:normal;font-weight:900;box-shadow:0 3px 0 #5c351f}
+.v11-hero-miners{display:flex;justify-content:center;align-items:end;height:105px;gap:2px}.v11-hero-miners .cute-avatar{width:72px;height:72px;flex-basis:72px;border-width:4px;transform:translateY(8px)}.v11-hero-miners .cute-avatar:nth-child(2){transform:translateY(-7px) scale(1.1)}.v11-spark{font-size:30px;animation:twinkle 1.3s infinite}
+.v11-sign{justify-self:end;background:#d9a76c;border:4px solid #6d4329;border-radius:12px;padding:13px 16px;text-align:center;font-weight:900;font-size:18px;box-shadow:0 5px 0 #8d5a38;transform:rotate(1deg)}.v11-sign small{font-size:12px;color:#542d21}
+.v11-topline{display:flex;justify-content:space-between;gap:12px;align-items:center;background:#fff7e2;border:4px solid #70462e;border-radius:18px;padding:10px 15px;box-shadow:0 5px 0 #d19a5e;margin-bottom:10px}.v11-topline b{font-size:20px;color:#6b3f25}.v11-topline span{background:#ffe39b;border:2px solid #a56a27;border-radius:999px;padding:7px 12px;font-weight:900}
+.v11-layout{display:grid;grid-template-columns:250px minmax(520px,1fr) 355px;gap:14px;align-items:start}.v11-left,.v11-right{display:flex;flex-direction:column;gap:12px}.v11-panel{background:#fffaf2;border:4px solid #6e472f;border-radius:20px;box-shadow:0 6px 0 #b77a45;overflow:hidden}.v11-panel-title{display:flex;justify-content:space-between;align-items:center;padding:10px 13px;background:linear-gradient(90deg,#ffe8b6,#f6ddf5);border-bottom:2px solid #d5a56f;font-weight:1000;color:#543622}.v11-player{margin:10px;border:2px solid #d6aa78;border-radius:14px;padding:8px;background:#fff}.v11-player:nth-child(3n+2){background:#eefbe7}.v11-player:nth-child(3n){background:#fff0f7}.v11-player.current{outline:3px solid #64cf72;background:#e8ffe8}.v11-player-main{display:flex;gap:8px;align-items:center}.v11-player-main .cute-avatar{width:42px;height:42px;flex-basis:42px}.v11-player-sub{font-size:11px;color:#7a654f;margin-top:2px}.v11-player-score{position:absolute}.v11-player{position:relative}.v11-player-score{right:8px;top:10px;text-align:right;color:#bd7b00}.v11-player-score small{display:block;color:#765e4a}.v11-broken{font-size:11px;color:#c94d40;margin-top:6px}.v11-room{padding-bottom:10px}.v11-room>div:not(.v11-panel-title){padding:3px 13px;font-size:13px}.v11-cute-sign{background:#d9a76c;border:4px solid #6e472f;border-radius:16px;padding:15px;text-align:center;font-weight:1000;color:#4b2c1c;box-shadow:0 5px 0 #a3683d}
+.v11-center .board-wrap{margin:0}.v11-center .legend{margin-top:8px;justify-content:center}.v11-log{margin-top:12px}.v11-log .log{max-height:180px}.v11-hand-panel{position:sticky;top:8px;padding-bottom:10px}.v11-hand-panel .hand-head{display:none}.v11-hand-panel .hand{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px;margin:0}.v11-hand-panel .gcard{width:100%;height:122px;margin:0;transform:none}.v11-hand-panel .gcard:hover:not(.disabled){transform:translateY(-4px) scale(1.02)}.v11-hand-panel .gcard.selected{transform:translateY(-6px) scale(1.04);outline:4px solid #2497ff;box-shadow:0 7px 0 #1884d6,0 0 0 7px #bce5ff}.v11-hand-panel .card-select-hint{font-size:10px}.v11-controls{margin:0 10px 10px;padding:10px;background:#fff3d8;border:2px solid #ecc58f;border-radius:14px}.v11-turn-help{text-align:center;font-size:15px;line-height:1.5;color:#65492e}.v11-turn-help.wait{color:#8a7c6b}.v11-action-title{font-weight:1000;color:#613b25;margin-bottom:7px}.place-status.ok{background:#e4ffe8;border-color:#5ac56a;color:#25733a}.place-status.warn{background:#fff1d5;border-color:#e5a642;color:#8a5615}.v11-role{text-align:center;padding-bottom:12px}.v11-role-art{height:190px;display:flex;align-items:center;justify-content:center}.v11-role-art .role-design-img{max-height:185px;max-width:88%}.v11-role-name{font-size:18px;font-weight:1000;color:#49a652}.v11-role-name.sab{color:#d95146}.v11-role-text{font-size:12px;padding:6px 18px 0;color:#735b47}.turn-banner{font-size:16px}
+.cell.placeable,.cell.path-valid-now{cursor:pointer!important;outline:4px solid #47d764!important;box-shadow:0 0 0 5px #e2ffe7,0 0 22px #4ff57f!important;animation:v11Pulse .8s ease-in-out infinite alternate!important;z-index:6!important}.cell.placeable::before,.cell.path-valid-now::before{content:"＋"!important;position:absolute!important;inset:6px!important;border-radius:10px!important;display:flex!important;align-items:center!important;justify-content:center!important;background:#ecfff0dd!important;color:#23a948!important;font-size:28px!important;font-weight:1000!important}.cell.placeable::after,.cell.path-valid-now::after{content:"วาง"!important;position:absolute!important;bottom:2px!important;left:50%!important;transform:translateX(-50%)!important;background:#2fbf59!important;color:white!important;border-radius:999px!important;padding:1px 5px!important;font-size:8px!important;font-weight:1000!important;z-index:9!important}@keyframes v11Pulse{from{filter:brightness(1)}to{filter:brightness(1.18)}}
+@media(max-width:1180px){.v11-layout{grid-template-columns:220px minmax(460px,1fr) 315px}.v11-hand-panel .gcard{height:112px}.v11-hero{grid-template-columns:1fr .8fr}.v11-sign{display:none}}
+@media(max-width:900px){.v11-layout{grid-template-columns:1fr}.v11-left{order:2}.v11-center{order:1}.v11-right{order:0}.v11-hand-panel{position:static}.v11-hand-panel .hand{grid-template-columns:repeat(6,minmax(82px,1fr));overflow-x:auto}.v11-hero{grid-template-columns:1fr}.v11-hero-miners{display:none}.v11-logo{text-align:center}.v11-left{display:grid;grid-template-columns:1fr 1fr}.v11-cute-sign{display:none}}
+@media(max-width:620px){.v11-left{display:flex}.v11-hand-panel .hand{grid-template-columns:repeat(3,1fr)}.v11-topline{font-size:12px}.v11-topline b{font-size:15px}.v11-hero{min-height:110px;padding:12px}.v11-logo strong{font-size:34px}}
+
 </style>
 </head>
 <body>
@@ -661,6 +677,7 @@ const DECK_RECIPE = [
 ];
 const HAND_SIZE = 6;
 const MAX_ROUNDS = 3;
+const APP_VERSION = 'V11';
 
 /* ============================== STATE ============================== */
 let myId = sessionStorage.getItem('deepDigPlayerId') || crypto.randomUUID();
@@ -762,7 +779,8 @@ async function pollLoop(){
 }
 function startPolling(){
   clearInterval(pollTimer);
-  pollTimer = setInterval(pollLoop, 2500);
+  pollLoop();
+  pollTimer = setInterval(pollLoop, 900);
 }
 
 /* ============================== GAME SETUP ============================== */
@@ -1260,7 +1278,7 @@ function renderCell(r, x, y){
     const canTryPath = r.phase==='playing' && currentPlayerId(r)===myId && selectedForBoard?.kind==='path';
     const placeable = canTryPath && canPlaceAt(r,x,y, rotateConn(PATH_SHAPES[selectedForBoard.type], ui.rotation));
     const rockfallTarget = ui.targetMode==='rockfall'; // any occupied checked below, this is empty cell so skip
-    if(placeable) cls += ' placeable target-select';
+    if(placeable) cls += ' placeable path-valid-now target-select';
     else cls += ' empty-void';
   }
   if(ui.targetMode==='rockfall' && r.game.board[key] && key!==START_POS){ cls += ' target-select'; }
@@ -1374,6 +1392,54 @@ function renderSidePanel(r){
   </div>`;
 }
 
+function bestRotationForCard(r, card){
+  if(!card || card.kind!=='path') return 0;
+  let bestRot = 0, bestCount = -1;
+  for(let rot=0; rot<4; rot++){
+    const conn = rotateConn(PATH_SHAPES[card.type], rot);
+    const count = countValidPathTargets(r, conn);
+    if(count > bestCount){ bestCount = count; bestRot = rot; }
+  }
+  return bestRot;
+}
+
+function renderPlayersPanel(r){
+  const g=r.game;
+  const myRole=g.roles[myId];
+  const rows=r.players.map((p,i)=>{
+    const isCur=r.phase==='playing' && currentPlayerId(r)===p.id;
+    const broken=(g.brokenTools[p.id]||[]);
+    const hand=g.hands[p.id]||[];
+    const roleTag=p.id===myId ? `<span class="role-tag ${myRole==='saboteur'?'sab':'dig'}">${myRole==='saboteur'?'ซาโบเทอร์':'นักขุด'}</span>` : '';
+    return `<div class="v11-player ${isCur?'current':''}">
+      <div class="v11-player-main">${avatarFor(p.id)}<div><b>${escapeHtml(p.name)}</b><div class="v11-player-sub">${isCur?'กำลังเล่น...':'รอเล่น'} ${roleTag}</div></div></div>
+      <div class="v11-player-score"><b>${p.gold}</b> 🪙<small>🃏 ${hand.length}</small></div>
+      ${broken.length?`<div class="v11-broken">เครื่องมือเสีย ${broken.map(t=>TOOL_ICON[t]).join(' ')}</div>`:''}
+    </div>`;
+  }).join('');
+  return `<section class="v11-panel v11-players"><div class="v11-panel-title">🐣 ผู้เล่นในห้อง <span>${r.players.length}/10</span></div>${rows}</section>`;
+}
+
+function renderRolePanelV11(r){
+  const isSab=r.game.roles[myId]==='saboteur';
+  return `<section class="v11-panel v11-role"><div class="v11-panel-title">🎭 บทบาทของคุณ</div>
+    <div class="v11-role-art">${roleArt(isSab)}</div>
+    <div class="v11-role-name ${isSab?'sab':''}">${isSab?'คุณคือซาโบเทอร์!':'คุณคือนักขุดทอง!'}</div>
+    <div class="v11-role-text">${isSab?'แอบขัดขวางทางขุดโดยอย่าให้ใครจับได้ 😈':'ขุดทางให้ถึงโพรงทองให้เจอ 💎'}</div>
+  </section>`;
+}
+
+function renderLogPanelV11(r){
+  const logs=(r.log||[]).slice().reverse().slice(0,10).map(l=>`<div>${escapeHtml(l)}</div>`).join('');
+  return `<section class="v11-panel v11-log"><div class="v11-panel-title">🔥 เรื่องเล่าในเหมือง</div><div class="log">${logs}</div></section>`;
+}
+
+function renderRoomInfoV11(r){
+  return `<section class="v11-panel v11-room"><div class="v11-panel-title">🧩 ข้อมูลห้อง</div>
+    <div><b>ห้อง:</b> ${r.code}</div><div><b>โหมด:</b> ร่วมมือกัน</div><div><b>ยก:</b> ${r.round}/${MAX_ROUNDS}</div><div><b>เหลือไพ่:</b> ${r.game.deck.length} ใบ</div>
+  </section>`;
+}
+
 function countValidPathTargets(r, conn){
   let n=0;
   for(let x=BOARD_MIN_X;x<=BOARD_MAX_X;x++){
@@ -1385,109 +1451,62 @@ function countValidPathTargets(r, conn){
 }
 
 function renderGame(){
-  const r = room;
-  const g = r.game;
-  const isMyTurn = r.phase==='playing' && currentPlayerId(r)===myId;
-  const selectedCard = getSelectedCard();
+  const r=room, g=r.game;
+  const isMyTurn=r.phase==='playing' && currentPlayerId(r)===myId;
+  const selectedCard=getSelectedCard();
 
-  let controls = '';
+  let controls='';
   if(r.phase==='playing'){
     if(isMyTurn && selectedCard){
       if(selectedCard.kind==='path'){
-        const previewConn = rotateConn(PATH_SHAPES[selectedCard.type], ui.rotation);
-        controls = `
-        <div class="rotation-preview">
-          ${renderPathTile(selectedCard, ui.rotation, 'path-preview-tile')}
-          <div class="rotation-preview-info">
-            <strong>กำลังวาง: ${cardLabel(selectedCard)}</strong>
-            <span class="rotation-deg">${['↑','→','↓','←'][ui.rotation]} หมุน ${ui.rotation*90}°</span>
-            <span class="connection-text">${connectionLabel(previewConn)}</span>
-          </div>
-        </div>
-        <div class="rotate-row">
-          <span class="hint">หมุนไพ่:</span>
-          <button class="small" id="btnRotateL">⟲ ซ้าย 90°</button>
-          <button class="small" id="btnRotateR">ขวา 90° ⟳</button>
-          <button class="ghost small" id="btnCancelSel">ยกเลิก</button>
-        </div>
-        <p class="hint">✅ เลือกไพ่แล้วคลิก <b>ช่องสีเขียว “วางตรงนี้”</b> ได้ทันที ถ้าไม่มีช่องสีเขียวให้หมุนไพ่ 90°</p>
-        <div class="place-status">🟢 ช่องที่วางได้ตอนนี้: <b>${countValidPathTargets(r, previewConn)}</b> ช่อง</div>`;
-        ui.targetMode = 'place';
+        const previewConn=rotateConn(PATH_SHAPES[selectedCard.type], ui.rotation);
+        const valid=countValidPathTargets(r, previewConn);
+        controls=`<div class="v11-action-title">เลือกตำแหน่งวางทาง</div>
+          <div class="rotation-preview">${renderPathTile(selectedCard,ui.rotation,'path-preview-tile')}<div class="rotation-preview-info"><strong>${cardLabel(selectedCard)}</strong><span class="rotation-deg">${['↑','→','↓','←'][ui.rotation]} ${ui.rotation*90}°</span><span class="connection-text">${connectionLabel(previewConn)}</span></div></div>
+          <div class="rotate-row"><button class="small" id="btnRotateL">⟲ หมุนซ้าย</button><button class="small" id="btnRotateR">หมุนขวา ⟳</button><button class="ghost small" id="btnDiscardSelected">ทิ้งใบนี้</button><button class="ghost small" id="btnCancelSel">ยกเลิก</button></div>
+          <div class="place-status ${valid?'ok':'warn'}">${valid?`🟢 มี ${valid} ช่องที่วางได้ — คลิกช่องสีเขียวบนกระดาน`:'🟠 มุมนี้วางไม่ได้ กดหมุนไพ่ 90°'}</div>`;
+        ui.targetMode='place';
       } else if(selectedCard.type==='rockfall'){
-        controls = `<p class="hint">คลิกไพ่ทางเดินบนกระดาน (ที่ไม่ใช่จุดเริ่ม/โพรงทอง) เพื่อทำลาย</p>
-        <button class="ghost small" id="btnCancelSel">ยกเลิก</button>`;
-        ui.targetMode = 'rockfall';
+        controls=`<div class="v11-action-title">💥 หินถล่ม</div><p class="hint">คลิกไพ่ทางเดินบนกระดานเพื่อทำลาย</p><div class="rotate-row"><button class="ghost small" id="btnDiscardSelected">ทิ้งใบนี้</button><button class="ghost small" id="btnCancelSel">ยกเลิก</button></div>`; ui.targetMode='rockfall';
       } else if(selectedCard.type==='map'){
-        controls = `<p class="hint">คลิกโพรงหนึ่งใน 3 ช่องทางขวาของกระดานเพื่อแอบดู</p>
-        <button class="ghost small" id="btnCancelSel">ยกเลิก</button>`;
-        ui.targetMode = 'map';
+        controls=`<div class="v11-action-title">🗺️ แผนที่</div><p class="hint">คลิกโพรงลับด้านขวา 1 ช่องเพื่อแอบดู</p><div class="rotate-row"><button class="ghost small" id="btnDiscardSelected">ทิ้งใบนี้</button><button class="ghost small" id="btnCancelSel">ยกเลิก</button></div>`; ui.targetMode='map';
       } else if(selectedCard.type==='break'){
-        const targets = r.players.filter(p=>p.id!==myId && !(g.brokenTools[p.id]||[]).includes(selectedCard.tool));
-        controls = `<p class="hint">เลือกเป้าหมายให้เครื่องมือ ${TOOL_ICON[selectedCard.tool]} เสีย:</p>
-        <div class="row">${targets.map(p=>`<button class="small" data-break-target="${p.id}">${escapeHtml(p.name)}</button>`).join('') || '<span class="hint">ไม่มีเป้าหมายที่ใช้ได้</span>'}</div>
-        <button class="ghost small" id="btnCancelSel">ยกเลิก</button>`;
-        ui.targetMode = 'break';
+        const targets=r.players.filter(p=>p.id!==myId && !(g.brokenTools[p.id]||[]).includes(selectedCard.tool));
+        controls=`<div class="v11-action-title">😈 ทำเครื่องมือเสีย</div><div class="row">${targets.map(p=>`<button class="small" data-break-target="${p.id}">${escapeHtml(p.name)} ${TOOL_ICON[selectedCard.tool]}</button>`).join('')||'<span class="hint">ไม่มีเป้าหมาย</span>'}</div><div class="rotate-row"><button class="ghost small" id="btnDiscardSelected">ทิ้งใบนี้</button><button class="ghost small" id="btnCancelSel">ยกเลิก</button></div>`; ui.targetMode='break';
       } else if(selectedCard.type==='repair'){
-        const targets = r.players.filter(p=>(g.brokenTools[p.id]||[]).includes(selectedCard.tool));
-        controls = `<p class="hint">เลือกคนที่จะซ่อมเครื่องมือ ${TOOL_ICON[selectedCard.tool]} ให้:</p>
-        <div class="row">${targets.map(p=>`<button class="small" data-repair-target="${p.id}">${escapeHtml(p.name)}</button>`).join('') || '<span class="hint">ไม่มีใครที่ต้องซ่อมตอนนี้</span>'}</div>
-        <button class="ghost small" id="btnCancelSel">ยกเลิก</button>`;
-        ui.targetMode = 'repair';
+        const targets=r.players.filter(p=>(g.brokenTools[p.id]||[]).includes(selectedCard.tool));
+        controls=`<div class="v11-action-title">🔧 ซ่อมเครื่องมือ</div><div class="row">${targets.map(p=>`<button class="small" data-repair-target="${p.id}">${escapeHtml(p.name)} ${TOOL_ICON[selectedCard.tool]}</button>`).join('')||'<span class="hint">ไม่มีใครต้องซ่อม</span>'}</div><div class="rotate-row"><button class="ghost small" id="btnDiscardSelected">ทิ้งใบนี้</button><button class="ghost small" id="btnCancelSel">ยกเลิก</button></div>`; ui.targetMode='repair';
       }
     } else if(isMyTurn){
-      controls = `<p class="hint">เลือกไพ่ 1 ใบด้านล่างเพื่อเล่น หรือกดทิ้งไพ่</p>
-      <div class="row" style="margin-top:8px;">
-        <select id="discardSelect" class="mono" style="background:#fff; color:var(--text); border:3px solid var(--outline-soft); padding:9px 10px; border-radius:12px; font-weight:700; flex:1; min-width:140px;">
-          ${(g.hands[myId]||[]).map(c=>`<option value="${c.uid}">${cardLabel(c)}</option>`).join('')}
-        </select>
-        <button class="ghost" id="btnDiscard">ทิ้งไพ่ &amp; จั่วใหม่</button>
-      </div>`;
-      ui.targetMode = null;
+      controls=`<div class="v11-turn-help">⛏️ <b>ตาของคุณ!</b><br>คลิกไพ่ด้านบนก่อน แล้วช่องที่วางได้จะเรืองแสงสีเขียว ✨</div>`;
+      ui.targetMode=null;
     } else {
-      controls = `<p class="hint">รอ ${escapeHtml(playerName(r,currentPlayerId(r)))} เล่น...</p>`;
-      ui.targetMode = null;
+      controls=`<div class="v11-turn-help wait">⏳ รอ ${escapeHtml(playerName(r,currentPlayerId(r)))} เล่น...</div>`; ui.targetMode=null;
     }
   }
 
-  let roundEndPanel = '';
+  let roundEndPanel='';
   if(r.phase==='roundEnd'){
-    const isHost = r.players.find(p=>p.id===myId)?.isHost;
-    const winnerTxt = g.winner==='diggers' ? '💎 ทีมนักขุดทองชนะยกนี้! เจอทองแล้ว!' : '🎭 ทีมซาโบเทอร์ชนะยกนี้! แผนป่วนสำเร็จ!';
-    roundEndPanel = `
-    <div class="turn-banner">${winnerTxt}</div>
-    <div class="panel-box">
-      <h3>🎉 เปิดบทบาททั้งหมดในยกนี้</h3>
-      ${r.players.map(p=>`<div class="player-row"><span>${avatarFor(p.id)} ${escapeHtml(p.name)} <span class="role-tag ${g.roles[p.id]==='saboteur'?'sab':'dig'}">${g.roles[p.id]==='saboteur'?'🎭 ซาโบเทอร์':'⛏️ นักขุด'}</span></span><span class="gold-count">${p.gold}💰</span></div>`).join('')}
-    </div>
-    ${isHost ? (r.round < MAX_ROUNDS
-        ? `<button class="primary" id="btnNextRound" style="width:100%;">ไปยกที่ ${r.round+1}</button>`
-        : `<button class="primary" id="btnFinishGame" style="width:100%;">สรุปผลรวมทั้งเกม</button>`)
-      : `<p class="hint">รอโฮสต์ไปต่อ...</p>`}
-    `;
+    const isHost=r.players.find(p=>p.id===myId)?.isHost;
+    const winnerTxt=g.winner==='diggers'?'💎 ทีมนักขุดทองชนะยกนี้!':'🎭 ทีมซาโบเทอร์ชนะยกนี้!';
+    roundEndPanel=`<div class="turn-banner">${winnerTxt}</div>${isHost?(r.round<MAX_ROUNDS?`<button class="primary" id="btnNextRound">ไปยก ${r.round+1}</button>`:`<button class="primary" id="btnFinishGame">สรุปผล</button>`):'<p class="hint">รอโฮสต์...</p>'}`;
   }
 
-  return `
-  <div class="design-hero"><img src="${V10_DESIGN_BANNER}" alt="Deep Dig Saboteur cute design"><div class="design-hero-badge">💎 ขุดด้วยกัน สนุกกว่า!</div></div>
-  <div class="topbar">
-    <div class="brand" style="margin:0;"><span class="cute-avatar" style="--hat:#f7b538;transform:scale(1.25);margin-right:10px"><i class="av-hat"></i><i class="av-hair"></i><i class="av-face"></i><i class="av-eye l"></i><i class="av-eye r"></i><i class="av-cheek l"></i><i class="av-cheek r"></i><i class="av-smile"></i></span><h1 style="font-size:1.6rem;">${r.code}</h1></div>
-    <div class="round-badge">🎲 ยกที่ ${r.round}/${MAX_ROUNDS} · 🃏 เหลือ ${g.deck.length} ใบ</div>
-  </div>
-  ${r.phase==='playing' ? `<div class="turn-banner ${isMyTurn?'mine':''}">${isMyTurn ? '🌟 ตาของคุณแล้ว! เลือกไพ่แล้วลุยเลย ⛏️' : `⏳ รอ ${avatarFor(currentPlayerId(r))} ${escapeHtml(playerName(r,currentPlayerId(r)))}`}</div>` : ''}
-  ${roundEndPanel}
-  <div class="game-grid">
-    <div>
-      ${renderBoard(r)}
-      <div class="legend">
-        <span><span class="swatch" style="background:var(--grass);"></span>🐹 ฐานนักขุด</span>
-        <span><span class="swatch" style="background:var(--purple);"></span>🎁 โพรงลับ (คลิกดูคำใบ้)</span>
-        <span><span class="swatch" style="background:var(--dirt);"></span>⛏️ ทางเดิน</span>
-        <span><span class="swatch" style="background:#c9b389;"></span>🪵 หินถล่ม/ปิดตาย</span>
-      </div>
-      ${r.phase==='playing' ? `<div class="card-panel" style="margin-top:14px;">${controls}${renderHand(r)}</div>` : ''}
-    </div>
-    <div>${renderSidePanel(r)}</div>
-  </div>
-  `;
+  const heroAvatars=r.players.slice(0,3).map(p=>avatarFor(p.id)).join('');
+  return `<div class="v11-version">${APP_VERSION}</div>
+    <header class="v11-hero">
+      <div class="v11-logo"><strong>DEEP DIG</strong><span>SABOTEUR</span><em>ขุด สนุก ลุ้น โพรงลับ! 💎</em></div>
+      <div class="v11-hero-miners">${heroAvatars}<div class="v11-spark">✨</div></div>
+      <div class="v11-sign">💎 ทีมร่วมมือกัน<br><b>หาทอง</b><br><small>แต่ระวัง... มีผู้ป่วน!</small></div>
+    </header>
+    <div class="v11-topline"><b>ห้อง ${r.code}</b><span>🎲 ยก ${r.round}/${MAX_ROUNDS} · 🃏 ${g.deck.length} ใบ</span></div>
+    ${r.phase==='playing'?`<div class="turn-banner ${isMyTurn?'mine':''}">${isMyTurn?'🌟 ตาของคุณแล้ว! เลือกไพ่ด้านขวาแล้ววางบนช่องสีเขียว':'⏳ รอ '+escapeHtml(playerName(r,currentPlayerId(r)))}</div>`:''}
+    ${roundEndPanel}
+    <main class="v11-layout">
+      <aside class="v11-left">${renderPlayersPanel(r)}${renderRoomInfoV11(r)}<div class="v11-cute-sign">ขุดไปด้วยกัน<br>แล้วเจอความลับ<br>ในโพรงลับ! 💎</div></aside>
+      <section class="v11-center">${renderBoard(r)}<div class="legend"><span>🏠 จุดเริ่ม</span><span>🎁 โพรงลับ</span><span>🟫 ทางเดิน</span><span>🪨 หิน</span><span>🦴 ซากฟอสซิล</span></div>${renderLogPanelV11(r)}</section>
+      <aside class="v11-right"><section class="v11-panel v11-hand-panel"><div class="v11-panel-title">⛏️ ไพ่ในมือของคุณ <span>${(g.hands[myId]||[]).length} ใบ</span></div>${renderHand(r)}<div class="v11-controls">${controls}</div></section>${renderRolePanelV11(r)}</aside>
+    </main>`;
 }
 
 /* ============================== SCREEN: GAME OVER ============================== */
@@ -1555,111 +1574,60 @@ function handlePathCellClick(elm){
 }
 
 function attachHandlers(){
-  const el = id => document.getElementById(id);
-  if(el('btnCreate')) el('btnCreate').onclick = createRoom;
-  if(el('btnJoin')) el('btnJoin').onclick = joinRoom;
-  if(el('btnCopyCode')) el('btnCopyCode').onclick = ()=>{ navigator.clipboard?.writeText(room.code); showToast('คัดลอกโค้ดแล้ว'); };
-  if(el('btnLeave')) el('btnLeave').onclick = leaveRoom;
-  if(el('btnStartGame')) el('btnStartGame').onclick = startGame;
-  if(el('btnNextRound')) el('btnNextRound').onclick = async ()=>{
-    ui.loading=true; render();
-    let fresh = await loadRoom(roomCode);
-    fresh.round += 1;
-    startNewRound(fresh);
-    await saveRoom(fresh); ui.loading=false; render();
-  };
-  if(el('btnFinishGame')) el('btnFinishGame').onclick = async ()=>{
-    let fresh = await loadRoom(roomCode);
-    fresh.phase='gameOver';
-    await saveRoom(fresh); render();
-  };
-  if(el('btnBackHome')) el('btnBackHome').onclick = leaveRoom;
-  if(el('btnClosePeek')) el('btnClosePeek').onclick = ()=>{ ui.peek=null; render(); };
-  if(el('btnDiscard')) el('btnDiscard').onclick = ()=>{
-    const val = el('discardSelect').value;
-    submitAction(r=>doDiscard(r, val), null);
-  };
-  if(el('btnCancelSel')) el('btnCancelSel').onclick = ()=>{ ui.selectedCardUid=null; ui.targetMode=null; ui.rotation=0; render(); };
-  if(el('btnRotateL')) el('btnRotateL').onclick = ()=>{ ui.rotation = (ui.rotation+3)%4; render(); };
-  if(el('btnRotateR')) el('btnRotateR').onclick = ()=>{ ui.rotation = (ui.rotation+1)%4; render(); };
+  const el=id=>document.getElementById(id);
+  if(el('btnCreate')) el('btnCreate').onclick=createRoom;
+  if(el('btnJoin')) el('btnJoin').onclick=joinRoom;
+  if(el('btnCopyCode')) el('btnCopyCode').onclick=()=>{navigator.clipboard?.writeText(room.code);showToast('คัดลอกโค้ดแล้ว');};
+  if(el('btnLeave')) el('btnLeave').onclick=leaveRoom;
+  if(el('btnStartGame')) el('btnStartGame').onclick=startGame;
+  if(el('btnNextRound')) el('btnNextRound').onclick=async()=>{ui.loading=true;render();let fresh=await loadRoom(roomCode);if(!fresh)return;fresh.round+=1;startNewRound(fresh);await saveRoom(fresh);ui.loading=false;render();};
+  if(el('btnFinishGame')) el('btnFinishGame').onclick=async()=>{let fresh=await loadRoom(roomCode);if(!fresh)return;fresh.phase='gameOver';await saveRoom(fresh);render();};
+  if(el('btnBackHome')) el('btnBackHome').onclick=leaveRoom;
+  if(el('btnClosePeek')) el('btnClosePeek').onclick=()=>{ui.peek=null;render();};
+  if(el('btnCancelSel')) el('btnCancelSel').onclick=()=>{ui.selectedCardUid=null;ui.targetMode=null;ui.rotation=0;render();};
+  if(el('btnRotateL')) el('btnRotateL').onclick=()=>{ui.rotation=(ui.rotation+3)%4;render();};
+  if(el('btnRotateR')) el('btnRotateR').onclick=()=>{ui.rotation=(ui.rotation+1)%4;render();};
+  if(el('btnDiscardSelected')) el('btnDiscardSelected').onclick=()=>{const c=getSelectedCard();if(c)submitAction(r=>doDiscard(r,c.uid),null);};
 
-
-  // V6 fallback: event delegation makes card selection reliable even after re-render.
-  const appRoot = document.getElementById('app');
-  if(appRoot){
-    appRoot.onclick = (ev)=>{
-      const cardEl = ev.target.closest?.('[data-card-select="1"]');
-      if(!cardEl || cardEl.disabled || cardEl.classList.contains('disabled')) return;
-      // Existing per-card onclick handles normal clicks. This fallback is only used if no handler is attached.
-      if(typeof cardEl.onclick === 'function') return;
-      const uidv = cardEl.getAttribute('data-uid');
-      const handNow = room?.game?.hands?.[myId] || [];
-      if(!uidv || !handNow.some(c=>c.uid===uidv)) return;
-      ui.selectedCardUid = (ui.selectedCardUid===uidv) ? null : uidv;
-      ui.rotation = 0; ui.targetMode = null; render();
-    };
-  }
-  document.querySelectorAll('[data-card-select="1"]').forEach(elm=>{
-    if(elm.disabled || elm.classList.contains('disabled')) return;
-    elm.onclick = (ev)=>{
-      ev.preventDefault();
-      ev.stopPropagation();
-      const uidv = elm.getAttribute('data-uid');
-      if(!uidv) return;
-      const handNow = room?.game?.hands?.[myId] || [];
-      if(!handNow.some(c=>c.uid===uidv)){
-        showToast('ไพ่ใบนี้ไม่อยู่ในมือแล้ว ลองเลือกใหม่');
-        return;
-      }
-      ui.selectedCardUid = (ui.selectedCardUid===uidv) ? null : uidv;
-      ui.rotation = 0;
-      ui.targetMode = null;
+  document.querySelectorAll('[data-card-select="1"]').forEach(cardEl=>{
+    cardEl.onclick=ev=>{
+      ev.preventDefault();ev.stopPropagation();
+      if(cardEl.disabled||cardEl.classList.contains('disabled')) return;
+      const uidv=cardEl.getAttribute('data-uid');
+      const handNow=room?.game?.hands?.[myId]||[];
+      const card=handNow.find(c=>c.uid===uidv);
+      if(!card){showToast('ไพ่ใบนี้ไม่อยู่ในมือแล้ว');return;}
+      if(currentPlayerId(room)!==myId){showToast('⏳ ยังไม่ถึงตาของคุณ');return;}
+      ui.selectedCardUid=(ui.selectedCardUid===uidv)?null:uidv;
+      ui.targetMode=null;
+      ui.rotation=card.kind==='path'?bestRotationForCard(room,card):0;
       render();
     };
   });
-  document.querySelectorAll('[data-break-target]').forEach(elm=>{
-    elm.onclick = ()=>{
-      const target = elm.getAttribute('data-break-target');
-      const card = getSelectedCard();
-      submitAction(r=>doBreak(r, card.uid, card.tool, target), null);
-    };
-  });
-  document.querySelectorAll('[data-repair-target]').forEach(elm=>{
-    elm.onclick = ()=>{
-      const target = elm.getAttribute('data-repair-target');
-      const card = getSelectedCard();
-      submitAction(r=>doRepair(r, card.uid, card.tool, target), null);
-    };
-  });
-  document.querySelectorAll('.cell').forEach(elm=>{
-    elm.style.cursor = 'pointer';
-    elm.addEventListener('click', (ev)=>{
-      ev.preventDefault();
-      const x = Number(elm.getAttribute('data-x'));
-      const y = Number(elm.getAttribute('data-y'));
-      const key = elm.getAttribute('data-key');
-      const selectedNow = getSelectedCard();
 
-      if(selectedNow?.kind==='path'){
-        handlePathCellClick(elm);
+  document.querySelectorAll('[data-break-target]').forEach(x=>x.onclick=()=>{const c=getSelectedCard();if(c)submitAction(r=>doBreak(r,c.uid,c.tool,x.getAttribute('data-break-target')),null);});
+  document.querySelectorAll('[data-repair-target]').forEach(x=>x.onclick=()=>{const c=getSelectedCard();if(c)submitAction(r=>doRepair(r,c.uid,c.tool,x.getAttribute('data-repair-target')),null);});
+
+  document.querySelectorAll('.cell').forEach(cell=>{
+    cell.onclick=()=>{
+      if(!room||room.phase!=='playing') return;
+      const x=Number(cell.dataset.x), y=Number(cell.dataset.y), key=cell.dataset.key;
+      const selected=getSelectedCard();
+      if(selected?.kind==='path' && currentPlayerId(room)===myId){
+        const conn=rotateConn(PATH_SHAPES[selected.type],ui.rotation);
+        if(canPlaceAt(room,x,y,conn)){
+          const uidv=selected.uid, rot=ui.rotation;
+          submitAction(r=>doPlacePath(r,uidv,x,y,rot),null);
+          return;
+        }
+        if(key!==START_POS && !room.game.board[key] && !room.game.goals[key]) showToast('❌ ช่องนี้ต่อไม่ได้ — เลือกช่องสีเขียวหรือหมุนไพ่');
         return;
       }
-      if(ui.targetMode==='rockfall' && elm.classList.contains('target-select')){
-        const card = getSelectedCard();
-        if(card) submitAction(r=>doRockfall(r, card.uid, x, y), null);
-        return;
-      }
-      if(ui.targetMode==='map' && elm.classList.contains('target-select')){
-        const card = getSelectedCard();
-        if(card) submitAction(r=>doMap(r, card.uid, key), null);
-        return;
-      }
-      if(key===START_POS){ showToast('🏡⛏️ จุดเริ่มต้น — เลือกไพ่ทางเดินแล้วต่อจากรอบ ๆ บ้าน'); return; }
-      if(GOAL_POS.includes(key)){
-        const goal = room?.game?.goals?.[key];
-        showToast(goal?.revealed ? (goal.isGold?'💎 เจอทองแล้ว!':'🪨 โพรงตัน') : '🎁 โพรงลับ — ต่อทางไปให้ถึงหรือใช้แผนที่');
-      }
-    });
+      if(ui.targetMode==='rockfall' && room.game.board[key] && key!==START_POS){const c=getSelectedCard();if(c)submitAction(r=>doRockfall(r,c.uid,x,y),null);return;}
+      if(ui.targetMode==='map' && GOAL_POS.includes(key)){const c=getSelectedCard();if(c)submitAction(r=>doMap(r,c.uid,key),null);return;}
+      if(key===START_POS){showToast('🏠 จุดเริ่มขุด — ต่อทางจากรอบ ๆ จุดนี้');return;}
+      if(GOAL_POS.includes(key)){const goal=room.game.goals[key];showToast(goal?.revealed?(goal.isGold?'💎 เจอทองแล้ว!':'🪨 ทางตัน'):'🎁 โพรงลับ — ใช้ไพ่แผนที่เพื่อดู');}
+    };
   });
 }
 

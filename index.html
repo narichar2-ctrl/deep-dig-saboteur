@@ -160,11 +160,31 @@
   .cell.blocked{ background:#c9b389; border-color: var(--outline-soft); }
   .cell.blocked::after{ content:"🪵"; font-size:1.3rem; }
   .cell.start{ background: var(--grass); border-color: var(--grass-dark); }
-  .cell.start::after{ content:"🏠"; font-size:1.6rem; }
+  .cell.start::after{ content:""; }
   .cell.start .stub{ background: var(--grass-dark); }
   .cell.goal{ background: linear-gradient(160deg, #b98be0, var(--purple)); border:3px solid #8a5cc4; font-size:1.7rem; }
   .cell.goal.gold{ background: linear-gradient(160deg, #fff1a8, var(--gold)); border-color: var(--gold-dark); }
   .cell.goal.rock{ background:#cbb98f; border-color: var(--outline-soft); }
+
+  /* Cute start / goal markers */
+  .start-marker,.goal-marker{
+    position:absolute; inset:2px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    pointer-events:none; z-index:4; line-height:1; text-align:center;
+  }
+  .start-marker .marker-icon{font-size:1.45rem;filter:drop-shadow(0 2px 0 #fff8);transform:translateY(-1px)}
+  .start-marker .marker-label{font-size:.46rem;font-weight:1000;color:#315f2c;background:#fff9;border:1.5px solid #4f9b45;border-radius:999px;padding:2px 5px;margin-top:2px;letter-spacing:.04em}
+  .start-marker::before{content:"✨";position:absolute;left:1px;top:0;font-size:.55rem;animation:twinkle 1.6s ease-in-out infinite}
+  .start-marker::after{content:"🌼";position:absolute;right:0;bottom:0;font-size:.55rem}
+
+  .goal-marker .goal-icon{font-size:1.5rem;filter:drop-shadow(0 2px 0 #fff8)}
+  .goal-marker .goal-label{font-size:.44rem;font-weight:1000;border-radius:999px;padding:2px 5px;margin-top:1px;background:#fff9;border:1.5px solid #8456bf;color:#62408d}
+  .goal-marker.secret .goal-icon{animation:goalBob 1.5s ease-in-out infinite}
+  .goal-marker.secret::before,.goal-marker.secret::after{content:"✨";position:absolute;font-size:.5rem;opacity:.9}
+  .goal-marker.secret::before{left:1px;top:1px}.goal-marker.secret::after{right:1px;bottom:1px;animation-delay:.7s}
+  .goal.gold .goal-marker .goal-label{border-color:#cf9810;color:#805b00;background:#fff8d8}
+  .goal.rock .goal-marker .goal-label{border-color:#8f7658;color:#684d35;background:#fff7ec}
+  @keyframes goalBob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-3px) rotate(2deg)}}
+  @keyframes twinkle{0%,100%{transform:scale(.8) rotate(0);opacity:.5}50%{transform:scale(1.25) rotate(20deg);opacity:1}}
 
   /* Hand */
   .hand{ display:flex; gap:12px; flex-wrap:wrap; margin-top:14px; }
@@ -452,6 +472,15 @@ body::after{width:220px;height:220px;right:-60px;bottom:8%;background:radial-gra
   .topbar{border-radius:18px}.board-wrap{padding:10px;border-radius:20px}.panel-box{border-radius:18px}.gcard{width:84px;height:118px}.hand{gap:10px;justify-content:center}.rotation-preview{align-items:center}.rotation-preview::after{display:none}
 }
 @media(prefers-reduced-motion:reduce){.turn-banner.mine,.cell.placeable,.gcard.selected{animation:none!important}}
+
+
+/* V4: reliable selectable hand cards */
+button.gcard{font-family:inherit;appearance:none;-webkit-appearance:none;line-height:normal;}
+button.gcard:not(:disabled){pointer-events:auto;touch-action:manipulation;}
+button.gcard:disabled{pointer-events:none;}
+.card-select-hint{margin-top:auto;background:#fff7cf;border:2px solid #d7a84e;border-radius:999px;padding:3px 7px;font-size:.58rem;font-weight:950;color:#744c22;white-space:nowrap;}
+.gcard.selected .card-select-hint{background:#dff8c9;border-color:#71b85d;color:#27591e;}
+.gcard:focus-visible{outline:4px solid #55a8ff;outline-offset:3px;}
 
 </style>
 </head>
@@ -1103,11 +1132,18 @@ function renderCell(r, x, y){
   let cls = 'cell', content = '', stubs = '';
   if(key===START_POS){
     cls += ' start';
+    content = `<div class="start-marker" title="จุดเริ่มต้น"><span class="marker-icon">⛏️</span><span class="marker-label">เริ่มขุด!</span></div>`;
   } else if(GOAL_POS.includes(key)){
     const goal = r.game.goals[key];
     cls += ' goal';
-    if(goal.revealed){ cls += goal.isGold ? ' gold' : ' rock'; content = goal.isGold ? '💎' : '🪨'; }
-    else { content = '❓'; }
+    if(goal.revealed){
+      cls += goal.isGold ? ' gold' : ' rock';
+      content = goal.isGold
+        ? `<div class="goal-marker"><span class="goal-icon">🎁</span><span class="goal-label">ทอง!</span></div>`
+        : `<div class="goal-marker"><span class="goal-icon">🪨</span><span class="goal-label">ตัน!</span></div>`;
+    } else {
+      content = `<div class="goal-marker secret"><span class="goal-icon">🎁</span><span class="goal-label">ลุ้นสมบัติ</span></div>`;
+    }
   } else if(r.game.board[key]){
     const c = r.game.board[key];
     if(c.type==='blocked'){ cls += ' blocked'; }
@@ -1184,11 +1220,12 @@ function renderHand(r){
     let extraCls = c.kind==='action' ? (c.type==='break'?'action sab':(c.type==='repair'?'action fix':'action')) : '';
     const visual = isPath ? renderPathTile(c, selected ? ui.rotation : 0) : `<div class="icon">${cardIcon(c)}</div>`;
     const reason = blockedByTool ? 'เครื่องมือคุณเสีย จึงเล่นไพ่ทางเดินไม่ได้' : (!isMyTurn ? 'ยังไม่ถึงตาของคุณ' : 'คลิกเพื่อเลือกไพ่');
-    return `<div class="gcard ${extraCls} ${selected?'selected':''} ${disabled?'disabled':''}" data-uid="${c.uid}" title="${reason}">
+    return `<button type="button" class="gcard ${extraCls} ${selected?'selected':''} ${disabled?'disabled':''}" data-uid="${c.uid}" data-card-select="1" title="${reason}" aria-pressed="${selected?'true':'false'}" ${disabled?'disabled':''}>
       ${visual}
       <div class="card-name">${cardLabel(c)}</div>
       <div class="card-kind">${isPath ? (selected ? `หมุน ${ui.rotation*90}°` : 'ไพ่ทางเดิน') : 'ไพ่คำสั่ง'}</div>
-    </div>`;
+      ${!disabled ? `<div class="card-select-hint">${selected?'✓ เลือกแล้ว':'แตะเพื่อเลือก'}</div>` : ''}
+    </button>`;
   }).join('');
   return `<div class="hand-head"><div class="hand-title">🃏 ไพ่ในมือของคุณ</div><div class="hand-count">${myHand.length} ใบ</div></div><div class="hand">${cards}</div>`;
 }
@@ -1323,8 +1360,8 @@ function renderGame(){
     <div>
       ${renderBoard(r)}
       <div class="legend">
-        <span><span class="swatch" style="background:var(--grass);"></span>🏠 จุดเริ่ม</span>
-        <span><span class="swatch" style="background:var(--purple);"></span>❓ โพรงลับ (ยังไม่เปิด)</span>
+        <span><span class="swatch" style="background:var(--grass);"></span>⛏️ จุดเริ่มน่ารัก</span>
+        <span><span class="swatch" style="background:var(--purple);"></span>🎁 หีบปริศนา (ยังไม่เปิด)</span>
         <span><span class="swatch" style="background:var(--dirt);"></span>⛏️ ทางเดิน</span>
         <span><span class="swatch" style="background:#c9b389;"></span>🪵 หินถล่ม/ปิดตาย</span>
       </div>
@@ -1405,12 +1442,21 @@ function attachHandlers(){
   if(el('btnRotateL')) el('btnRotateL').onclick = ()=>{ ui.rotation = (ui.rotation+3)%4; render(); };
   if(el('btnRotateR')) el('btnRotateR').onclick = ()=>{ ui.rotation = (ui.rotation+1)%4; render(); };
 
-  document.querySelectorAll('.gcard').forEach(elm=>{
-    if(elm.classList.contains('disabled')) return;
-    elm.onclick = ()=>{
+  document.querySelectorAll('[data-card-select="1"]').forEach(elm=>{
+    if(elm.disabled || elm.classList.contains('disabled')) return;
+    elm.onclick = (ev)=>{
+      ev.preventDefault();
+      ev.stopPropagation();
       const uidv = elm.getAttribute('data-uid');
+      if(!uidv) return;
+      const handNow = room?.game?.hands?.[myId] || [];
+      if(!handNow.some(c=>c.uid===uidv)){
+        showToast('ไพ่ใบนี้ไม่อยู่ในมือแล้ว ลองเลือกใหม่');
+        return;
+      }
       ui.selectedCardUid = (ui.selectedCardUid===uidv) ? null : uidv;
       ui.rotation = 0;
+      ui.targetMode = null;
       render();
     };
   });

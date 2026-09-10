@@ -680,6 +680,8 @@ body::after{width:260px;height:260px;right:-90px;bottom:8%;background:radial-gra
 <body>
 <div id="app"></div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 <script>
 /* ============================== CONSTANTS ============================== */
 const DIRS = ['N','E','S','W'];
@@ -712,7 +714,7 @@ const DECK_RECIPE = [
 ];
 const HAND_SIZE = 6;
 const MAX_ROUNDS = 3;
-const APP_VERSION = 'V15';
+const APP_VERSION = 'V16';
 
 /* ============================== STATE ============================== */
 let myId = sessionStorage.getItem('deepDigPlayerId') || crypto.randomUUID();
@@ -759,46 +761,38 @@ function showToast(msg, ms=2600){
 }
 
 /* ============================== FIREBASE REALTIME DATABASE ============================== */
-// ใช้ Firebase Realtime Database ผ่าน REST API เพื่อให้ GitHub Pages เล่นข้ามเครื่องได้
-// Project: deep-dig-saboteur / Region: asia-southeast1 (Singapore)
-const FIREBASE_DB_URL = 'https://deep-dig-saboteur-default-rtdb.asia-southeast1.firebasedatabase.app';
-
-function firebaseRoomUrl(code){
-  const key = ROOM_PREFIX + String(code || '').toUpperCase();
-  return `${FIREBASE_DB_URL}/${encodeURIComponent(key)}.json`;
+// V16: use the official Firebase JS SDK instead of REST polling.
+// This gives true realtime room sync and Firebase transactions for room updates.
+const firebaseConfig = {
+  apiKey: "AIzaSyBsZ6ttXuFzANPtGGNxsZvi6kP-NeuVBUQ",
+  authDomain: "deep-dig-saboteur.firebaseapp.com",
+  databaseURL: "https://deep-dig-saboteur-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "deep-dig-saboteur",
+  storageBucket: "deep-dig-saboteur.firebasestorage.app",
+  messagingSenderId: "208917077186",
+  appId: "1:208917077186:web:5d06bac26d4d72af2d6f5b",
+  measurementId: "G-2NXQVL4C52"
+};
+let firebaseReady=false;
+let db=null;
+let roomListenerRef=null;
+let roomListenerCb=null;
+let lastFirebaseError='';
+try{
+  if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  db=firebase.database();
+  firebaseReady=true;
+}catch(e){
+  console.error('Firebase init failed',e);
+  lastFirebaseError=e?.message||String(e);
 }
 
-async function fetchWithTimeout(url, options={}, timeoutMs=10000){
-  const controller = new AbortController();
-  const timer = setTimeout(()=>controller.abort(), timeoutMs);
-  try{
-    return await fetch(url, { ...options, signal: controller.signal, cache:'no-store' });
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
-function roomSnapshot(r){
-  try { return JSON.stringify(r); } catch(e) { return ''; }
-}
-
-async function saveRoom(newRoom){
-  try{
-    newRoom.rev = Number(newRoom.rev || 0) + 1;
-    newRoom.updatedAt = Date.now();
-    const res = await fetchWithTimeout(firebaseRoomUrl(newRoom.code), {
-      method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(newRoom)
-    });
-    if(!res.ok){ throw new Error(`Firebase ${res.status}`); }
-    room = newRoom; lastRoomSnapshot = roomSnapshot(newRoom); lastRemoteUpdateAt = Date.now();
-    return true;
-  }catch(e){ console.error(e); showToast('เชื่อมต่อห้องออนไลน์ไม่ได้'); return false; }
-}
+function roomPath(code){ return ROOM_PREFIX + String(code||'').toUpperCase(); }
+function roomRef(code){ return db.ref(roomPath(code)); }
+function roomSnapshot(r){ try{return JSON.stringify(r);}catch(e){return '';} }
 
 function normalizeRoomData(data){
   if(!data || typeof data!=='object') return null;
-  // Firebase may return numeric-key collections as objects after partial writes.
-  // Normalize the structures that the UI/game expects to be arrays.
   if(!Array.isArray(data.players)) data.players = data.players ? Object.values(data.players) : [];
   if(!Array.isArray(data.log)) data.log = data.log ? Object.values(data.log) : [];
   if(data.game){
@@ -814,39 +808,74 @@ function normalizeRoomData(data){
   return data;
 }
 
-async function loadRoom(code){
+async function saveRoom(newRoom){
+  if(!firebaseReady){ showToast('Firebase ยังไม่พร้อม: '+lastFirebaseError); return false; }
   try{
-    const res = await fetchWithTimeout(firebaseRoomUrl(code), {method:'GET',cache:'no-store'});
-    if(!res.ok){ console.error('Firebase GET',res.status); return null; }
-    return normalizeRoomData((await res.json()) || null);
-  }catch(e){ console.error('Firebase load error',e); return null; }
+    newRoom.rev=Number(newRoom.rev||0)+1;
+    newRoom.updatedAt=Date.now();
+    await roomRef(newRoom.code).set(newRoom);
+    room=normalizeRoomData(structuredClone(newRoom));
+    lastRoomSnapshot=roomSnapshot(room);
+    lastRemoteUpdateAt=Date.now();
+    return true;
+  }catch(e){
+    console.error('Firebase save failed',e);
+    lastFirebaseError=e?.message||String(e);
+    showToast('Firebase เขียนข้อมูลไม่ได้: '+lastFirebaseError);
+    return false;
+  }
+}
+
+async function loadRoom(code){
+  if(!firebaseReady) return null;
+  try{
+    const snap=await roomRef(code).once('value');
+    return normalizeRoomData(snap.val());
+  }catch(e){
+    console.error('Firebase load failed',e);
+    lastFirebaseError=e?.message||String(e);
+    return null;
+  }
 }
 
 async function atomicRoomUpdate(code, updater){
-  // V15: intentionally avoid ETag/custom headers here. Those headers can fail
-  // CORS preflight on a static GitHub Pages site and were the reason Join/Start
-  // became unreliable in V13. The game is turn-based, so a fresh GET followed
-  // by one PUT is predictable and works well for small private rooms.
+  if(!firebaseReady) return {ok:false,reason:'firebase'};
+  let userError=null;
   try{
-    const current = await loadRoom(code);
-    if(!current) return {ok:false,reason:'missing'};
-    const next = structuredClone(current);
-    const result = updater(next);
-    if(result===false) return {ok:false,reason:'cancelled',room:current};
-    next.rev = Number(current.rev||0)+1;
-    next.updatedAt = Date.now();
-    const ok = await saveRoom(next);
-    return ok ? {ok:true,room:next} : {ok:false,reason:'save'};
+    const result=await roomRef(code).transaction(current=>{
+      if(current==null) return; // abort missing room
+      const next=normalizeRoomData(structuredClone(current));
+      try{
+        const changed=updater(next);
+        if(changed===false){ userError='cancelled'; return; }
+      }catch(e){ userError=e?.message||'update'; return; }
+      next.rev=Number(next.rev||0)+1;
+      next.updatedAt=Date.now();
+      return next;
+    }, undefined, false);
+    if(userError) return {ok:false,reason:userError};
+    if(!result.committed) return {ok:false,reason:'missing'};
+    const next=normalizeRoomData(result.snapshot.val());
+    room=next;
+    lastRoomSnapshot=roomSnapshot(next);
+    lastRemoteUpdateAt=Date.now();
+    return {ok:true,room:next};
   }catch(e){
-    console.error('room update failed',e);
-    return {ok:false,reason:e?.message||'update'};
+    console.error('Firebase transaction failed',e);
+    lastFirebaseError=e?.message||String(e);
+    return {ok:false,reason:lastFirebaseError};
   }
 }
 
 function stopRoomSync(){
+  if(roomListenerRef && roomListenerCb){
+    try{ roomListenerRef.off('value',roomListenerCb); }catch(e){}
+  }
+  roomListenerRef=null; roomListenerCb=null;
   clearInterval(pollTimer); pollTimer=null; pollBusy=false;
 }
 function applyRemoteRoom(fresh){
+  fresh=normalizeRoomData(fresh);
   if(!fresh) return;
   const snap=roomSnapshot(fresh);
   if(snap===lastRoomSnapshot) return;
@@ -863,21 +892,26 @@ function shouldKeepSelection(fresh){
   return hand.some(c=>c.uid===ui.selectedCardUid) && currentPlayerId(fresh)===myId;
 }
 async function pollLoop(){
-  if(!roomCode||pollBusy)return;
-  pollBusy=true;
-  try{
-    const fresh=await loadRoom(roomCode);
-    if(fresh) applyRemoteRoom(fresh);
-  }finally{pollBusy=false;}
+  if(!roomCode) return;
+  const fresh=await loadRoom(roomCode);
+  if(fresh) applyRemoteRoom(fresh);
 }
 function startPolling(){
   stopRoomSync();
+  if(!firebaseReady || !roomCode) return;
   lastRoomSnapshot=roomSnapshot(room);
-  pollLoop();
-  pollTimer=setInterval(pollLoop,700);
+  roomListenerRef=roomRef(roomCode);
+  roomListenerCb=snap=>{
+    const fresh=snap.val();
+    if(fresh) applyRemoteRoom(fresh);
+  };
+  roomListenerRef.on('value',roomListenerCb,err=>{
+    console.error('Firebase realtime listener failed',err);
+    lastFirebaseError=err?.message||String(err);
+    showToast('Realtime sync มีปัญหา: '+lastFirebaseError);
+  });
 }
-window.addEventListener('focus',()=>{ if(roomCode) pollLoop(); });
-document.addEventListener('visibilitychange',()=>{ if(!document.hidden && roomCode) pollLoop(); });
+window.addEventListener('focus',()=>{ if(roomCode && firebaseReady) pollLoop(); });
 
 /* ============================== GAME SETUP ============================== */
 function buildDeck(){
@@ -1603,7 +1637,7 @@ function renderGame(){
   }
 
   const heroAvatars=r.players.slice(0,3).map(p=>avatarFor(p.id)).join('');
-  return `<div class="v11-version">${APP_VERSION} • STABLE</div>
+  return `<div class="v11-version">${APP_VERSION} • REALTIME</div>
     <header class="v11-hero">
       <div class="v11-logo"><strong>DEEP DIG</strong><span>SABOTEUR</span><em>ขุด สนุก ลุ้น โพรงลับ! 💎</em></div>
       <div class="v11-hero-miners">${heroAvatars}<div class="v11-spark">✨</div></div>
@@ -1724,6 +1758,7 @@ function attachHandlers(){
 
 // Auto reconnect on refresh within the same tab/session
 (async()=>{
+  if(!firebaseReady){ ui.error='Firebase SDK โหลดไม่สำเร็จ: '+lastFirebaseError; }
   const savedCode=sessionStorage.getItem('deepDigRoomCode');
   const savedName=sessionStorage.getItem('deepDigPlayerName');
   if(savedCode){
